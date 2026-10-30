@@ -161,5 +161,8 @@ export function isWeaklyVisible(triangles: Triangle[], dualTree: number[]) {
                     // If (APEX, R, L) = right turn (we pinched the funnel)
                         // CurrentPathToApex.push(APEX)
                         // APEX <- L
+        // If at any vertex P, the shortest path (V1 -> P) and the shortest path (V2 -> P) share an edge, return FALSE
+    
+    // Return TRUE
     
 }
