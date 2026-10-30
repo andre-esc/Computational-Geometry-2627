@@ -1,8 +1,10 @@
-import type { XY } from "fabric";
+import type { Edge } from "../types/geometry";
 import { intersect } from "./misc";
 
-function edges(points: XY[]): [XY, XY][] {
-    const e: [XY, XY][] = [];
+import type { XY } from "fabric";
+
+function edges(points: XY[]): Edge[] {
+    const e: Edge[] = [];
 
     for (let i = 0; i < points.length-1; i++) {
         e.push([points[i], points[i+1]]);
