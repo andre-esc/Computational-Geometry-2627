@@ -3,6 +3,7 @@ import "./style.css";
 // import { Canvas, FabricText, Polygon } from "fabric";
 import * as fabric from "fabric";
 import { GPolygon } from "./geometry/GPolygon";
+import { triangulate } from "./geometry/triangulation";
 // import { isPolygonSimple } from "./geometry/simple";
 
 /* ---- Initialization ---- */
@@ -26,12 +27,23 @@ canvas.on("mouse:dblclick", e => {
     P.createNewVertex(e.viewportPoint);
 })
 
+const text = new fabric.Textbox("coords", {
+    top: 20, left: 200, width: 300
+});
+canvas.add(text);
+
+canvas.on("mouse:move", e => {
+    // console.log("FJKLSD");
+    text.set("text", `coords: ${e.viewportPoint}`);
+    canvas.requestRenderAll();
+})
+
 
 //// TESTING ////
 
-// window.addEventListener("keydown", e => {
-//     // console.log("FJKLDS");
-//     if (e.key === " ") {
-//         isPolygonSimple(P.points);
-//     }
-// })
+window.addEventListener("keydown", e => {
+    // console.log("FJKLDS");
+    if (e.key === " ") {
+        triangulate(P.getPoints());
+    }
+})

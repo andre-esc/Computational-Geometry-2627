@@ -1,6 +1,8 @@
 
 // Indexes array circularly
 export function getCircular<T>(arr: T[], i: number) {
+    while (i < 0) { i += arr.length; }
+
     return arr[i % arr.length];
 }
 
@@ -13,10 +15,12 @@ export function getCircular<T>(arr: T[], i: number) {
  * 
  * @returns The sliced sub-array
  */
-export function sliceCircular<T>(arr: T[], from: number, count: number) {
+export function sliceCircular<T>(arr: T[], from: number, to: number) {
     const res = [];
 
-    for (let i = 0; i < count; i++) {
+    if (from > to) to += arr.length;
+
+    for (let i = 0; i < to - from + 1; i++) {
         res.push(arr[(from + i) % arr.length]);
     }
 

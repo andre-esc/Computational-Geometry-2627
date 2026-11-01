@@ -146,4 +146,7 @@ export class GPolygon {
 
         this.canvas.requestRenderAll();
     }
+
+    // Returns a copy of the GPolygon's points
+    public getPoints = (): XY[] => this.poly.points.map(({ x, y }) => ({ x: x, y: y }));
 };
