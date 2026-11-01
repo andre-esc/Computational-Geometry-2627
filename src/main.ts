@@ -2,7 +2,7 @@ import "./style.css";
 
 // import { Canvas, FabricText, Polygon } from "fabric";
 import * as fabric from "fabric";
-import { GPolygon } from "./geometry/GPolygon";
+import { GPolygon } from "./canvas/GPolygon";
 import { triangulate } from "./geometry/triangulation";
 // import { isPolygonSimple } from "./geometry/simple";
 

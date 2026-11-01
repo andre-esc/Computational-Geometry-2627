@@ -1,5 +1,5 @@
 import type { Edge } from "../types/geometry";
-import { intersect } from "./misc";
+import { intersectSegmentSegment } from "./misc";
 
 import type { XY } from "fabric";
 
@@ -24,7 +24,7 @@ export function isPolygonSimple(points: XY[]): boolean {
         for (let j = i+2; j < (i === 0 ? e.length-1 : e.length); j++) {
             // if (i === 0 && j === e.length-1) continue;
 
-            if (intersect(e[i], e[j])) return false;
+            if (intersectSegmentSegment(e[i], e[j])) return false;
         }
     }
 

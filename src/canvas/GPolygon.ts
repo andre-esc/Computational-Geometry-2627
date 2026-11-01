@@ -1,6 +1,6 @@
 import { Canvas, Point, Polygon, Polyline, type XY } from "fabric";
-import { PointControl } from "../canvas/PointControl";
-import { isPolygonSimple } from "./simple";
+import { PointControl } from "./PointControl";
+import { isPolygonSimple } from "../geometry/simple";
 
 const BOTTOM_EDGE_MIN_HALF_WIDTH = 20;
 
