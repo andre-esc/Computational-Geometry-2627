@@ -1,18 +1,13 @@
 import type { XY } from "fabric";
 import type { BoundaryCoord } from "./boundaryCoord";
+import { compareBoundaryCoord, normalizeBoundaryCoord } from "./boundaryCoord";
 import {
-  distance,
   computeRaySegmentIntersection,
   isPointInPolygon,
+  isSegmentInsidePolygon,
+  type RaySegmentIntersection,
 } from "./misc";
 
-// ---------------------- AI USAGE --------------------------
-//    The following section is [AI:R] on the 0rwx scale.
-// ----------------------------------------------------------
-
-/*
- * Continuous interval on the polygon boundary ∂P visible from a guard.
- */
 export interface VisibleInterval {
   start: BoundaryCoord;
   end: BoundaryCoord;
@@ -25,129 +20,169 @@ export interface VisibilityCut {
 }
 
 /**
- * Shoots a ray starding from the origin in the given direction and finds
- * the first ∂P point hit by the ray.
- *
- * @param rayOrigin - Starting point of the ray
- * @param rayThroughPoint - Point giving the direction of the ray
- * @param polygon - Polygon vertices in order
- * @returns The first boundary hit by the edge as a BoundaryCoord or null if there is no hit.
+ * Shoots a ray starting from rayOrigin through rayThroughPoint and finds
+ * the first polygon boundary hit strictly in front of the ray.
  */
 export function shootRayToFirstBoundaryHit(
   rayOrigin: XY,
   rayThroughPoint: XY,
   polygon: XY[],
+  ignoreEdgeIndices: number[] = [],
 ): BoundaryCoord | null {
-  var bestIntersection = null;
-  var bestDistance = Number.MAX_VALUE;
-  var bestIndex = -1;
-  for (var i = 0; i < polygon.length - 1; i++) {
-    let intersection = computeRaySegmentIntersection(
+  const n = polygon.length;
+  let bestIntersection: RaySegmentIntersection | null = null;
+  let bestDistance = Number.MAX_VALUE;
+  let bestEdgeIndex = -1;
+
+  for (let i = 0; i < n; i++) {
+    if (ignoreEdgeIndices.includes(i)) continue;
+
+    const next = (i + 1) % n;
+    const intersection = computeRaySegmentIntersection(
       [rayOrigin, rayThroughPoint],
-      [polygon[i], polygon[i + 1]],
+      [polygon[i], polygon[next]],
     );
-    if (intersection === null) {
-      continue;
-    }
-    // If the current intersection point we found is closer to the origin of the ray,
-    // then it gets hit before the currently stored intersection point. Store it.
-    if (intersection.dist < bestDistance) {
+
+    if (intersection === null) continue;
+    // Filter out self-hits at the origin
+    if (intersection.dist > 1e-4 && intersection.dist < bestDistance) {
       bestIntersection = intersection;
       bestDistance = intersection.dist;
-      bestIndex = i;
+      bestEdgeIndex = i;
     }
   }
-  return bestIntersection
-    ? {
-        edgeIndex: bestIndex,
-        t: bestIntersection.t,
-        point: bestIntersection.point,
-      }
-    : null;
+
+  if (!bestIntersection) return null;
+
+  return normalizeBoundaryCoord(
+    {
+      edgeIndex: bestEdgeIndex,
+      t: bestIntersection.t,
+      point: bestIntersection.point,
+    },
+    n,
+  );
 }
 
 /**
- * Returns true if the vertex is an occluding vertex, that is it
- * casts a shadow, occluding some of the boundary behind it.
- * @param guard - The guard to check from
- * @param vertexIndex - Index of the vertex to check in the polygon
- * @param polygon - The polygon
- * @returns
+ * Returns true if vertex j is an occluding corner relative to guard g,
+ * meaning a sightline ray extending past it enters the interior of P.
  */
 export function isOccludingVertex(
   guard: XY,
   vertexIndex: number,
   polygon: XY[],
 ): boolean {
-  // Shoot ray from guard to vertex.
-  let vertex = polygon[vertexIndex];
-  let dx = vertex.x - guard.x;
-  let dy = vertex.y - guard.y;
-  let len = Math.hypot(dx, dy);
+  const vertex = polygon[vertexIndex];
+  const dx = vertex.x - guard.x;
+  const dy = vertex.y - guard.y;
+  const len = Math.hypot(dx, dy);
 
   if (len < 1e-9) return false;
 
-  // Once you hit, extend the ray slightly beyond the vertex,
-  // if that point is inside the polygon, that vertex casts
-  // a shadow and return true.
-  let probe: XY = {
-    x: vertex.x + (dx / len) * 1e-4,
-    y: vertex.y + (dy / len) * 1e-4,
+  const probe: XY = {
+    x: vertex.x + (dx / len) * 1e-3,
+    y: vertex.y + (dy / len) * 1e-3,
   };
 
   return isPointInPolygon(probe, polygon);
 }
 
+/**
+ * Computes all maximal continuous boundary intervals along ∂P visible from guardIndex.
+ */
 export function computeVisibleIntervalsForVertex(
   guardIndex: number,
   polygon: XY[],
 ): VisibleInterval[] {
-  let guard = polygon[guardIndex];
-  let occludingVertices: XY[] = [];
+  const n = polygon.length;
+  const guard = polygon[guardIndex];
 
-  //// Find all occluding vertices that are visible from the guard
-  polygon.forEach(function (vertex, index) {
-    let firstIntercept = shootRayToFirstBoundaryHit(
-      guard,
-      vertex,
-      polygon,
-    )?.point;
-    if (firstIntercept) {
-      let dx = firstIntercept.x - vertex.x;
-      let dy = firstIntercept.y - vertex.y;
-      if (Math.hypot(dx, dy) < 1e-9) {
-        // The first hit of the ray from the guard to the vertex is that vertex
-        // If it's an occluding vertex, we save it.
-        if (isOccludingVertex(guard, index, polygon)) {
-          occludingVertices.push(vertex);
-        }
+  // 1. Initialize candidate boundary cut events with all polygon vertices
+  const cuts: BoundaryCoord[] = [];
+  for (let i = 0; i < n; i++) {
+    cuts.push({ edgeIndex: i, t: 0, point: polygon[i] });
+  }
+
+  // 2. Identify visible occluding vertices and cast shadow extension rays
+  for (let j = 0; j < n; j++) {
+    if (j === guardIndex) continue;
+
+    // Is vertex j directly visible from the guard?
+    if (!isSegmentInsidePolygon(guard, polygon[j], polygon)) {
+      continue;
+    }
+
+    // If it's an occluding corner, shoot ray past it into P
+    if (isOccludingVertex(guard, j, polygon)) {
+      const prevEdge = (j - 1 + n) % n;
+      const nextEdge = j;
+
+      const hit = shootRayToFirstBoundaryHit(
+        polygon[j],
+        {
+          x: polygon[j].x + (polygon[j].x - guard.x),
+          y: polygon[j].y + (polygon[j].y - guard.y),
+        },
+        polygon,
+        [prevEdge, nextEdge],
+      );
+
+      if (hit) {
+        cuts.push(hit);
       }
     }
-  });
+  }
 
-  let criticalPoints: XY[] = [];
-  //// Get all critical points on the boundary
-  occludingVertices.forEach(function (occludingVertex, index) {
-    // We shoot a ray from the occludingVertex in the same direction as
-    // the sightline from the guard to said vertex to find the boundary
-    // intersection from which the boundary is visible from the guard.
-    // - HAHAHAHAHA this is unreadable :')
+  // 3. Sort all cut coordinates monotonically along ∂P traversal
+  cuts.sort((a, b) => compareBoundaryCoord(a, b, n));
 
-    let dx = occludingVertex.x - guard.x;
-    let dy = occludingVertex.y - guard.y;
-    let len = Math.hypot(dx, dy);
-    let extension: XY = {
-      x: occludingVertex.x + dx / len,
-      y: occludingVertex.y + dx / len,
+  // 4. Deduplicate adjacent cuts
+  const uniqueCuts: BoundaryCoord[] = [];
+  for (const c of cuts) {
+    if (
+      uniqueCuts.length === 0 ||
+      compareBoundaryCoord(uniqueCuts[uniqueCuts.length - 1], c, n) !== 0
+    ) {
+      uniqueCuts.push(c);
+    }
+  }
+
+  if (uniqueCuts.length < 2) return [];
+
+  // 5. Evaluate elementary pieces between adjacent cuts and merge visible intervals
+  const intervals: VisibleInterval[] = [];
+  let currentStart: BoundaryCoord | null = null;
+  const numCuts = uniqueCuts.length;
+
+  for (let i = 0; i < numCuts; i++) {
+    const c1 = uniqueCuts[i];
+    const c2 = uniqueCuts[(i + 1) % numCuts];
+
+    // Midpoint between consecutive cut points
+    const midPoint: XY = {
+      x: (c1.point.x + c2.point.x) / 2,
+      y: (c1.point.y + c2.point.y) / 2,
     };
 
-    let criticalPoint = shootRayToFirstBoundaryHit(
-      occludingVertex,
-      extension,
-      polygon,
-    )?.point;
-    if (criticalPoint) {
-      criticalPoints.push(criticalPoint);
+    const isVisible = isSegmentInsidePolygon(guard, midPoint, polygon);
+
+    if (isVisible) {
+      if (currentStart === null) {
+        currentStart = c1;
+      }
+    } else {
+      if (currentStart !== null) {
+        intervals.push({ start: currentStart, end: c1 });
+        currentStart = null;
+      }
     }
-  });
+  }
+
+  // Close any trailing interval
+  if (currentStart !== null) {
+    intervals.push({ start: currentStart, end: uniqueCuts[0] });
+  }
+
+  return intervals;
 }
