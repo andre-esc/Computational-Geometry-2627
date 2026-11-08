@@ -13,6 +13,10 @@ export interface VisibleInterval {
   end: BoundaryCoord;
 }
 
+// ---------------------- AI USAGE --------------------------
+//    The following section is [AI:R] on the 0rwx scale.
+// ----------------------------------------------------------
+
 /**
  * Shoots a ray starting from rayOrigin through rayThroughPoint and finds
  * the first polygon boundary hit strictly in front of the ray.
@@ -81,6 +85,10 @@ export function isOccludingVertex(
 
   return isPointInPolygon(probe, polygon);
 }
+
+// ---------------------- AI USAGE --------------------------
+//    The following section is [AI:W] on the 0rwx scale.
+// ----------------------------------------------------------
 
 /**
  * Computes all maximal continuous boundary intervals along ∂P visible from guardIndex.
@@ -180,6 +188,10 @@ export function computeVisibleIntervalsForVertex(
 
   return intervals;
 }
+
+// ---------------------- AI USAGE --------------------------
+//    The following section is [AI:0] on the 0rwx scale.
+// ----------------------------------------------------------
 
 /**
  * Computes the endpoints of the visible intervals from a given guard
