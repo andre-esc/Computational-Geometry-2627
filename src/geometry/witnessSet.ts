@@ -47,3 +47,43 @@ export function collectUniqueBoundaryCuts(polygon: XY[]): BoundaryCoord[] {
 
   return uniqueBoundaryCuts;
 }
+
+/**
+ * Build the witness set of the given polygon.
+ * @param polygon
+ * @param includeBaseEdge
+ * @returns
+ */
+export function buildWitnessSet(
+  polygon: XY[],
+  includeBaseEdge: boolean = false,
+): WitnessPoint[] {
+  let boundaryCuts = collectUniqueBoundaryCuts(polygon);
+
+  let witnessPoints = [];
+
+  for (var i = 0; i < boundaryCuts.length - 1; i++) {
+    // Get each edge wrapping around.
+    const previousCut = boundaryCuts[i];
+    const currentCut = boundaryCuts[(i + 1) % boundaryCuts.length];
+
+    if (
+      !includeBaseEdge &&
+      previousCut.edgeIndex == 0 &&
+      currentCut.edgeIndex == 0
+    )
+      continue;
+
+    const midpointX = (previousCut.point.x + currentCut.point.x) / 2;
+    const midpointY = (previousCut.point.y + currentCut.point.y) / 2;
+
+    witnessPoints.push({
+      index: witnessPoints.length,
+      point: { x: midpointX, y: midpointY },
+      segmentStart: previousCut,
+      segmentEnd: currentCut,
+    });
+  }
+
+  return witnessPoints;
+}
