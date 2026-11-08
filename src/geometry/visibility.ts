@@ -13,12 +13,6 @@ export interface VisibleInterval {
   end: BoundaryCoord;
 }
 
-export interface VisibilityCut {
-  coord: BoundaryCoord;
-  sourceVertexIndex?: number;
-  isShadowHit: boolean;
-}
-
 /**
  * Shoots a ray starting from rayOrigin through rayThroughPoint and finds
  * the first polygon boundary hit strictly in front of the ray.
@@ -185,4 +179,23 @@ export function computeVisibleIntervalsForVertex(
   }
 
   return intervals;
+}
+
+/**
+ * Computes the endpoints of the visible intervals from a given guard
+ * on the boundary of the polygon ∂P.
+ */
+export function computeVertexBoundaryCutEndpoints(
+  guardIndex: number,
+  polygon: XY[],
+): BoundaryCoord[] {
+  const intervals = computeVisibleIntervalsForVertex(guardIndex, polygon);
+  const cutEndpoints: BoundaryCoord[] = [];
+
+  for (const interval of intervals) {
+    cutEndpoints.push(interval.start);
+    cutEndpoints.push(interval.end);
+  }
+
+  return cutEndpoints;
 }
