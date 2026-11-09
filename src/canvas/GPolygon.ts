@@ -4,7 +4,7 @@ import { isPolygonSimple } from "../geometry/simple";
 
 const BOTTOM_EDGE_MIN_HALF_WIDTH = 20;
 
-function setPolyPoint(poly: Polyline, pointIndex: number, position: Point): void {
+export function setPolyPoint(poly: Polyline, pointIndex: number, position: Point): void {
     poly.points[pointIndex] = position;
 
     poly.setBoundingBox(true);
