@@ -60,6 +60,7 @@ const btnClearOverlays = document.getElementById("btn-clear-overlays") as HTMLBu
 const toggleCuts = document.getElementById("toggle-cuts") as HTMLInputElement;
 const toggleWitnesses = document.getElementById("toggle-witnesses") as HTMLInputElement;
 const toggleSightlines = document.getElementById("toggle-sightlines") as HTMLInputElement;
+const toggleLive = document.getElementById("toggle-live") as HTMLInputElement;
 
 canvas.on("mouse:move", (e) => {
   const p = e.viewportPoint;
@@ -179,6 +180,26 @@ function renderVisuals(): void {
 
 /* ---- Core Pipeline Trigger ---- */
 
+let liveUpdateFrame: number | null = null;
+
+function scheduleLiveGuarding(): void {
+  if (!toggleLive.checked) return;
+
+  if (liveUpdateFrame !== null) {
+    cancelAnimationFrame(liveUpdateFrame);
+  }
+
+  liveUpdateFrame = requestAnimationFrame(() => {
+    liveUpdateFrame = null;
+    runBoundaryGuarding();
+  });
+}
+
+// Hook into GPolygon vertex movement / addition / deletion
+P.onUpdate = () => {
+  scheduleLiveGuarding();
+};
+
 function runBoundaryGuarding(): void {
   const points = P.getPoints();
   if (points.length < 3) {
@@ -227,6 +248,14 @@ btnClearOverlays.addEventListener("click", () => {
 toggleCuts.addEventListener("change", renderVisuals);
 toggleWitnesses.addEventListener("change", renderVisuals);
 toggleSightlines.addEventListener("change", renderVisuals);
+toggleLive.addEventListener("change", () => {
+  if (toggleLive.checked) {
+    runBoundaryGuarding();
+  }
+});
+
+// Run initial solve so guards appear immediately on load
+runBoundaryGuarding();
 
 window.addEventListener("keydown", (e) => {
   if (e.key === "g" || e.key === "G") {

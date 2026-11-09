@@ -18,6 +18,8 @@ export class GPolygon {
 
     private readonly controls: PointControl[] = [];
 
+    public onUpdate?: (points: XY[]) => void;
+
     private readonly updatePolygon = (updateBottomEdge?: boolean) => {
         if (!isPolygonSimple(this.poly.points)) {
             this.poly.set("fill", "rgba(255,0,0,0.1)");
@@ -64,7 +66,7 @@ export class GPolygon {
         this.updatePolygon(index < 2);
         this.canvas.requestRenderAll();
 
-        console.log(isPolygonSimple(this.poly.points));
+        this.onUpdate?.(this.getPoints());
     }
 
     private readonly factoryRemoveVertex = (index: number) => (control: PointControl) => {
@@ -88,6 +90,8 @@ export class GPolygon {
         this.canvas.remove(control.getControl());
 
         this.canvas.requestRenderAll();
+
+        this.onUpdate?.(this.getPoints());
     }
 
     private readonly createControlForVertex = (index: number) => {
@@ -145,6 +149,8 @@ export class GPolygon {
         this.controls.push(newControl);
 
         this.canvas.requestRenderAll();
+
+        this.onUpdate?.(this.getPoints());
     }
 
     // Returns a copy of the GPolygon's points
