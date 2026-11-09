@@ -18,7 +18,7 @@ export interface WitnessPoint {
  */
 export function collectUniqueBoundaryCuts(polygon: XY[]): BoundaryCoord[] {
   let boundaryCuts: BoundaryCoord[] = [];
-  for (var index = 0; 0 < polygon.length; index++) {
+  for (var index = 0; index < polygon.length; index++) {
     let cutsFromGuard = computeVertexBoundaryCutEndpoints(index, polygon);
     // Push all the cuts & the vertex
     boundaryCuts.push(...cutsFromGuard);
