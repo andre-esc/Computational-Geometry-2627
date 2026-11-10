@@ -1,6 +1,6 @@
 import type { PointIndex } from "../types/geometry";
 import { getCircular } from "../util/circularList";
-import { isConvex, orient } from "./misc";
+import { isConvex, isSegmentInsidePolygon, orient } from "./misc";
 import { triangulate } from "./triangulation";
 import { getShortestPathTree } from "./shortestPathTree";
 
@@ -34,7 +34,12 @@ export function isWeaklyVisible(polygon: XY[]) {
     console.log("p0's convex slice:", leftConvexSlice);
 
     // First base vertex is not convex. Check if it guards its convex slice.
-    if (leftConvexSlice.length > 2 && !doesVertexGuardPolygon(polygon, leftConvexSlice, 0)) return false;
+    if (leftConvexSlice.length > 2) {
+        if (
+            !isSegmentInsidePolygon(polygon[0], polygon[w1], polygon) ||  // If the last vertex of the convex slice is blocked by other edges
+            !doesVertexGuardPolygon(polygon, leftConvexSlice, 0)          // If base vertex doesn't guard the convex slice
+        ) return false;
+    }
 
     //// 2. Check if p1 is concave. If so, check if p1 guards the concave part then trim that part off to make p1 convex.
 
@@ -50,7 +55,12 @@ export function isWeaklyVisible(polygon: XY[]) {
     console.log("p1's convex slice:", rightConvexSlice);
 
     // Second base vertex is not convex. Check if it guards its convex slice.
-    if (rightConvexSlice.length > 2 && !doesVertexGuardPolygon(polygon, rightConvexSlice, 1)) return false;
+    if (rightConvexSlice.length > 2) {
+        if (
+            !isSegmentInsidePolygon(polygon[1], polygon[w2], polygon) ||  // If the last vertex of the convex slice is blocked by other edges
+            !doesVertexGuardPolygon(polygon, rightConvexSlice, 1)         // If base vertex doesn't guard the convex slice
+        ) return false;
+    }
 
     polygon = polygon
         .toSpliced(w1+1, leftConvexSlice.length-2)
