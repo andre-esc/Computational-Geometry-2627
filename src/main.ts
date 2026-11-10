@@ -1,10 +1,10 @@
 import "./style.css";
 
-// import { Canvas, FabricText, Polygon } from "fabric";
 import * as fabric from "fabric";
+
 import { GPolygon } from "./canvas/GPolygon";
-import { triangulate } from "./geometry/triangulation";
-// import { isPolygonSimple } from "./geometry/simple";
+import { computeBoundaryGuardSet } from "./geometry/boundaryGuard";
+import { isWeaklyVisible } from "./geometry/weakVisibility";
 
 /* ---- Initialization ---- */
 
@@ -44,6 +44,16 @@ canvas.on("mouse:move", e => {
 window.addEventListener("keydown", e => {
     // console.log("FJKLDS");
     if (e.key === " ") {
-        triangulate(P.getPoints());
+        // triangulate(P.getPoints());
+
+        const points = P.getPoints();
+
+        // const { triangles, dualTree, rootIndex, commonEdgeMatrix } = triangulate(points);
+
+        if (!isWeaklyVisible(points)) {
+            console.log("Not weakly visible.");
+        } else {
+            console.log(`Boundary guard: ${computeBoundaryGuardSet(points).guards}`);
+        }
     }
 })
