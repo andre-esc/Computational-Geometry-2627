@@ -4,7 +4,7 @@ import { isPolygonSimple } from "../geometry/simple";
 
 const BOTTOM_EDGE_MIN_HALF_WIDTH = 20;
 
-function setPolyPoint(poly: Polyline, pointIndex: number, position: Point): void {
+export function setPolyPoint(poly: Polyline, pointIndex: number, position: Point): void {
     poly.points[pointIndex] = position;
 
     poly.setBoundingBox(true);
@@ -17,6 +17,8 @@ export class GPolygon {
     private readonly bottomEdge: Polyline;
 
     private readonly controls: PointControl[] = [];
+
+    public onUpdate?: (points: XY[]) => void;
 
     private readonly updatePolygon = (updateBottomEdge?: boolean) => {
         if (!isPolygonSimple(this.poly.points)) {
@@ -64,7 +66,7 @@ export class GPolygon {
         this.updatePolygon(index < 2);
         this.canvas.requestRenderAll();
 
-        console.log(isPolygonSimple(this.poly.points));
+        this.onUpdate?.(this.getPoints());
     }
 
     private readonly factoryRemoveVertex = (index: number) => (control: PointControl) => {
@@ -88,6 +90,8 @@ export class GPolygon {
         this.canvas.remove(control.getControl());
 
         this.canvas.requestRenderAll();
+
+        this.onUpdate?.(this.getPoints());
     }
 
     private readonly createControlForVertex = (index: number) => {
@@ -145,6 +149,8 @@ export class GPolygon {
         this.controls.push(newControl);
 
         this.canvas.requestRenderAll();
+
+        this.onUpdate?.(this.getPoints());
     }
 
     // Returns a copy of the GPolygon's points

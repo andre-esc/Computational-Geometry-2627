@@ -4,12 +4,48 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>geom-project</title>
+    <title>geom-project: Boundary Guarding (Ashur et al. 2022)</title>
   </head>
   <body>
     <div id="app">
-      Double click to add polygon point, right-click to remove polygon point
-      <canvas id="canvas"></canvas>
+      <header id="toolbar">
+        <div class="instructions">
+          <span><strong>Double-click:</strong> add vertex</span>
+          <span><strong>Right-click vertex:</strong> delete</span>
+          <span><strong>Drag:</strong> move</span>
+        </div>
+        <div class="controls">
+          <button id="btn-compute-guards" class="btn primary">Compute ∂P Guards</button>
+          <button id="btn-triangulate" class="btn">Triangulate</button>
+          <button id="btn-clear-overlays" class="btn">Clear</button>
+
+          <label class="toggle-label live-toggle">
+            <input type="checkbox" id="toggle-live" checked />
+            <span><strong>Live Updates</strong></span>
+          </label>
+          <label class="toggle-label">
+            <input type="checkbox" id="toggle-cuts" />
+            <span>Show Cuts (B)</span>
+          </label>
+          <label class="toggle-label">
+            <input type="checkbox" id="toggle-witnesses" checked />
+            <span>Show Witnesses (W)</span>
+          </label>
+          <label class="toggle-label">
+            <input type="checkbox" id="toggle-sightlines" />
+            <span>Show Guard Sightlines</span>
+          </label>
+        </div>
+      </header>
+
+      <main id="canvas-container">
+        <canvas id="canvas"></canvas>
+      </main>
+
+      <footer id="status-bar">
+        <span id="coords-display">coords: (0, 0)</span>
+        <span id="status-info">Ready. Press "Compute ∂P Guards" or press 'G'.</span>
+      </footer>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
