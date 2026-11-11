@@ -139,6 +139,7 @@ export function computeVisibleIntervalsForVertex(
   // 3. Sort all cut coordinates monotonically along ∂P traversal
   cuts.sort((a, b) => compareBoundaryCoord(a, b, n));
 
+
   // 4. Deduplicate adjacent cuts
   const uniqueCuts: BoundaryCoord[] = [];
   for (const c of cuts) {
@@ -185,6 +186,9 @@ export function computeVisibleIntervalsForVertex(
   if (currentStart !== null) {
     intervals.push({ start: currentStart, end: uniqueCuts[0] });
   }
+
+
+  console.log(`p${guardIndex}:`, intervals);
 
   return intervals;
 }

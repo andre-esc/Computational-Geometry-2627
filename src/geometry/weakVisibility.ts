@@ -35,6 +35,8 @@ export function isWeaklyVisible(polygon: XY[]) {
 
     // First base vertex is not convex. Check if it guards its convex slice.
     if (leftConvexSlice.length > 2) {
+        leftConvexSlice.reverse();  // Ensure ccw order
+
         if (
             !isSegmentInsidePolygon(polygon[0], polygon[w1], polygon) ||  // If the last vertex of the convex slice is blocked by other edges
             !doesVertexGuardPolygon(polygon, leftConvexSlice, 0)          // If base vertex doesn't guard the convex slice
