@@ -1,7 +1,10 @@
 import "./style.css";
 
 import * as fabric from "fabric";
+
 import { GPolygon } from "./canvas/GPolygon";
+import { computeBoundaryGuardSet } from "./geometry/boundaryGuard";
+import { isWeaklyVisible } from "./geometry/weakVisibility";
 import { triangulate } from "./geometry/triangulation";
 import { buildWitnessSet, collectUniqueBoundaryCuts, type WitnessPoint } from "./geometry/witnessSet";
 import { buildVisibilityMatrix, type VisibilityMatrix } from "./geometry/visibilityMatrix";
@@ -62,6 +65,31 @@ const toggleWitnesses = document.getElementById("toggle-witnesses") as HTMLInput
 const toggleSightlines = document.getElementById("toggle-sightlines") as HTMLInputElement;
 const toggleLive = document.getElementById("toggle-live") as HTMLInputElement;
 
+// canvas.on("mouse:move", e => {
+//     // console.log("FJKLSD");
+//     text.set("text", `coords: ${e.viewportPoint}`);
+//     canvas.requestRenderAll();
+// })
+
+
+//// TESTING ////
+
+window.addEventListener("keydown", e => {
+    // console.log("FJKLDS");
+    if (e.key === " ") {
+        // triangulate(P.getPoints());
+
+        const points = P.getPoints();
+
+        // const { triangles, dualTree, rootIndex, commonEdgeMatrix } = triangulate(points);
+
+        if (!isWeaklyVisible(points)) {
+            console.log("Not weakly visible.");
+        } else {
+            console.log(`Boundary guard: ${computeBoundaryGuardSet(points).guards}`);
+        }
+    }
+})
 canvas.on("mouse:move", (e) => {
   const p = e.viewportPoint;
   coordsDisplay.textContent = `coords: (${Math.round(p.x)}, ${Math.round(p.y)})`;

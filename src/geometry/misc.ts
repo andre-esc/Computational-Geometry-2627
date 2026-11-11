@@ -5,10 +5,17 @@ import type { Edge } from "../types/geometry";
 //     The following section is [AI:0] on the 0rwx scale.
 // ----------------------------------------------------------
 
+// fabric.XY to string. For debugging purposes
+export function ptos(p: XY) {
+  return `(${p.x}, ${p.y})`;
+}
+
 export function distance(p1: XY, p2: XY) {
   return Math.hypot(p2.x - p1.x, p2.y - p1.y);
 }
 
+// Returns positive for left turns.
+// Note that this is the opposite of usual conventions, since the y-axis goes down instead of up.
 export function orient(p1: XY, p2: XY, p3: XY) {
   return (p3.x - p1.x) * (p2.y - p1.y) - (p2.x - p1.x) * (p3.y - p1.y);
 }
