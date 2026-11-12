@@ -81,7 +81,7 @@ export function isWeaklyVisible(polygon: XY[]) {
     while (!p0sptCheck.done) {
         const [p3, p2, p1] = p0sptCheck.value;
 
-        if (p1 !== undefined && orient(polygon[p1], polygon[p2!], polygon[p3!]) < 0) {
+        if (p1 !== undefined && orient(polygon[p1], polygon[p2!], polygon[p3!]) > 0) {
             return false;
         }
 
