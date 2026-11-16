@@ -6,7 +6,7 @@
  * 
  * @returns Spanning tree of graph
  */
-export function getSpanningTree(adjacency: number[][], root: number) {
+export default function getSpanningTree(adjacency: number[][], root: number) {
     const queue: number[] = [root];
     const visited = new Set<number>([root]);
 

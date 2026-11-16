@@ -5,6 +5,9 @@ import { triangulate } from "./triangulation";
 import { getShortestPathTree } from "./shortestPathTree";
 
 import type { XY } from "fabric";
+import { computeShortestPathTree } from "./spt2";
+import { shootRayToFirstBoundaryHit } from "./visibility";
+import type { BoundaryCoord } from "./boundaryCoord";
 
 // Returns true of the given vertex guards the entire polygon.
 // Uses a basic half-plane check.
@@ -19,86 +22,187 @@ function doesVertexGuardPolygon(pointRef: XY[], vertices: PointIndex[], guard: P
     return true;
 }
 
-export function isWeaklyVisible(polygon: XY[]) {
-    //// 1. Check if p0 is concave. If so, check if p0 guards the concave part then trim that part off to make p0 convex.
+type ShadowProjection = {
+    uIndex: PointIndex, vIndex: PointIndex,  // Sightline projecting the shadow
+    ccwiseVisRegionStart: boolean            // Whether this projection is a start or an end of a visibility region
+}
 
-    let w1 = polygon.length - 1;
-    const leftConvexSlice = [0];
+/**
+ * Generator that yields all sightlines that produce a shadow.
+ * 
+ * @param pointRef      Dictionary of points
+ * @param spt           Shortest Path Tree from one of the base edge vertices
+ * @param from          The base edge vertex we're checking from
+ */
+function * visHelper(pointRef: XY[], spt: PointIndex[], from: 0 | 1) {
+    const concaveDirection = from === 0 ? 1 : -1;
+    // We don't check the branch of the SPT rooted at the other base edge vertex.
+    // This is because that portion of the polygon could be concave relative to that other vertex, and therefore only guarded by it.
+    // The left-right turn check would then fail for this vertex, despite the polygon still being WV-visible.
+    const pruneIndex = 1 - from;
 
-    while (!isConvex(polygon[w1], polygon[0], polygon[1])) {
-        leftConvexSlice.push(w1);
-        w1--;
+    for (let i = 0; i < spt.length; i++) {
+        if (spt[spt[i]] === pruneIndex) {
+            spt[i] = pruneIndex;
+        }
+        else if (spt[i] !== pruneIndex) {
+            const vIndex = spt[i];
+            const uIndex = spt[vIndex];
+
+            const w = pointRef[i];
+            const v = pointRef[vIndex];
+            const u = pointRef[uIndex];
+
+            console.log(`p${from} SPT: checking ${spt[spt[i]]} ${spt[i]} ${i}`);
+
+            // If we're currently checking a turn adjacent to a concave base edge vertex
+            if (uIndex === from && v.y > u.y && concaveDirection * orient(u, v, w) > 0) {
+                console.log("CONCAVE OBSTRUCTION!");
+                yield { uIndex, vIndex, ccwiseVisRegionStart: from === 1 } as ShadowProjection;
+            }
+            // If we're checking a regular turn
+            else if (concaveDirection * orient(u, v, w) < 0) {
+                console.log("OBSTRUCTION!");
+                yield { uIndex, vIndex, ccwiseVisRegionStart: from === 0 } as ShadowProjection;
+            }
+
+        }
     }
-    leftConvexSlice.push(w1);
+}
 
-    console.log("p0's convex slice:", leftConvexSlice);
+type LinkedList = {
+    point: BoundaryCoord,
+    next: LinkedList | null,
+    prev: LinkedList | null
+};
 
-    // First base vertex is not convex. Check if it guards its convex slice.
-    if (leftConvexSlice.length > 2) {
-        leftConvexSlice.reverse();  // Ensure ccw order
+function printLL(ll: LinkedList) {
+    console.log("Linked list:");
+    // const a = ll;
 
-        if (
-            !isSegmentInsidePolygon(polygon[0], polygon[w1], polygon) ||  // If the last vertex of the convex slice is blocked by other edges
-            !doesVertexGuardPolygon(polygon, leftConvexSlice, 0)          // If base vertex doesn't guard the convex slice
-        ) return false;
+    ll.prev!.next = null;
+
+    let lll: LinkedList | null = ll;
+    let i = 0;
+
+    while (lll !== null) {
+        console.log(lll.point);
+        lll = lll.next;
+
+
+        i++;
+        if (i > 20) break;
     }
 
-    //// 2. Check if p1 is concave. If so, check if p1 guards the concave part then trim that part off to make p1 convex.
+    ll.prev!.next = ll;
+}
 
-    let w2 = 2;
-    const rightConvexSlice = [1];
+function projectShadow(
+    { uIndex, vIndex, ccwiseVisRegionStart }: ShadowProjection,
+    polygon: XY[],
+    initialNodes: LinkedList[]
+) {
+    const u = polygon[uIndex], v = polygon[vIndex];
 
-    while (!isConvex(polygon[0], polygon[1], polygon[w2])) {
-        rightConvexSlice.push(w2);
-        w2++;
+    const edgeBeforeV = (vIndex - 1 + polygon.length) % polygon.length;
+
+    const projection = shootRayToFirstBoundaryHit(u, v, polygon, [edgeBeforeV, vIndex]);
+    // console.log(projection);
+
+    if (projection === null) throw new Error("Sightline causes shadow, but does not project onto boundary.");
+
+    if (ccwiseVisRegionStart) {
+        const nextPoint = initialNodes[projection.edgeIndex].next;
+        const newNode: LinkedList = { point: projection, next: nextPoint, prev: initialNodes[vIndex] };
+        initialNodes[vIndex].next = newNode;
+        nextPoint!.prev = newNode;
     }
-    rightConvexSlice.push(w2);
+    else {
+        const prevPoint = getCircular(initialNodes, projection.edgeIndex+1).prev;
+        const newNode: LinkedList = { point: projection, next: initialNodes[vIndex], prev: prevPoint };
+        initialNodes[vIndex].prev = newNode;
+        prevPoint!.next = newNode;
+    }
+}
 
-    console.log("p1's convex slice:", rightConvexSlice);
+export function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
+    //// 1. Build circular linked list of polygon vertices in order
 
-    // Second base vertex is not convex. Check if it guards its convex slice.
-    if (rightConvexSlice.length > 2) {
-        if (
-            !isSegmentInsidePolygon(polygon[1], polygon[w2], polygon) ||  // If the last vertex of the convex slice is blocked by other edges
-            !doesVertexGuardPolygon(polygon, rightConvexSlice, 1)         // If base vertex doesn't guard the convex slice
-        ) return false;
+    const initialNodes = new Array<LinkedList>(polygon.length);
+    let ll: LinkedList | null = { point: { edgeIndex: 0, t: 0, point: polygon[0] }, next: null, prev: null };
+    initialNodes[0] = ll;
+
+    for (let i = 1; i < polygon.length; i++) {
+        const next: LinkedList = { point: { edgeIndex: i, t: 0, point: polygon[i] }, next: null, prev: ll };
+        
+        ll.next = next;
+        ll = next;
+
+        initialNodes[i] = ll;
     }
 
-    polygon = polygon
-        .toSpliced(w1+1, leftConvexSlice.length-2)
-        .toSpliced(2, rightConvexSlice.length-2);
+    ll.next = initialNodes[0];
+    ll.next.prev = ll;
+    ll = ll.next;
 
-    //// 3. Check if remaining points satisfy the visibility condition (p0/p1 shortest paths always turn left/right)
+    console.log("linked list:", ll);
+
+    //// 2. Check if remaining points satisfy the visibility condition (p0/p1 shortest paths always turn left/right)
 
     const { triangles, dualTree, rootIndex, commonEdgeMatrix } = triangulate(polygon);
 
-    // SPTs from vertices 0 and 1
-    const p0sptGenerator = getShortestPathTree(polygon, triangles, dualTree, commonEdgeMatrix, 0, rootIndex);
-    const p1sptGenerator = getShortestPathTree(polygon, triangles, dualTree, commonEdgeMatrix, 1, rootIndex);
-    
-    let p0sptCheck = p0sptGenerator.next();
+    const p0spt = computeShortestPathTree(polygon, triangles, dualTree, commonEdgeMatrix, 0, rootIndex);
+    const p1spt = computeShortestPathTree(polygon, triangles, dualTree, commonEdgeMatrix, 1, rootIndex);
 
-    while (!p0sptCheck.done) {
-        const [p3, p2, p1] = p0sptCheck.value;
+    console.log(`p0 SPT: ${p0spt}`);
+    console.log(`p1 SPT: ${p1spt}`);
 
-        if (p1 !== undefined && orient(polygon[p1], polygon[p2!], polygon[p3!]) > 0) {
-            return false;
-        }
+    const p0visibilityGenerator = visHelper(polygon, p0spt, 0);
+    let p0visibility = p0visibilityGenerator.next();
 
-        p0sptCheck = p0sptGenerator.next();
+    let isWeaklyVisible = true;
+
+    while (!p0visibility.done) {
+        // If we enter here, that means there is one or more sightline that produces a shadow.
+        isWeaklyVisible = false;
+
+        projectShadow(p0visibility.value, polygon, initialNodes);
+
+        p0visibility = p0visibilityGenerator.next();
     }
 
-    let p1sptCheck = p1sptGenerator.next();
+    const p1visibilityGenerator = visHelper(polygon, p1spt, 1);
+    let p1visibility = p1visibilityGenerator.next();
 
-    while (!p1sptCheck.done) {
-        const [p3, p2, p1] = p1sptCheck.value;
+    while (!p1visibility.done) {
+        // If we enter here, that means there is one or more sightline that produces a shadow.
+        isWeaklyVisible = false;
+        
+        projectShadow(p1visibility.value, polygon, initialNodes);
 
-        if (p1 !== undefined && orient(polygon[p1], polygon[p2!], polygon[p3!]) < 0) {
-            return false;
-        }
-
-        p1sptCheck = p1sptGenerator.next();
+        p1visibility = p1visibilityGenerator.next();
     }
 
-    return true;
+    //// 3. Extract visibility polygon from linked list
+
+    console.log("Extraction");
+
+    const visPolygon: XY[] = [];
+
+    ll.prev!.next = null;  // Sever the linked list to mark where to stop
+    let i = 0;
+
+    while (ll !== null) {
+        console.log(ll);
+        visPolygon.push(ll.point.point);
+
+        ll = ll.next;
+
+        i++;
+        if (i > 50) break;  // To avoid u
+    }
+
+    console.log(visPolygon);
+
+    return [isWeaklyVisible, visPolygon];
 }

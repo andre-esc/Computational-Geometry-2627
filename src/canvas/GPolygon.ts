@@ -1,15 +1,7 @@
-import { Canvas, Point, Polygon, Polyline, type XY } from "fabric";
+import { Canvas, Polygon, Polyline, type XY } from "fabric";
 import { PointControl } from "./PointControl";
-import { isPolygonSimple } from "../geometry/simple";
 
 const BOTTOM_EDGE_MIN_HALF_WIDTH = 20;
-
-function setPolyPoint(poly: Polyline, pointIndex: number, position: Point): void {
-    poly.points[pointIndex] = position;
-
-    poly.setBoundingBox(true);
-    poly.set("dirty", true);
-}
 
 export class GPolygon {
     private readonly canvas: Canvas;
@@ -18,14 +10,13 @@ export class GPolygon {
 
     private readonly controls: PointControl[] = [];
 
+    public onPolygonChanged = (_p: GPolygon) => {};
+
+    public setFill = (color: string) => this.poly.set("fill", color);
+    public setStroke = (color: string) => this.poly.set("stroke", color);
+
     private readonly updatePolygon = (updateBottomEdge?: boolean) => {
-        if (!isPolygonSimple(this.poly.points)) {
-            this.poly.set("fill", "rgba(255,0,0,0.1)");
-            this.poly.set("stroke", "rgb(255,0,0)");
-        } else {
-            this.poly.set("fill", "rgba(0,0,0,0.1)");
-            this.poly.set("stroke", "rgb(0,0,0)");
-        }
+        this.onPolygonChanged(this);
 
         this.poly.setBoundingBox(true);
         this.poly.set("dirty", true);
@@ -64,7 +55,7 @@ export class GPolygon {
         this.updatePolygon(index < 2);
         this.canvas.requestRenderAll();
 
-        console.log(isPolygonSimple(this.poly.points));
+        // console.log(isPolygonSimple(this.poly.points));
     }
 
     private readonly factoryRemoveVertex = (index: number) => (control: PointControl) => {

@@ -1,6 +1,6 @@
 import { getCircular } from "../util/circularList";
 import { isConvex, isInTriangle } from "./misc";
-import { getSpanningTree } from "./spanningTree";
+import getSpanningTree from "./spanningTree";
 import type { PointIndex, IndexTriangle, TriangleIndex } from "../types/geometry";
 
 import type { XY } from "fabric";
@@ -35,10 +35,10 @@ function findEarIndex(pointRef: XY[], availablePoints: number[]): number {
     let i = 0;
 
 
-    console.log(availablePoints);
+    // console.log(availablePoints);
     for (; i < availablePoints.length; i++) {
         if (isAnEar(i, pointRef, availablePoints)) {
-            console.log("Found ear", availablePoints[i], "at index", i, "of polygon", availablePoints);
+            // console.log("Found ear", availablePoints[i], "at index", i, "of polygon", availablePoints);
 
             return i;
         }
