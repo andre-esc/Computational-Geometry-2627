@@ -1,8 +1,9 @@
 import Demo from "./Demo";
 
 import { GPolygon } from "../canvas/GPolygon";
-import { isPolygonSimple } from "../geometry/simple";
-import { isWeaklyVisible } from "../geometry/weakVisibility";
+
+import isPolygonSimple from "../geometry/simple";
+import isWeaklyVisible from "../geometry/weakVisibility";
 
 import { Polygon, type TPointerEventInfo } from "fabric";
 

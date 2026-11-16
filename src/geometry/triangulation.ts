@@ -70,7 +70,7 @@ export type TriangulationDualTree = {
  * 
  * @returns The triangulation and its corresponding dual tree, with root at the polygon's first edge.
  */
-export function triangulate(points: XY[]): TriangulationDualTree {
+export default function triangulate(points: XY[]): TriangulationDualTree {
     
     // edgeMap.get("i j") gives the index of all triangles sharing the edge [points[i], points[j]]
     const edgeMap = new Map<string, TriangleIndex[]>();

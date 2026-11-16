@@ -1,26 +1,13 @@
 import type { PointIndex } from "../types/geometry";
+import type { BoundaryCoord } from "./boundaryCoord";
 import { getCircular } from "../util/circularList";
-import { isConvex, isSegmentInsidePolygon, orient } from "./misc";
-import { triangulate } from "./triangulation";
-import { getShortestPathTree } from "./shortestPathTree";
+import { orient } from "./misc";
+import { shootRayToFirstBoundaryHit } from "./visibility";
+
+import triangulate from "./triangulation";
+import computeShortestPathTree from "./spt2";
 
 import type { XY } from "fabric";
-import { computeShortestPathTree } from "./spt2";
-import { shootRayToFirstBoundaryHit } from "./visibility";
-import type { BoundaryCoord } from "./boundaryCoord";
-
-// Returns true of the given vertex guards the entire polygon.
-// Uses a basic half-plane check.
-function doesVertexGuardPolygon(pointRef: XY[], vertices: PointIndex[], guard: PointIndex) {
-    for (let i = 0; i < vertices.length; i++) {
-        const v1 = pointRef[vertices[i]];
-        const v2 = pointRef[getCircular(vertices, i+1)];
-
-        if (orient(v1, v2, pointRef[guard]) < 0) return false;
-    }
-
-    return true;
-}
 
 type ShadowProjection = {
     uIndex: PointIndex, vIndex: PointIndex,  // Sightline projecting the shadow
@@ -97,6 +84,7 @@ function printLL(ll: LinkedList) {
     ll.prev!.next = ll;
 }
 
+// Helper function for projecting a sightline onto the polygon
 function projectShadow(
     { uIndex, vIndex, ccwiseVisRegionStart }: ShadowProjection,
     polygon: XY[],
@@ -125,7 +113,7 @@ function projectShadow(
     }
 }
 
-export function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
+export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
     //// 1. Build circular linked list of polygon vertices in order
 
     const initialNodes = new Array<LinkedList>(polygon.length);

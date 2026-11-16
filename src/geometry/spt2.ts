@@ -78,7 +78,7 @@ function findTangentToFunnel(pointRef: XY[], funnel: PointIndex[], apexAt: numbe
     }
 }
 
-export function computeShortestPathTree(
+export default function computeShortestPathTree(
     polygon: XY[], triangles: IndexTriangle[], 
     dualTree: TriangleIndex[][], commonEdgeMatrix: ([PointIndex, PointIndex] | null)[][],
     startPointIndex: PointIndex, startTriangleIndex: TriangleIndex

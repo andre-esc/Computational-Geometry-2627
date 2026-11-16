@@ -17,7 +17,7 @@ function edges(points: XY[]): Edge[] {
 
 // Test if a polygon is simple (placeholder, will be replaced later)
 
-export function isPolygonSimple(points: XY[]): boolean {
+export default function isPolygonSimple(points: XY[]): boolean {
     const e = edges(points);
     
     for (let i = 0; i < e.length; i++) {

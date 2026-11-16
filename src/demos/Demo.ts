@@ -1,5 +1,11 @@
 import { Canvas, type TPointerEventInfo } from "fabric";
 
+/**
+ * Base class for demos. Takes in a canvas id and dimensions, and automatically initializes
+ * the fabric.js canvas.
+ * 
+ * Also contains modifiable callbacks for various input events.
+ */
 export default abstract class Demo {
     protected readonly canvasElement: HTMLCanvasElement;
     protected readonly canvas: Canvas;
