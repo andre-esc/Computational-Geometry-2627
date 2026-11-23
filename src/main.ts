@@ -3,7 +3,7 @@ import "./style.css";
 import * as demos from "./demos"
 import type Demo from "./demos/Demo";
 
-/* ---- Initialization ---- */
+/* ---- Canvas Initialization ---- */
 
 const initializedDemos: Demo[] = [];
 

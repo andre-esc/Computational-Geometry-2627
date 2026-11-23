@@ -1,6 +1,7 @@
 import type { XY } from "fabric";
 import { compareBoundaryCoord, type BoundaryCoord } from "./boundaryCoord";
 import { computeVertexBoundaryCutEndpoints } from "./visibility";
+import type { ConstructedEdge } from "./misc";
 
 export interface WitnessPoint {
   index: number;
@@ -16,12 +17,14 @@ export interface WitnessPoint {
 /**
  * B = ∪_(v in V)[ W'(v) ] ∪ V
  */
-export function collectUniqueBoundaryCuts(polygon: XY[]): BoundaryCoord[] {
+export function collectUniqueBoundaryCuts(polygon: XY[]): { boundaryCuts: BoundaryCoord[]; constructedEdges: ConstructedEdge[] } {
   let boundaryCuts: BoundaryCoord[] = [];
+  let constructedEdges: ConstructedEdge[] = [];
   for (var index = 0; index < polygon.length; index++) {
-    let cutsFromGuard = computeVertexBoundaryCutEndpoints(index, polygon);
+    let {cutEndpoints, constructedEdges} = computeVertexBoundaryCutEndpoints(index, polygon);
     // Push all the cuts & the vertex
-    boundaryCuts.push(...cutsFromGuard);
+    boundaryCuts.push(...cutEndpoints);
+    constructedEdges.push(...constructedEdges);
     boundaryCuts.push({
       edgeIndex: index,
       t: 0,
@@ -45,7 +48,7 @@ export function collectUniqueBoundaryCuts(polygon: XY[]): BoundaryCoord[] {
     }
   }
 
-  return uniqueBoundaryCuts;
+  return { boundaryCuts: uniqueBoundaryCuts, constructedEdges };
 }
 
 /**
@@ -57,8 +60,8 @@ export function collectUniqueBoundaryCuts(polygon: XY[]): BoundaryCoord[] {
 export function buildWitnessSet(
   polygon: XY[],
   includeBaseEdge: boolean = false,
-): WitnessPoint[] {
-  let boundaryCuts = collectUniqueBoundaryCuts(polygon);
+): { witnessPoints: WitnessPoint[]; constructedEdges: ConstructedEdge[] } {
+  let {boundaryCuts, constructedEdges} = collectUniqueBoundaryCuts(polygon);
 
   let witnessPoints = [];
 
@@ -85,5 +88,5 @@ export function buildWitnessSet(
     });
   }
 
-  return witnessPoints;
+  return {witnessPoints, constructedEdges};
 }

@@ -5,6 +5,8 @@ import {
   computeRaySegmentIntersection,
   isPointInPolygon,
   isSegmentInsidePolygon,
+  orient,
+  type ConstructedEdge,
   type RaySegmentIntersection,
 } from "./misc";
 
@@ -96,10 +98,11 @@ export function isOccludingVertex(
 export function computeVisibleIntervalsForVertex(
   guardIndex: number,
   polygon: XY[],
-): VisibleInterval[] {
+): {intervals: VisibleInterval[]; constructedEdges: ConstructedEdge[]} {
   const n = polygon.length;
   const guard = polygon[guardIndex];
-
+  const constructedEdges: ConstructedEdge[] = [];
+  
   // 1. Initialize candidate boundary cut events with all polygon vertices
   const cuts: BoundaryCoord[] = [];
   for (let i = 0; i < n; i++) {
@@ -131,7 +134,8 @@ export function computeVisibleIntervalsForVertex(
       );
 
       if (hit) {
-        cuts.push(hit);
+        cuts.push(hit); 
+        recordConstructedEdge(constructedEdges, guardIndex, j, hit, polygon);
       }
     }
   }
@@ -151,7 +155,7 @@ export function computeVisibleIntervalsForVertex(
     }
   }
 
-  if (uniqueCuts.length < 2) return [];
+  if (uniqueCuts.length < 2) return { intervals: [], constructedEdges };
 
   // 5. Evaluate elementary pieces between adjacent cuts and merge visible intervals
   const intervals: VisibleInterval[] = [];
@@ -190,7 +194,7 @@ export function computeVisibleIntervalsForVertex(
 
   console.log(`p${guardIndex}:`, intervals);
 
-  return intervals;
+  return { intervals, constructedEdges };
 }
 
 // ---------------------- AI USAGE --------------------------
@@ -204,8 +208,8 @@ export function computeVisibleIntervalsForVertex(
 export function computeVertexBoundaryCutEndpoints(
   guardIndex: number,
   polygon: XY[],
-): BoundaryCoord[] {
-  const intervals = computeVisibleIntervalsForVertex(guardIndex, polygon);
+): { cutEndpoints: BoundaryCoord[]; constructedEdges: ConstructedEdge[] } {
+  const { intervals, constructedEdges } = computeVisibleIntervalsForVertex(guardIndex, polygon);
   const cutEndpoints: BoundaryCoord[] = [];
 
   for (const interval of intervals) {
@@ -213,5 +217,27 @@ export function computeVertexBoundaryCutEndpoints(
     cutEndpoints.push(interval.end);
   }
 
-  return cutEndpoints;
+  return {cutEndpoints, constructedEdges};
+}
+
+// ---------------------- AI USAGE --------------------------
+//    The following section is [AI:W] on the 0rwx scale.
+// ----------------------------------------------------------
+function recordConstructedEdge(
+  list: ConstructedEdge[],
+  guardIndex: number,
+  j: number,
+  hit: BoundaryCoord,
+  polygon: XY[],
+): void {
+  const n = polygon.length;
+  const a = polygon[j], b = hit.point;
+  const [lower, upper] = a.y > b.y ? [a, b] : [b, a];
+
+  const nb = [polygon[(j + n - 1) % n], polygon[(j + 1) % n]]
+    .find(q => Math.abs(orient(a, b, q)) > 1e-9);
+  if (!nb) return; // degenerate: both neighbours collinear with the sightline
+
+  const pocketSide = Math.sign(orient(lower, upper, nb));
+  list.push({ guard: guardIndex, lower, upper, pocketSide });
 }

@@ -17,7 +17,7 @@ export default function getSpanningTree(adjacency: number[][], root: number) {
 
         for (let j of adjacency[i]) {
             if (!visited.has(j)) {
-                visited.add(i);
+                visited.add(j);
 
                 tree[i].push(j);
                 queue.push(j);

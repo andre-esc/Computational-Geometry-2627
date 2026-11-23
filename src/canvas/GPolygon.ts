@@ -54,8 +54,6 @@ export class GPolygon {
 
         this.updatePolygon(index < 2);
         this.canvas.requestRenderAll();
-
-        // console.log(isPolygonSimple(this.poly.points));
     }
 
     private readonly factoryRemoveVertex = (index: number) => (control: PointControl) => {

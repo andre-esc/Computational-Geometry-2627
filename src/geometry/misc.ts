@@ -235,3 +235,22 @@ export function isPointInPolygon(p: XY, polygon: XY[], eps = 1e-9): boolean {
 
   return inside;
 }
+
+/**
+ * Represents an edge constructed in the visibility graph.
+ */
+export interface ConstructedEdge {
+  guard: number;
+  lower: XY;          // x
+  upper: XY;          // y
+  pocketSide: number; // sign of orient(lower, upper, pocket)
+}
+
+export function onBase(e: ConstructedEdge, polygon: XY[]): boolean {
+  const a = polygon[0], b = polygon[1];
+  return (
+    Math.abs(e.lower.y - a.y) < 1e-6 &&
+    e.lower.x >= a.x - 1e-6 &&
+    e.lower.x <= b.x + 1e-6
+  );
+}

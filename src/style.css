@@ -1,13 +1,129 @@
 :root {
-    background-color: gray;
+  --bg-dark: #1e1e24;
+  --bg-panel: #2b2b36;
+  --accent: #4c82f7;
+  --accent-hover: #3a6cd4;
+  --text-main: #f0f0f5;
+  --text-muted: #9e9eb3;
+  --border: #3f3f50;
+  --guard-color: #e63946;
+  --witness-color: #2a9d8f;
+  --cut-color: #f4a261;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body, html {
-    height: 100%;
-    overflow: hidden;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  user-select: none;
 }
 
-div#app {
-    width: 100%;
-    height: 100%;
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+#toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px;
+  background-color: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.instructions {
+  display: flex;
+  gap: 14px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.instructions strong {
+  color: var(--text-main);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  background: #3c3c4c;
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn:hover {
+  background: #4a4a5e;
+}
+
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn.primary:hover {
+  background: var(--accent-hover);
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.toggle-label input[type="checkbox"] {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+#canvas-container {
+  flex: 1;
+  width: 100%;
+  height: calc(100% - 90px);
+  position: relative;
+  background: #ffffff;
+}
+
+#status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 18px;
+  font-size: 12px;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+#status-info {
+  font-weight: 500;
+  color: var(--text-main);
 }
