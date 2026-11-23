@@ -8,6 +8,7 @@ import triangulate from "./triangulation";
 import computeShortestPathTree from "./spt2";
 
 import type { XY } from "fabric";
+import type { LinkedList } from "../types/util";
 
 type ShadowProjection = {
     uIndex: PointIndex, vIndex: PointIndex,  // Sightline projecting the shadow
@@ -57,19 +58,15 @@ function * visHelper(pointRef: XY[], spt: PointIndex[], from: 0 | 1) {
     }
 }
 
-type LinkedList = {
-    point: BoundaryCoord,
-    next: LinkedList | null,
-    prev: LinkedList | null
-};
 
-function printLL(ll: LinkedList) {
+
+function printLL(ll: LinkedList<BoundaryCoord>) {
     console.log("Linked list:");
     // const a = ll;
 
     ll.prev!.next = null;
 
-    let lll: LinkedList | null = ll;
+    let lll: LinkedList<BoundaryCoord> | null = ll;
     let i = 0;
 
     while (lll !== null) {
@@ -88,7 +85,7 @@ function printLL(ll: LinkedList) {
 function projectShadow(
     { uIndex, vIndex, ccwiseVisRegionStart }: ShadowProjection,
     polygon: XY[],
-    initialNodes: LinkedList[]
+    initialNodes: LinkedList<BoundaryCoord>[]
 ) {
     const u = polygon[uIndex], v = polygon[vIndex];
 
@@ -101,13 +98,13 @@ function projectShadow(
 
     if (ccwiseVisRegionStart) {
         const nextPoint = initialNodes[projection.edgeIndex].next;
-        const newNode: LinkedList = { point: projection, next: nextPoint, prev: initialNodes[vIndex] };
+        const newNode: LinkedList<BoundaryCoord> = { point: projection, next: nextPoint, prev: initialNodes[vIndex] };
         initialNodes[vIndex].next = newNode;
         nextPoint!.prev = newNode;
     }
     else {
         const prevPoint = getCircular(initialNodes, projection.edgeIndex+1).prev;
-        const newNode: LinkedList = { point: projection, next: initialNodes[vIndex], prev: prevPoint };
+        const newNode: LinkedList<BoundaryCoord> = { point: projection, next: initialNodes[vIndex], prev: prevPoint };
         initialNodes[vIndex].prev = newNode;
         prevPoint!.next = newNode;
     }
@@ -116,12 +113,12 @@ function projectShadow(
 export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
     //// 1. Build circular linked list of polygon vertices in order
 
-    const initialNodes = new Array<LinkedList>(polygon.length);
-    let ll: LinkedList | null = { point: { edgeIndex: 0, t: 0, point: polygon[0] }, next: null, prev: null };
+    const initialNodes = new Array<LinkedList<BoundaryCoord>>(polygon.length);
+    let ll: LinkedList<BoundaryCoord> | null = { point: { edgeIndex: 0, t: 0, point: polygon[0] }, next: null, prev: null };
     initialNodes[0] = ll;
 
     for (let i = 1; i < polygon.length; i++) {
-        const next: LinkedList = { point: { edgeIndex: i, t: 0, point: polygon[i] }, next: null, prev: ll };
+        const next: LinkedList<BoundaryCoord> = { point: { edgeIndex: i, t: 0, point: polygon[i] }, next: null, prev: ll };
         
         ll.next = next;
         ll = next;
@@ -177,7 +174,7 @@ export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
 
     const visPolygon: XY[] = [];
 
-    ll.prev!.next = null;  // Sever the linked list to mark where to stop
+    ll!.prev!.next = null;  // Sever the linked list to mark where to stop
     let i = 0;
 
     while (ll !== null) {
@@ -187,7 +184,7 @@ export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
         ll = ll.next;
 
         i++;
-        if (i > 50) break;  // To avoid u
+        if (i > 50) break;  // To avoid infinite loops, just in case
     }
 
     console.log(visPolygon);

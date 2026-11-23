@@ -20,6 +20,7 @@ export class PointControl {
     public onMove = (_c: PointControl) => {};
     public onClick = (_c: PointControl) => {};
     public onRightClick = (_c: PointControl) => {};
+    public onDoubleClick = (_c: PointControl) => {};
 
     public constructor(pos: XY, label: string, options?: Partial<GroupProps>) {
         this.circle = new Circle({
@@ -43,6 +44,7 @@ export class PointControl {
         ));
     
         this.control = new Group([ this.circle, this.label ], options);
+        this.control.set("isPolyControl", true);  // Label it as a polygon control
 
         this.control.setControlsVisibility({
             mt: false,
@@ -59,5 +61,6 @@ export class PointControl {
         this.control.on("moving", _e => this.onMove(this));
         this.control.on("mouseup", _e => this.onClick(this));
         this.control.on("contextmenu", _e => this.onRightClick(this));
+        this.control.on("mousedblclick", _e => this.onDoubleClick(this));
     }
 };

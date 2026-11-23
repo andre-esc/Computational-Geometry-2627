@@ -4,3 +4,4 @@
  */
 
 export { default as WVDemo } from "./WVDemo";
+export { default as VisPolygonDemo } from "./VisPolygonDemo";

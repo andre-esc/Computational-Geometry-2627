@@ -3,6 +3,12 @@ import { PointControl } from "./PointControl";
 
 const BOTTOM_EDGE_MIN_HALF_WIDTH = 20;
 
+export interface PolygonChangeEvent {
+    polygon: GPolygon;
+    added: number[];
+    removed: number[];
+};
+
 export class GPolygon {
     private readonly canvas: Canvas;
     private readonly poly: Polygon;
@@ -10,13 +16,17 @@ export class GPolygon {
 
     private readonly controls: PointControl[] = [];
 
-    public onPolygonChanged = (_p: GPolygon) => {};
+    public onPolygonChanged = (_p: PolygonChangeEvent) => {};
+    public onVertexDoubleClicked = (_p: GPolygon, _i: number) => {}
 
     public setFill = (color: string) => this.poly.set("fill", color);
     public setStroke = (color: string) => this.poly.set("stroke", color);
 
-    private readonly updatePolygon = (updateBottomEdge?: boolean) => {
-        this.onPolygonChanged(this);
+    private readonly updatePolygon = (
+        added: number[], removed: number[], 
+        updateBottomEdge?: boolean
+    ) => {
+        this.onPolygonChanged({ polygon: this, added, removed });
 
         this.poly.setBoundingBox(true);
         this.poly.set("dirty", true);
@@ -52,7 +62,7 @@ export class GPolygon {
         // setPolyPoint(this.poly, index, c);
         this.poly.points[index] = c;
 
-        this.updatePolygon(index < 2);
+        this.updatePolygon([], [], index < 2);
         this.canvas.requestRenderAll();
     }
 
@@ -67,12 +77,14 @@ export class GPolygon {
 
             this.controls[j].onMove = this.factoryOnMove(j-1);
             this.controls[j].onRightClick = this.factoryRemoveVertex(j-1);
+
+            this.controls[j].onDoubleClick = _c => this.onVertexDoubleClicked(this, j-1);
         }
 
         this.controls.splice(index, 1);
 
         this.poly.points.splice(index, 1);
-        this.updatePolygon();
+        this.updatePolygon([], [index]);
 
         this.canvas.remove(control.getControl());
 
@@ -88,6 +100,8 @@ export class GPolygon {
 
         control.onMove = this.factoryOnMove(index);
         control.onRightClick = this.factoryRemoveVertex(index);
+
+        control.onDoubleClick = _c => this.onVertexDoubleClicked(this, index);
 
         return control;
     }
@@ -127,7 +141,7 @@ export class GPolygon {
     public createNewVertex = (pos: XY) => {
         this.poly.points.push(pos);
 
-        this.updatePolygon();
+        this.updatePolygon([this.poly.points.length - 1], []);
 
         const newControl = this.createControlForVertex(this.poly.points.length - 1);
         this.canvas.add(newControl.getControl());

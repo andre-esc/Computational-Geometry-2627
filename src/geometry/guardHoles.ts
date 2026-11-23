@@ -8,18 +8,23 @@ export function guardHoles(polygon: XY[], constructedEdges: ConstructedEdge[]): 
   for (const e of all.filter(e => isUpper(e))) {
     let best: { p: XY; x2: XY } | null = null;
 
+    const lower1 = e.lower.point, upper1 = e.upper.point;
+
     for (const e2 of all) {
       if (e2 === e) continue;
-      // x' must be on the same side of line(e) as the pocket
-      if (Math.sign(orient(e.lower, e.upper, e2.lower)) !== e.pocketSide) continue;
+      
+      const lower2 = e2.lower.point, upper2 = e2.upper.point;
 
-      const hit = computeSegmentIntersection([e.lower, e.upper], [e2.lower, e2.upper]);
+      // x' must be on the same side of line(e) as the pocket
+      if (Math.sign(orient(lower1, upper1, lower2)) !== e.pocketSide) continue;
+
+      const hit = computeSegmentIntersection([lower1, upper1], [lower2, upper2]);
       if (!hit) continue;
-      if (!best || hit.point.y < best.p.y) best = { p: hit.point, x2: e2.lower }; // topmost = smallest canvas y
+      if (!best || hit.point.y < best.p.y) best = { p: hit.point, x2: lower2 }; // topmost = smallest canvas y
     }
 
     if (best) {
-      const w = findVertexSeeingTriangle(polygon, [e.lower, best.p, best.x2]);
+      const w = findVertexSeeingTriangle(polygon, [lower1, best.p, best.x2]);
       if (w !== -1) extra.add(w);
     }
   }
@@ -35,6 +40,8 @@ function findVertexSeeingTriangle(polygon: XY[], tri: XY[]): number {
 
 
 function isUpper(e: ConstructedEdge): boolean {
-  const downSide = Math.sign(orient(e.lower, e.upper, { x: e.lower.x, y: e.lower.y + 1 }));
+  const lower = e.lower.point, upper = e.upper.point;
+
+  const downSide = Math.sign(orient(lower, upper, { x: lower.x, y: lower.y + 1 }));
   return e.pocketSide === downSide;
 }

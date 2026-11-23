@@ -29,7 +29,7 @@ export default class WVDemo extends Demo {
 
         this.canvas.add(this.visPoly);
 
-        this.poly.onPolygonChanged = polygon => {
+        this.poly.onPolygonChanged = ({ polygon }) => {
             if (!isPolygonSimple(polygon.getPoints())) {
                 polygon.setFill("rgba(255,0,0,0.1)");
                 polygon.setStroke("rgb(255,0,0)");
@@ -64,6 +64,8 @@ export default class WVDemo extends Demo {
     }
 
     protected override onDoubleClick(e: TPointerEventInfo<PointerEvent>): void {
-        this.poly.createNewVertex(e.viewportPoint);
+        if (!e.target?.get("isPolyControl")) {
+            this.poly.createNewVertex(e.viewportPoint);
+        }
     }
 }

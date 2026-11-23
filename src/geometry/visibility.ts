@@ -129,13 +129,19 @@ export function computeVisibleIntervalsForVertex(
           x: polygon[j].x + (polygon[j].x - guard.x),
           y: polygon[j].y + (polygon[j].y - guard.y),
         },
+        // { x: -guard.x, y: -guard.y },
         polygon,
         [prevEdge, nextEdge],
       );
 
       if (hit) {
         cuts.push(hit); 
-        recordConstructedEdge(constructedEdges, guardIndex, j, hit, polygon);
+
+        recordConstructedEdge(
+          constructedEdges, guardIndex, 
+          { edgeIndex: j, t: 0, point: polygon[j] },
+          hit,
+          polygon);
       }
     }
   }
@@ -192,7 +198,7 @@ export function computeVisibleIntervalsForVertex(
   }
 
 
-  console.log(`p${guardIndex}:`, intervals);
+  // console.log(`p${guardIndex}:`, intervals);
 
   return { intervals, constructedEdges };
 }
@@ -226,18 +232,20 @@ export function computeVertexBoundaryCutEndpoints(
 function recordConstructedEdge(
   list: ConstructedEdge[],
   guardIndex: number,
-  j: number,
+  j: BoundaryCoord,
   hit: BoundaryCoord,
   polygon: XY[],
 ): void {
   const n = polygon.length;
-  const a = polygon[j], b = hit.point;
-  const [lower, upper] = a.y > b.y ? [a, b] : [b, a];
+  const jp = j.point, hp = hit.point;
+  const [lower, upper] = jp.y > hp.y ? [j, hit] : [hit, j];
 
-  const nb = [polygon[(j + n - 1) % n], polygon[(j + 1) % n]]
-    .find(q => Math.abs(orient(a, b, q)) > 1e-9);
+  const ji = j.edgeIndex;
+
+  const nb = [polygon[(ji + n - 1) % n], polygon[(ji + 1) % n]]
+    .find(q => Math.abs(orient(jp, hp, q)) > 1e-9);
   if (!nb) return; // degenerate: both neighbours collinear with the sightline
 
-  const pocketSide = Math.sign(orient(lower, upper, nb));
+  const pocketSide = Math.sign(orient(lower.point, upper.point, nb));
   list.push({ guard: guardIndex, lower, upper, pocketSide });
 }

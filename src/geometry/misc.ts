@@ -1,5 +1,6 @@
 import type { XY } from "fabric";
 import type { Edge } from "../types/geometry";
+import type { BoundaryCoord } from "./boundaryCoord";
 
 // ---------------------- AI USAGE --------------------------
 //     The following section is [AI:0] on the 0rwx scale.
@@ -241,16 +242,16 @@ export function isPointInPolygon(p: XY, polygon: XY[], eps = 1e-9): boolean {
  */
 export interface ConstructedEdge {
   guard: number;
-  lower: XY;          // x
-  upper: XY;          // y
+  lower: BoundaryCoord;          // x
+  upper: BoundaryCoord;          // y
   pocketSide: number; // sign of orient(lower, upper, pocket)
 }
 
 export function onBase(e: ConstructedEdge, polygon: XY[]): boolean {
   const a = polygon[0], b = polygon[1];
   return (
-    Math.abs(e.lower.y - a.y) < 1e-6 &&
-    e.lower.x >= a.x - 1e-6 &&
-    e.lower.x <= b.x + 1e-6
+    Math.abs(e.lower.point.y - a.y) < 1e-6 &&
+    e.lower.point.x >= a.x - 1e-6 &&
+    e.lower.point.x <= b.x + 1e-6
   );
 }
