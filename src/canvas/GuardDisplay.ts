@@ -86,7 +86,11 @@ export class GuardDisplay {
         const isVisible = this.visibilityPolygons[index].get("visible");
         this.visibilityPolygons[index].set("visible", !isVisible);
 
-        console.log(this.visibilityPolygons[index].points)
+        this.canvas.requestRenderAll();
+    }
+
+    public setGuardColor(index: PointIndex, color: string) {
+        this.visibilityPolygons[index].set("fill", color);
 
         this.canvas.requestRenderAll();
     }
