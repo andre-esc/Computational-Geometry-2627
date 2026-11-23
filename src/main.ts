@@ -86,7 +86,7 @@ window.addEventListener("keydown", e => {
         if (!isWeaklyVisible(points)) {
             console.log("Not weakly visible.");
         } else {
-            console.log(`Boundary guard: ${computeBoundaryGuardSet(points).guards}`);
+            console.log(`Boundary guard: ${computeBoundaryGuardSet(points).dominatingSet.guards.length} guards.`);
         }
     }
 })
@@ -238,8 +238,8 @@ function runBoundaryGuarding(): void {
   const startTime = performance.now();
 
   // Phase 2/3: Discretize boundary into cut points and witnesses
-  lastCuts = collectUniqueBoundaryCuts(points);
-  lastWitnesses = buildWitnessSet(points, true);
+  lastCuts = collectUniqueBoundaryCuts(points).boundaryCuts;
+  lastWitnesses = buildWitnessSet(points, true).witnessPoints;
 
   // Phase 4: Construct bipartite visibility matrix
   lastMatrix = buildVisibilityMatrix(points, lastWitnesses);
