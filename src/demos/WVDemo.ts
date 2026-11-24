@@ -11,8 +11,8 @@ export default class WVDemo extends Demo {
     private readonly poly: GPolygon;
     private readonly visPoly: Polygon;
 
-    constructor() {
-        super("wvDemo", 800, 300);
+    constructor(canvasId = "wvDemo", width = 760, height = 300) {
+        super(canvasId, width, height);
 
         this.poly = new GPolygon([
             { x: 300, y: 250 },

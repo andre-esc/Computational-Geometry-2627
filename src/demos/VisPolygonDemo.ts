@@ -9,8 +9,8 @@ export default class VisPolygonDemo extends Demo {
     private readonly poly: GPolygon;
     private readonly visibility: GuardDisplay;
 
-    constructor() {
-        super("visPolyDemo", 800, 300);
+    constructor(canvasId = "visPolyDemo", width = 760, height = 300) {
+        super(canvasId, width, height);
 
         this.poly = new GPolygon([
             { x: 300, y: 250 },

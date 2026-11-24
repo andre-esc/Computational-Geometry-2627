@@ -5,3 +5,4 @@
 
 export { default as WVDemo } from "./WVDemo";
 export { default as VisPolygonDemo } from "./VisPolygonDemo";
+export { default as PlaygroundDemo } from "./PlaygroundDemo";

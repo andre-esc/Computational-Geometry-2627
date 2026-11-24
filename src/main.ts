@@ -1,62 +1,78 @@
 import "./style.css";
 
-import * as demos from "./demos"
-import type Demo from "./demos/Demo";
+import WVDemo from "./demos/WVDemo";
+import VisPolygonDemo from "./demos/VisPolygonDemo";
+import PlaygroundDemo from "./demos/PlaygroundDemo";
 
-/* ---- Canvas Initialization ---- */
+// ── Article demos ────────────────────────────────────────────────────────────
 
-const initializedDemos: Demo[] = [];
-
-for (const demo of Object.values(demos)) {
-    initializedDemos.push(new demo());
+function tryInit<T>(fn: () => T): T | null {
+    try { return fn(); }
+    catch (e) { console.warn("Demo init skipped:", e); return null; }
 }
 
-// const canvasElement = document.getElementById("canvas") as HTMLCanvasElement;
-// const canvas = new fabric.Canvas(canvasElement, {
-//     backgroundColor: "#fff",
-//     width: 800,
-//     height: 300
-// });
+void tryInit(() => new WVDemo("wvDemo", 760, 300));
+void tryInit(() => new VisPolygonDemo("visPolyDemo", 760, 300));
+const playgroundDemo = tryInit(() => new PlaygroundDemo("playgroundCanvas", 920, 520));
 
-// canvas.selection = false;
+// ── Status bar for playground ─────────────────────────────────────────────────
 
-// const P = new GPolygon([
-//     { x: 300, y: 250 },
-//     { x: 500, y: 250 },
-//     { x: 400, y: 50 },
-// ], canvas);
+const statusEl = document.getElementById("pg-status");
+const statusTextEl = document.getElementById("pg-status-text");
 
-// canvas.on("mouse:dblclick", e => {
-//     P.createNewVertex(e.viewportPoint);
-// })
+function setStatus(msg: string, type: "ok" | "warn" | "error" | "info") {
+    if (!statusEl || !statusTextEl) return;
+    statusEl.className = `pg-status pg-status--${type}`;
+    statusTextEl.textContent = msg;
+}
 
-// const text = new fabric.Textbox("coords", {
-//     top: 20, left: 200, width: 300
-// });
-// canvas.add(text);
+playgroundDemo?.setStatusCallback(setStatus);
 
-// canvas.on("mouse:move", e => {
-//     // console.log("FJKLSD");
-//     text.set("text", `coords: ${e.viewportPoint}`);
-//     canvas.requestRenderAll();
-// })
+// ── Playground toolbar buttons ────────────────────────────────────────────────
 
+document.getElementById("pg-btn-wv")?.addEventListener("click", () => {
+    playgroundDemo?.checkWV();
+});
 
-// //// TESTING ////
+document.getElementById("pg-btn-boundary")?.addEventListener("click", () => {
+    playgroundDemo?.computeBoundaryGuards();
+});
 
-// window.addEventListener("keydown", e => {
-//     // console.log("FJKLDS");
-//     if (e.key === " ") {
-//         // triangulate(P.getPoints());
+document.getElementById("pg-btn-full")?.addEventListener("click", () => {
+    playgroundDemo?.computeAllGuards();
+});
 
-//         const points = P.getPoints();
+document.getElementById("pg-btn-clear")?.addEventListener("click", () => {
+    playgroundDemo?.clearOverlay();
+});
 
-//         // const { triangles, dualTree, rootIndex, commonEdgeMatrix } = triangulate(points);
+// ── Tab switching ─────────────────────────────────────────────────────────────
 
-//         if (!isWeaklyVisible(points)) {
-//             console.log("Not weakly visible.");
-//         } else {
-//             // console.log(`Boundary guard: ${computeBoundaryGuardSet(points).guards}`);
-//         }
-//     }
-// })
+const tabArticle    = document.getElementById("tab-article")!;
+const tabPlayground = document.getElementById("tab-playground")!;
+const btnArticle    = document.getElementById("btn-tab-article")!;
+const btnPlayground = document.getElementById("btn-tab-playground")!;
+
+function activateTab(tab: "article" | "playground") {
+    if (tab === "article") {
+        tabArticle.classList.remove("hidden");
+        tabPlayground.classList.add("hidden");
+        btnArticle.classList.add("tab-active");
+        btnPlayground.classList.remove("tab-active");
+    } else {
+        tabArticle.classList.add("hidden");
+        tabPlayground.classList.remove("hidden");
+        btnArticle.classList.remove("tab-active");
+        btnPlayground.classList.add("tab-active");
+        // Force fabric to re-render after the container becomes visible
+        setTimeout(() => {
+            playgroundDemo?.clearOverlay(false);
+        }, 50);
+    }
+}
+
+btnArticle?.addEventListener("click", () => activateTab("article"));
+btnPlayground?.addEventListener("click", () => activateTab("playground"));
+
+// Respect hash navigation
+if (window.location.hash === "#playground") activateTab("playground");
