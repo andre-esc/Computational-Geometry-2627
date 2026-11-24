@@ -1,5 +1,5 @@
 import { Canvas, Polygon, type XY } from "fabric";
-import calculateVisibilityPolygonFromPoint from "../geometry/visibilityPolygon";
+import computeVisibilityPolygonFromPoint from "../geometry/visibilityPolygon";
 import type { PointIndex } from "../types/geometry";
 
 export class GuardDisplay {
@@ -22,7 +22,7 @@ export class GuardDisplay {
         for (let i = 0; i < this.polyPoints.length; i++) {
             // if (i !== 1) continue;
 
-            const visPolyPoints = calculateVisibilityPolygonFromPoint(this.polyPoints, i);
+            const visPolyPoints = computeVisibilityPolygonFromPoint(this.polyPoints, i);
 
             const polygon = this.createVisibilityPolygon(visPolyPoints);
             
@@ -35,7 +35,7 @@ export class GuardDisplay {
         for (let i = 0; i < this.polyPoints.length; i++) {
             // if (i !== 1) continue;
 
-            const visPolyPoints = calculateVisibilityPolygonFromPoint(this.polyPoints, i);
+            const visPolyPoints = computeVisibilityPolygonFromPoint(this.polyPoints, i);
 
             this.visibilityPolygons[i].set({
                 points: visPolyPoints,

@@ -1,12 +1,14 @@
-import type { XY } from "fabric";
 import type { IndexTriangle, TriangleIndex, PointIndex } from "../types/geometry";
 import { orient } from "./misc";
+
+import type { XY } from "fabric";
 
 type Funnel = {
     funnel: PointIndex[];  // BST [d1, ..., apex, ..., d2] containing the shortest paths from apex to d1 and d2
     apexAt: number;
 };
 
+// Gets the vertex of the given triangle that is not on the given edge
 function getThirdVertex(triangle: IndexTriangle, edge: [PointIndex, PointIndex]) {
     return triangle.find(v => v !== edge[0] && v !== edge[1])!;
 }
@@ -78,6 +80,18 @@ function findTangentToFunnel(pointRef: XY[], funnel: PointIndex[], apexAt: numbe
     }
 }
 
+/**
+ * Computes the Shortest Path Tree of a polygon from a given vertex
+ * 
+ * @param polygon               The points of the polygon
+ * @param triangles             The triangles of the polygon's triangulation
+ * @param dualTree              The dual tree of the polygon's triangulation
+ * @param commonEdgeMatrix      Matrix storing common edges between triangles of the triangulation
+ * @param startPointIndex       Index of the starting point (root of the SPT)
+ * @param startTriangleIndex    Index of the triangle containing the starting point
+ * 
+ * @returns The SPT from the given point
+ */
 export default function computeShortestPathTree(
     polygon: XY[], triangles: IndexTriangle[], 
     dualTree: TriangleIndex[][], commonEdgeMatrix: ([PointIndex, PointIndex] | null)[][],
@@ -105,8 +119,6 @@ export default function computeShortestPathTree(
         } else {
             stack.push([neighborTriangleIndex, { funnel: [d1Index, startPointIndex, d2Index], apexAt: 1 }]);
         }
-        
-        console.log("init diagonal:", diagonal);
     }
 
     while (stack.length > 0) {
@@ -117,12 +129,7 @@ export default function computeShortestPathTree(
         const d1 = funnel[0], d2 = funnel[funnel.length - 1];
 
         const newVertexIndex = getThirdVertex(triangles[triangleIndex], [d1, d2]);
-
-        // console.log(newVertexIndex);
-        console.log(`funnel: ${funnel}, apexAt: ${funnel[apexAt]}, newVertex: ${newVertexIndex}`);
-        
         const tangentAt = findTangentToFunnel(polygon, funnel, apexAt, newVertexIndex);
-        console.log(`tangent: ${funnel[tangentAt]} (index ${tangentAt})`);
 
         // Split funnel into two at the tangent
         const newFunnel1: Funnel = {

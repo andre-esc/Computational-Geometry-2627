@@ -1,6 +1,7 @@
-import type { XY } from "fabric";
 import type { Edge } from "../types/geometry";
 import type { BoundaryCoord } from "./boundaryCoord";
+
+import type { XY } from "fabric";
 
 // ---------------------- AI USAGE --------------------------
 //     The following section is [AI:0] on the 0rwx scale.

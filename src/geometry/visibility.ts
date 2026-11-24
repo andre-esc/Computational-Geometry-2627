@@ -1,4 +1,3 @@
-import type { XY } from "fabric";
 import type { BoundaryCoord } from "./boundaryCoord";
 import { compareBoundaryCoord, normalizeBoundaryCoord } from "./boundaryCoord";
 import {
@@ -9,6 +8,8 @@ import {
   type ConstructedEdge,
   type RaySegmentIntersection,
 } from "./misc";
+
+import type { XY } from "fabric";
 
 export interface VisibleInterval {
   start: BoundaryCoord;
@@ -181,15 +182,11 @@ export function computeVisibleIntervalsForVertex(
     const isVisible = isSegmentInsidePolygon(guard, midPoint, polygon);
 
     if (isVisible) {
-      if (currentStart === null) {
-        currentStart = c1;
-      }
-    } else {
-      if (currentStart !== null) {
+      currentStart ??= c1;
+    } else if (currentStart !== null) {
         intervals.push({ start: currentStart, end: c1 });
         currentStart = null;
       }
-    }
   }
 
   // Close any trailing interval
@@ -219,8 +216,7 @@ export function computeVertexBoundaryCutEndpoints(
   const cutEndpoints: BoundaryCoord[] = [];
 
   for (const interval of intervals) {
-    cutEndpoints.push(interval.start);
-    cutEndpoints.push(interval.end);
+    cutEndpoints.push(interval.start, interval.end);
   }
 
   return {cutEndpoints, constructedEdges};
