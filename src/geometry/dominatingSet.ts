@@ -126,6 +126,7 @@ export function localSearchDominatingSet(
     // Replace 2 guards with 1 guard.
 
     const guardArray = Array.from(Q);
+    // Avoid finding guards on the base edge (i = 2 instead of 0)
     for (let i = 2; i < guardArray.length && !improved; i++) {
       const guard1 = guardArray[i];
 

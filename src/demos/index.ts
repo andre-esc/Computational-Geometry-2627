@@ -4,4 +4,5 @@
  */
 
 export { default as WVDemo } from "./WVDemo";
-export { default as VisPolygonDemo } from "./VisPolygonDemo";
+export { default as BoundaryGuardingDemo } from "./BoundaryGuardingDemo";
+export { default as HoleGuardingDemo } from "./HoleGuardingDemo";

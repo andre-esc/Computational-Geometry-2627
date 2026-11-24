@@ -1,9 +1,16 @@
 import type { XY } from "fabric";
 import { onBase, orient, computeSegmentIntersection, isSegmentInsidePolygon, type ConstructedEdge } from "./misc";
 
-export function guardHoles(polygon: XY[], constructedEdges: ConstructedEdge[]): number[] {
+/**
+ * Implements the algorithm of Ashur et al. to guard holes in a boundary vertex guard
+ * 
+ * @param polygon 
+ * @param constructedEdges 
+ * @returns A map of guard indices to the triangles that they guard
+ */
+export function guardHoles(polygon: XY[], constructedEdges: ConstructedEdge[]): Map<number, [XY, XY, XY]> {
   const all = constructedEdges.filter(e => onBase(e, polygon));
-  const extra = new Set<number>();
+  const extra = new Map<number, [XY, XY, XY]>();
 
   for (const e of all.filter(e => isUpper(e))) {
     let best: { p: XY; x2: XY } | null = null;
@@ -24,15 +31,19 @@ export function guardHoles(polygon: XY[], constructedEdges: ConstructedEdge[]): 
     }
 
     if (best) {
+      const triangle: [XY, XY, XY] = [lower1, best.p, best.x2];
       const w = findVertexSeeingTriangle(polygon, [lower1, best.p, best.x2]);
-      if (w !== -1) extra.add(w);
+
+      if (w !== -1 && !extra.has(w)) extra.set(w, triangle);
     }
   }
-  return [...extra];
+
+  return extra;
 }
 
 function findVertexSeeingTriangle(polygon: XY[], tri: XY[]): number {
-  for (let w = 0; w < polygon.length; w++) {
+  // Avoid finding guards on the base edge (w = 2 instead of 0)
+  for (let w = 2; w < polygon.length; w++) {
     if (tri.every(c => isSegmentInsidePolygon(polygon[w], c, polygon))) return w;
   }
   return -1;

@@ -1,5 +1,4 @@
 import { Canvas, Polygon, type XY } from "fabric";
-import { computeVisibleIntervalsForVertex, type VisibleInterval } from "../geometry/visibility";
 import calculateVisibilityPolygonFromPoint from "../geometry/visibilityPolygon";
 import type { PointIndex } from "../types/geometry";
 
@@ -82,9 +81,26 @@ export class GuardDisplay {
         this.canvas.requestRenderAll();
     }
 
+    public getVisibleGuards(): number[] {
+        return this.visibilityPolygons.reduce<number[]>((acc, vp, i) => {
+            if (vp.get("visible")) acc.push(i);
+
+            return acc;
+        }, []);
+    }
+
+    public isGuardVisible(index: PointIndex) {
+        return this.visibilityPolygons[index].get("visible");
+    }
+
     public toggleGuardVisible(index: PointIndex) {
-        const isVisible = this.visibilityPolygons[index].get("visible");
-        this.visibilityPolygons[index].set("visible", !isVisible);
+        const isVisible = this.isGuardVisible(index);
+
+        this.setGuardVisible(index, !isVisible);
+    }
+
+    public setGuardVisible(index: PointIndex, visible: boolean) {
+        this.visibilityPolygons[index].set("visible", visible);
 
         this.canvas.requestRenderAll();
     }

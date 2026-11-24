@@ -249,3 +249,19 @@ function recordConstructedEdge(
   const pocketSide = Math.sign(orient(lower.point, upper.point, nb));
   list.push({ guard: guardIndex, lower, upper, pocketSide });
 }
+
+// ---------------------- AI USAGE --------------------------
+//    The following section is [AI:0] on the 0rwx scale.
+// ----------------------------------------------------------
+export function getConstructedEdges(polygon: XY[], guards: number[]) {
+    const constructedEdges: ConstructedEdge[] = [];
+
+    // computeVisibleIntervalsForVertex()
+    for (const g of guards) {
+        const { constructedEdges: c } = computeVisibleIntervalsForVertex(g, polygon);
+
+        constructedEdges.push(...c);
+    }
+
+    return constructedEdges;
+}

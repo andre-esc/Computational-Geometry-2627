@@ -8,10 +8,23 @@ import type { XY } from "fabric";
 import { guardHoles } from "./guardHoles";
 import type { ConstructedEdge } from "./misc";
 import trimPolygonForBaseEdgeConvexity from "./baseEdgeConvexity";
+import { getConstructedEdges } from "./visibility";
 
-export function _computeBoundaryGuardSet(polygon: XY[]): { dominatingSet: DominatingSetResult; constructedEdges: ConstructedEdge[] } {
+export function checkBoundaryGuard(polygon: XY[], guards: number[]) {
+  const { witnessPoints: witnesses } = buildWitnessSet(polygon, true);
+  const vm = buildVisibilityMatrix(polygon, witnesses);
+
+  const coveredWitnesses = new Set<number>();
+
+  for (const g of guards) {
+    for (const w of vm.guardCoverage[g]) coveredWitnesses.add(w);
+  }
+
+  return coveredWitnesses.size === witnesses.length;
+}
+
+export function computeBoundaryGuardSetConvex(polygon: XY[]): { dominatingSet: DominatingSetResult; constructedEdges: ConstructedEdge[] } {
   const {witnessPoints: witnesses, constructedEdges} = buildWitnessSet(polygon, true);
-  console.log(witnesses);
   const vm = buildVisibilityMatrix(polygon, witnesses);
   const result = localSearchDominatingSet(vm);
   return { dominatingSet: result, constructedEdges };
@@ -20,7 +33,7 @@ export function _computeBoundaryGuardSet(polygon: XY[]): { dominatingSet: Domina
 export function computeBoundaryGuardSet(polygon: XY[]) {
   // Make base edge convex
   const trimmed = trimPolygonForBaseEdgeConvexity(polygon);
-  const guardSet = _computeBoundaryGuardSet(trimmed.polygon);
+  const guardSet = computeBoundaryGuardSetConvex(trimmed.polygon);
 
   console.log(trimmed);
 
@@ -57,9 +70,62 @@ export function computeBoundaryGuardSet(polygon: XY[]) {
   return guardSet;
 }
 
-export function computeFullGuardSet(polygon: XY[]): number[] {
-  const { dominatingSet: { guards }, constructedEdges } = computeBoundaryGuardSet(polygon);
+export interface FullGuardSet {
+  guardsBefore: number[];
+  totalGuards: number[];
+  extraGuardTriangles: [number, [XY, XY, XY]][];
+};
+
+export function computeFullGuardSetConvex(polygon: XY[]): FullGuardSet {
+  const { dominatingSet: { guards }, constructedEdges } = computeBoundaryGuardSetConvex(polygon);
   const edges = constructedEdges.filter(e => guards.includes(e.guard));
+
   const extra = guardHoles(polygon, edges);
-  return [...new Set([...guards, ...extra])];
+
+  return {
+    guardsBefore: guards,
+    totalGuards: [...new Set([...guards, ...extra.keys()])], 
+    extraGuardTriangles: [...extra.entries()]
+  } as FullGuardSet;
+}
+
+export function computeFullGuardSet(polygon: XY[]): FullGuardSet {
+  // Make base edge convex
+  const trimmed = trimPolygonForBaseEdgeConvexity(polygon);
+  const guardSet = computeFullGuardSetConvex(trimmed.polygon);
+
+  // Add guards if base edge was concave
+  if (trimmed.trimmedLeft > 0) {
+    // No index shifting since these points were removed from the end
+    guardSet.guardsBefore.push(0);
+    guardSet.totalGuards.push(0);
+  }
+  if (trimmed.trimmedRight > 0) {
+    guardSet.guardsBefore.push(1);
+    guardSet.totalGuards.push(1);
+
+    // Need to shift indices since these points were removed from the beginning
+    guardSet.guardsBefore.forEach((guard, i) => {
+      if (guard >= 2) guardSet.guardsBefore[i] += trimmed.trimmedRight;
+    })
+    guardSet.totalGuards.forEach((guard, i) => {
+      if (guard >= 2) guardSet.totalGuards[i] += trimmed.trimmedRight;
+    })
+    guardSet.extraGuardTriangles.forEach(([guard, _], i) => {
+      if (guard >= 2) guardSet.extraGuardTriangles[i][0] += trimmed.trimmedRight;
+    })
+  }
+
+  return guardSet;
+}
+
+// Computes a full guard set given existing guards
+export function computeFullGuardSetFromGuards(polygon: XY[], guards: number[]): FullGuardSet {
+  const extra = guardHoles(polygon, getConstructedEdges(polygon, guards));
+
+  return {
+      guardsBefore: guards,
+      totalGuards: [...guards, ...extra.keys()],
+      extraGuardTriangles: [...extra.entries()]
+  } as FullGuardSet;
 }
