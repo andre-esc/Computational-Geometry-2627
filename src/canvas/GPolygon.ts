@@ -138,15 +138,62 @@ export class GPolygon {
         this.initializeControls();
     }
 
+    /** Squared distance from point p to segment ab (avoids a sqrt for comparisons). */
+    private static distSqPointToSegment = (p: XY, a: XY, b: XY): number => {
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const lenSq = dx * dx + dy * dy;
+        if (lenSq === 0) return (p.x - a.x) ** 2 + (p.y - a.y) ** 2;
+        const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / lenSq));
+        return (p.x - (a.x + t * dx)) ** 2 + (p.y - (a.y + t * dy)) ** 2;
+    }
+
+    /**
+     * Returns the index at which a new vertex at `pos` should be spliced in,
+     * i.e. the index i+1 of the nearest polygon edge (p_i → p_{i+1}).
+     * The base edge (p0 → p1) is excluded so it is never split.
+     */
+    private findNearestEdgeInsertIndex = (pos: XY): number => {
+        const pts = this.poly.points;
+        const n = pts.length;
+        let bestIndex = n;   // fallback: append at end
+        let bestDistSq = Infinity;
+
+        // Start at i=1 to skip the base edge (p0→p1)
+        for (let i = 1; i < n; i++) {
+            const a = pts[i];
+            const b = pts[(i + 1) % n];
+            const dSq = GPolygon.distSqPointToSegment(pos, a, b);
+            if (dSq < bestDistSq) {
+                bestDistSq = dSq;
+                // Edge from pts[n-1] back to pts[0]: insert at end (index n)
+                bestIndex = (i + 1 < n) ? i + 1 : n;
+            }
+        }
+
+        return bestIndex;
+    }
+
     public createNewVertex = (pos: XY) => {
-        this.poly.points.push(pos);
+        const insertIndex = this.findNearestEdgeInsertIndex(pos);
 
-        this.updatePolygon([this.poly.points.length - 1], []);
+        // Splice new point into the polygon at the right edge
+        this.poly.points.splice(insertIndex, 0, pos);
 
-        const newControl = this.createControlForVertex(this.poly.points.length - 1);
+        // Shift labels and callbacks of all controls at insertIndex and beyond
+        for (let j = this.controls.length - 1; j >= insertIndex; j--) {
+            const newIdx = j + 1;   // const: each iteration captures its own value
+            this.controls[j].setLabelText(`p${newIdx}`);
+            this.controls[j].onMove = this.factoryOnMove(newIdx);
+            this.controls[j].onRightClick = this.factoryRemoveVertex(newIdx);
+            this.controls[j].onDoubleClick = (_c) => this.onVertexDoubleClicked(this, newIdx);
+        }
+
+        // Create and register the new control
+        const newControl = this.createControlForVertex(insertIndex);
         this.canvas.add(newControl.getControl());
-        this.controls.push(newControl);
+        this.controls.splice(insertIndex, 0, newControl);
 
+        this.updatePolygon([insertIndex], []);
         this.canvas.requestRenderAll();
     }
 
