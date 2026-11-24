@@ -3,11 +3,12 @@ import Demo from "./Demo";
 import { GPolygon } from "../canvas/GPolygon";
 import { GuardDisplay } from "../canvas/GuardDisplay";
 
-import { type TPointerEventInfo } from "fabric";
 import isWeaklyVisible from "../geometry/weakVisibility";
 import { computeBoundaryGuardSet } from "../geometry/boundaryGuard";
 import type { DominatingSetResult } from "../geometry/dominatingSet";
 import isPolygonSimple from "../geometry/simple";
+
+import { type TPointerEventInfo } from "fabric";
 
 export default class BoundaryGuardingDemo extends Demo {
     private readonly poly: GPolygon;
@@ -58,16 +59,19 @@ export default class BoundaryGuardingDemo extends Demo {
             this.visibility.updatePolygon(points, added, removed);
 
             if (!isPolygonSimple(polygon.getPoints())) {
+                polygon.setFill("rgba(255,0,0,0.1)");
                 polygon.setStroke("rgb(255,0,0)");
                 
                 this.canvas.requestRenderAll();
             }
             else if (!isWeaklyVisible(points)[0]) {
+                polygon.setFill("rgba(255, 255, 0, 0.1)");
                 polygon.setStroke("rgb(200, 200, 0)");
                 
                 this.canvas.requestRenderAll();
             }
             else {
+                polygon.setFill("rgba(0, 0, 0, 0.1)");
                 polygon.setStroke("rgb(0, 0, 0)");
                 
                 this.canvas.requestRenderAll();

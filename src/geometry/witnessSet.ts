@@ -1,7 +1,8 @@
-import type { XY } from "fabric";
 import { compareBoundaryCoord, type BoundaryCoord } from "./boundaryCoord";
 import { computeVertexBoundaryCutEndpoints } from "./visibility";
 import type { ConstructedEdge } from "./misc";
+
+import type { XY } from "fabric";
 
 export interface WitnessPoint {
   index: number;
@@ -20,7 +21,7 @@ export interface WitnessPoint {
 export function collectUniqueBoundaryCuts(polygon: XY[]): { boundaryCuts: BoundaryCoord[]; constructedEdges: ConstructedEdge[] } {
   let boundaryCuts: BoundaryCoord[] = [];
   let constructedEdges: ConstructedEdge[] = [];
-  for (var index = 0; index < polygon.length; index++) {
+  for (let index = 0; index < polygon.length; index++) {
     let {cutEndpoints, constructedEdges} = computeVertexBoundaryCutEndpoints(index, polygon);
     // Push all the cuts & the vertex
     boundaryCuts.push(...cutEndpoints);
@@ -65,7 +66,7 @@ export function buildWitnessSet(
 
   let witnessPoints = [];
 
-  for (var i = 0; i < boundaryCuts.length - 1; i++) {
+  for (let i = 0; i < boundaryCuts.length - 1; i++) {
     // Get each edge wrapping around.
     const previousCut = boundaryCuts[i];
     const currentCut = boundaryCuts[(i + 1) % boundaryCuts.length];

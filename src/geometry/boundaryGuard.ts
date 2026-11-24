@@ -10,6 +10,7 @@ import type { ConstructedEdge } from "./misc";
 import trimPolygonForBaseEdgeConvexity from "./baseEdgeConvexity";
 import { getConstructedEdges } from "./visibility";
 
+// Verifies whether the given guards guard the polygon's boundary
 export function checkBoundaryGuard(polygon: XY[], guards: number[]) {
   const { witnessPoints: witnesses } = buildWitnessSet(polygon, true);
   const vm = buildVisibilityMatrix(polygon, witnesses);
@@ -23,6 +24,7 @@ export function checkBoundaryGuard(polygon: XY[], guards: number[]) {
   return coveredWitnesses.size === witnesses.length;
 }
 
+// Computes the boundary guard of a WV-polygon, assuming convex base edge vertices
 export function computeBoundaryGuardSetConvex(polygon: XY[]): { dominatingSet: DominatingSetResult; constructedEdges: ConstructedEdge[] } {
   const {witnessPoints: witnesses, constructedEdges} = buildWitnessSet(polygon, true);
   const vm = buildVisibilityMatrix(polygon, witnesses);
@@ -30,6 +32,7 @@ export function computeBoundaryGuardSetConvex(polygon: XY[]): { dominatingSet: D
   return { dominatingSet: result, constructedEdges };
 }
 
+// Computes the boundary guard of a WV-polygon
 export function computeBoundaryGuardSet(polygon: XY[]) {
   // Make base edge convex
   const trimmed = trimPolygonForBaseEdgeConvexity(polygon);
@@ -48,8 +51,6 @@ export function computeBoundaryGuardSet(polygon: XY[]) {
     }
   }
   if (trimmed.trimmedRight > 0) {
-    console.log("Before shifting", guardSet.dominatingSet);
-
     guardSet.dominatingSet.guards.push(1);
     guardSet.dominatingSet.guardPoints.push(polygon[1]);
 
@@ -76,6 +77,7 @@ export interface FullGuardSet {
   extraGuardTriangles: [number, [XY, XY, XY]][];
 };
 
+// Computes the full guard of a WV-polygon, assuming convex base edge vertices
 export function computeFullGuardSetConvex(polygon: XY[]): FullGuardSet {
   const { dominatingSet: { guards }, constructedEdges } = computeBoundaryGuardSetConvex(polygon);
   const edges = constructedEdges.filter(e => guards.includes(e.guard));
@@ -89,6 +91,7 @@ export function computeFullGuardSetConvex(polygon: XY[]): FullGuardSet {
   } as FullGuardSet;
 }
 
+// Computes the full guard of a WV-polygon
 export function computeFullGuardSet(polygon: XY[]): FullGuardSet {
   // Make base edge convex
   const trimmed = trimPolygonForBaseEdgeConvexity(polygon);
@@ -119,7 +122,7 @@ export function computeFullGuardSet(polygon: XY[]): FullGuardSet {
   return guardSet;
 }
 
-// Computes a full guard set given existing guards
+// Computes a full guard of a WV-polygon, given existing boundary guards
 export function computeFullGuardSetFromGuards(polygon: XY[], guards: number[]): FullGuardSet {
   const extra = guardHoles(polygon, getConstructedEdges(polygon, guards));
 

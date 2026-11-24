@@ -1,4 +1,3 @@
-import type { XY } from "fabric";
 import type { BoundaryCoord } from "./boundaryCoord";
 import { compareBoundaryCoord, normalizeBoundaryCoord } from "./boundaryCoord";
 import {
@@ -9,6 +8,8 @@ import {
   type ConstructedEdge,
   type RaySegmentIntersection,
 } from "./misc";
+
+import type { XY } from "fabric";
 
 export interface VisibleInterval {
   start: BoundaryCoord;
@@ -129,7 +130,6 @@ export function computeVisibleIntervalsForVertex(
           x: polygon[j].x + (polygon[j].x - guard.x),
           y: polygon[j].y + (polygon[j].y - guard.y),
         },
-        // { x: -guard.x, y: -guard.y },
         polygon,
         [prevEdge, nextEdge],
       );
@@ -181,24 +181,17 @@ export function computeVisibleIntervalsForVertex(
     const isVisible = isSegmentInsidePolygon(guard, midPoint, polygon);
 
     if (isVisible) {
-      if (currentStart === null) {
-        currentStart = c1;
-      }
-    } else {
-      if (currentStart !== null) {
+      currentStart ??= c1;
+    } else if (currentStart !== null) {
         intervals.push({ start: currentStart, end: c1 });
         currentStart = null;
       }
-    }
   }
 
   // Close any trailing interval
   if (currentStart !== null) {
     intervals.push({ start: currentStart, end: uniqueCuts[0] });
   }
-
-
-  // console.log(`p${guardIndex}:`, intervals);
 
   return { intervals, constructedEdges };
 }
@@ -219,8 +212,7 @@ export function computeVertexBoundaryCutEndpoints(
   const cutEndpoints: BoundaryCoord[] = [];
 
   for (const interval of intervals) {
-    cutEndpoints.push(interval.start);
-    cutEndpoints.push(interval.end);
+    cutEndpoints.push(interval.start, interval.end);
   }
 
   return {cutEndpoints, constructedEdges};
@@ -256,7 +248,6 @@ function recordConstructedEdge(
 export function getConstructedEdges(polygon: XY[], guards: number[]) {
     const constructedEdges: ConstructedEdge[] = [];
 
-    // computeVisibleIntervalsForVertex()
     for (const g of guards) {
         const { constructedEdges: c } = computeVisibleIntervalsForVertex(g, polygon);
 

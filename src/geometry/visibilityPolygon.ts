@@ -2,35 +2,12 @@ import type { PointIndex } from "../types/geometry";
 import type { LinkedList } from "../types/util";
 import type { BoundaryCoord } from "./boundaryCoord";
 
-import type { XY } from "fabric";
 import { computeVisibleIntervalsForVertex } from "./visibility";
 import { getCircular } from "../util/circularList";
 
-function printLL(ll: LinkedList<BoundaryCoord>) {
-    console.log("Linked list:");
-    // const a = ll;
+import type { XY } from "fabric";
 
-    ll.prev!.next = null;
-
-    let lll: LinkedList<BoundaryCoord> | null = ll;
-    let i = 0;
-
-    while (lll !== null) {
-        console.log(lll.point);
-        lll = lll.next;
-
-
-        i++;
-        if (i > 20) {
-            console.log("INFINITE");
-            break;
-        };
-    }
-
-    ll.prev!.next = ll;
-}
-
-export default function calculateVisibilityPolygonFromPoint(polygon: XY[], point: PointIndex) {
+export default function computeVisibilityPolygonFromPoint(polygon: XY[], point: PointIndex) {
     //// 1. Build circular linked list of polygon vertices in order
 
     const initialNodes = new Array<LinkedList<BoundaryCoord>>(polygon.length);
@@ -60,7 +37,7 @@ export default function calculateVisibilityPolygonFromPoint(polygon: XY[], point
         const newNode: LinkedList<BoundaryCoord> = { point: newVertex, next: null, prev: null };
 
         let next: LinkedList<BoundaryCoord>, prev: LinkedList<BoundaryCoord>;
-        
+
         // The immediately adjacent vertex that would be occluded by the shadow being cast
         let adjacentOccludedVertex: PointIndex;
 
@@ -91,8 +68,6 @@ export default function calculateVisibilityPolygonFromPoint(polygon: XY[], point
 
     //// 3. Extract visibility polygon from linked list
 
-    // printLL(ll!);
-
     const visPolygon: XY[] = [];
 
     ll!.prev!.next = null;  // Sever the linked list to mark where to stop
@@ -105,9 +80,6 @@ export default function calculateVisibilityPolygonFromPoint(polygon: XY[], point
         i++;
         if (i > 50) break;  // To avoid infinite loops, just in case
     }
-
-    // console.log(visPolygon);
-    
 
     return visPolygon;
 }

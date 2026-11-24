@@ -3,10 +3,11 @@ import Demo from "./Demo";
 import { GPolygon } from "../canvas/GPolygon";
 import { GuardDisplay } from "../canvas/GuardDisplay";
 
-import { Circle, Point, Polygon, type TPointerEventInfo, type XY } from "fabric";
 import isWeaklyVisible from "../geometry/weakVisibility";
 import { checkBoundaryGuard, computeFullGuardSet, computeFullGuardSetFromGuards, type FullGuardSet } from "../geometry/boundaryGuard";
 import isPolygonSimple from "../geometry/simple";
+
+import { Circle, Point, Polygon, type TPointerEventInfo, type XY } from "fabric";
 
 export default class HoleGuardingDemo extends Demo {
     private readonly poly: GPolygon;
@@ -83,7 +84,6 @@ export default class HoleGuardingDemo extends Demo {
     constructor() {
         super("holeGuardDemo", 800, 300);
 
-        // this.poly = new GPolygon(demoPoly, this.canvas);
         this.poly = new GPolygon([
             { x: 300, y: 250 },
             { x: 500, y: 250 },
@@ -115,16 +115,19 @@ export default class HoleGuardingDemo extends Demo {
             this.visibility.updatePolygon(points, added, removed);
 
             if (!isPolygonSimple(polygon.getPoints())) {
+                polygon.setFill("rgba(255,0,0,0.1)");
                 polygon.setStroke("rgb(255,0,0)");
                 
                 this.canvas.requestRenderAll();
             }
             else if (!isWeaklyVisible(points)[0]) {
+                polygon.setFill("rgba(255, 255, 0, 0.1)");
                 polygon.setStroke("rgb(200, 200, 0)");
                 
                 this.canvas.requestRenderAll();
             }
             else {
+                polygon.setFill("rgba(0, 0, 0, 0.1)");
                 polygon.setStroke("rgb(0, 0, 0)");
                 
                 this.canvas.requestRenderAll();
@@ -155,8 +158,7 @@ export default class HoleGuardingDemo extends Demo {
             this.startButton.disabled = true;
             this.customButton.disabled = true;
             
-            this.poly.setVertexColors(new Set(guardSet.guardsBefore), "rgb(0,255,0)");
-            this.visibility.setVisibleGuards(new Set());
+            this.setVisibleGuards(new Set(this.guardSet.guardsBefore))
             this.currentTriangle = -1;
         }
 

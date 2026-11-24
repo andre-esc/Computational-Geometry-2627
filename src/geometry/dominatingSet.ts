@@ -65,7 +65,12 @@ export function greedySetCover(vm: VisibilityMatrix): Set<number> {
   return Q;
 }
 
-//
+/**
+ * Performs a local search to optimize a dominating set in a visibility matrix
+ * 
+ * @param vm The visibility matrix to optimize
+ * @returns An optimized dominating set
+ */
 export function localSearchDominatingSet(
   vm: VisibilityMatrix,
 ): DominatingSetResult {

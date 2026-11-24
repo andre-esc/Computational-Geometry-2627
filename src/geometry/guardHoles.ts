@@ -4,9 +4,10 @@ import { onBase, orient, computeSegmentIntersection, isSegmentInsidePolygon, typ
 /**
  * Implements the algorithm of Ashur et al. to guard holes in a boundary vertex guard
  * 
- * @param polygon 
- * @param constructedEdges 
- * @returns A map of guard indices to the triangles that they guard
+ * @param polygon           The polygon to guard
+ * @param constructedEdges  The constructed edges of existing boundary guards
+ * 
+ * @returns A map of added guard indices to the triangles that they guard
  */
 export function guardHoles(polygon: XY[], constructedEdges: ConstructedEdge[]): Map<number, [XY, XY, XY]> {
   const all = constructedEdges.filter(e => onBase(e, polygon));
@@ -48,7 +49,6 @@ function findVertexSeeingTriangle(polygon: XY[], tri: XY[]): number {
   }
   return -1;
 }
-
 
 function isUpper(e: ConstructedEdge): boolean {
   const lower = e.lower.point, upper = e.upper.point;

@@ -15,15 +15,11 @@ function edges(points: XY[]): Edge[] {
     return e;
 }
 
-// Test if a polygon is simple (placeholder, will be replaced later)
-
 export default function isPolygonSimple(points: XY[]): boolean {
     const e = edges(points);
     
     for (let i = 0; i < e.length; i++) {
         for (let j = i+2; j < (i === 0 ? e.length-1 : e.length); j++) {
-            // if (i === 0 && j === e.length-1) continue;
-
             if (intersectSegmentSegment(e[i], e[j])) return false;
         }
     }
