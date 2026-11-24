@@ -1,5 +1,4 @@
 import { Canvas, Polygon, type XY } from "fabric";
-import { computeVisibleIntervalsForVertex, type VisibleInterval } from "../geometry/visibility";
 import calculateVisibilityPolygonFromPoint from "../geometry/visibilityPolygon";
 import type { PointIndex } from "../types/geometry";
 

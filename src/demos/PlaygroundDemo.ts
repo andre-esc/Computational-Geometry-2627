@@ -5,6 +5,7 @@ import isWeaklyVisible from "../geometry/weakVisibility";
 import isPolygonSimple from "../geometry/simple";
 import { computeBoundaryGuardSet, computeFullGuardSet } from "../geometry/boundaryGuard";
 import calculateVisibilityPolygonFromPoint from "../geometry/visibilityPolygon";
+import type { Scenario } from "./scenarios";
 
 export type StatusType = "ok" | "warn" | "error" | "info";
 
@@ -171,6 +172,12 @@ export default class PlaygroundDemo extends Demo {
             this.guardCircles.push(circle);
         }
         this.canvas.requestRenderAll();
+    }
+
+    public loadScenario(scenario: Scenario) {
+        this.clearOverlay(false);
+        this.poly.loadPoints(scenario.points);
+        this.emit(`Loaded scenario: ${scenario.name}`, "info");
     }
 
     protected override onDoubleClick(e: TPointerEventInfo<PointerEvent>): void {

@@ -197,6 +197,36 @@ export class GPolygon {
         this.canvas.requestRenderAll();
     }
 
+    /**
+     * Replace all polygon vertices with `pts`, rebuild every PointControl,
+     * and re-render.  `pts[0]` and `pts[1]` become the new base-edge endpoints.
+     */
+    public loadPoints = (pts: XY[]) => {
+        // 1. Remove every existing control circle from the canvas
+        for (const c of this.controls) this.canvas.remove(c.getControl());
+        this.controls.splice(0, this.controls.length);
+
+        // 2. Replace points on the Fabric Polygon in-place
+        this.poly.points.splice(0, this.poly.points.length, ...pts);
+
+        // 3. Sync the bottom-edge polyline to the new p0 / p1
+        this.bottomEdge.points.splice(0, this.bottomEdge.points.length,
+            this.poly.points[0], this.poly.points[1]);
+
+        // 4. Force Fabric to re-compute bounding boxes
+        this.poly.setBoundingBox(true);
+        this.poly.set("dirty", true);
+        this.bottomEdge.setBoundingBox(true);
+        this.bottomEdge.set("dirty", true);
+
+        // 5. Rebuild controls
+        this.initializeControls();
+
+        // 6. Notify listeners and re-render
+        this.onPolygonChanged({ polygon: this, added: pts.map((_, i) => i), removed: [] });
+        this.canvas.requestRenderAll();
+    }
+
     // Returns a copy of the GPolygon's points
     public getPoints = (): XY[] => this.poly.points.map(({ x, y }) => ({ x: x, y: y }));
 };

@@ -3,6 +3,7 @@ import "./style.css";
 import WVDemo from "./demos/WVDemo";
 import VisPolygonDemo from "./demos/VisPolygonDemo";
 import PlaygroundDemo from "./demos/PlaygroundDemo";
+import { SCENARIOS } from "./demos/scenarios";
 
 // ── Article demos ────────────────────────────────────────────────────────────
 
@@ -27,24 +28,6 @@ function setStatus(msg: string, type: "ok" | "warn" | "error" | "info") {
 }
 
 playgroundDemo?.setStatusCallback(setStatus);
-
-// ── Playground toolbar buttons ────────────────────────────────────────────────
-
-document.getElementById("pg-btn-wv")?.addEventListener("click", () => {
-    playgroundDemo?.checkWV();
-});
-
-document.getElementById("pg-btn-boundary")?.addEventListener("click", () => {
-    playgroundDemo?.computeBoundaryGuards();
-});
-
-document.getElementById("pg-btn-full")?.addEventListener("click", () => {
-    playgroundDemo?.computeAllGuards();
-});
-
-document.getElementById("pg-btn-clear")?.addEventListener("click", () => {
-    playgroundDemo?.clearOverlay();
-});
 
 // ── Tab switching ─────────────────────────────────────────────────────────────
 
@@ -76,3 +59,50 @@ btnPlayground?.addEventListener("click", () => activateTab("playground"));
 
 // Respect hash navigation
 if (window.location.hash === "#playground") activateTab("playground");
+
+// ── Playground toolbar buttons ────────────────────────────────────────────────
+
+document.getElementById("pg-btn-wv")?.addEventListener("click", () => {
+    playgroundDemo?.checkWV();
+});
+
+document.getElementById("pg-btn-boundary")?.addEventListener("click", () => {
+    playgroundDemo?.computeBoundaryGuards();
+});
+
+document.getElementById("pg-btn-full")?.addEventListener("click", () => {
+    playgroundDemo?.computeAllGuards();
+});
+
+document.getElementById("pg-btn-clear")?.addEventListener("click", () => {
+    playgroundDemo?.clearOverlay();
+});
+
+// ── Scenario selector ─────────────────────────────────────────────────────────
+
+const scenarioSelect = document.getElementById("pg-scenario-select") as HTMLSelectElement | null;
+
+if (scenarioSelect) {
+    // Populate the <select> from the scenarios array
+    for (const s of SCENARIOS) {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = s.name;
+        scenarioSelect.appendChild(opt);
+    }
+
+    scenarioSelect.addEventListener("change", () => {
+        const id = scenarioSelect.value;
+        if (!id) return;
+        const scenario = SCENARIOS.find(s => s.id === id);
+        if (scenario && playgroundDemo) {
+            activateTab("playground");
+            // Small delay so the canvas is visible before we reload points
+            setTimeout(() => {
+                playgroundDemo.loadScenario(scenario);
+            }, 60);
+        }
+        // Reset select to placeholder so the same item can be re-loaded
+        scenarioSelect.value = "";
+    });
+}
