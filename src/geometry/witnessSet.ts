@@ -21,12 +21,11 @@ export interface WitnessPoint {
 export function collectUniqueBoundaryCuts(polygon: XY[]): { boundaryCuts: BoundaryCoord[]; constructedEdges: ConstructedEdge[] } {
   let boundaryCuts: BoundaryCoord[] = [];
   let constructedEdges: ConstructedEdge[] = [];
-  for (var index = 0; index < polygon.length; index++) {
-    let { cutEndpoints, constructedEdges: vertexConstructedEdges } =
-      computeVertexBoundaryCutEndpoints(index, polygon);
+  for (let index = 0; index < polygon.length; index++) {
+    let {cutEndpoints, constructedEdges} = computeVertexBoundaryCutEndpoints(index, polygon);
     // Push all the cuts & the vertex
     boundaryCuts.push(...cutEndpoints);
-    constructedEdges.push(...vertexConstructedEdges);
+    constructedEdges.push(...constructedEdges);
     boundaryCuts.push({
       edgeIndex: index,
       t: 0,
