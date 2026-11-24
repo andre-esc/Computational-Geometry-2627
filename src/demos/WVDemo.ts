@@ -15,12 +15,16 @@ export default class WVDemo extends Demo {
         super(canvasId, width, height);
 
         this.poly = new GPolygon([
-            { x: 300, y: 250 },
-            { x: 500, y: 250 },
-            { x: 400, y: 50 },
+            { x: 110, y: 265 },   // u — base-edge left
+            { x: 650, y: 265 },   // v — base-edge right
+            { x: 600, y: 110 },
+            { x: 460, y: 185 },
+            { x: 380, y:  65 },
+            { x: 240, y: 175 },
+            { x: 150, y:  95 },
         ], this.canvas);
 
-        this.visPoly = new Polygon(this.poly.getPoints(), {
+        this.visPoly = new Polygon([], {
             visible: false,
             selectable: false,
             evented: false,
