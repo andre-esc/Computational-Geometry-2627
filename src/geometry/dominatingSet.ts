@@ -7,6 +7,7 @@ export interface DominatingSetResult {
   // For visualisation purposes:
   iterations: number; // Number of local search improvements performed
   initialGreedySize: number; // Size before local search optimization
+  iterationGuards: number[][]; // Guards at each iteration
 }
 
 /**
@@ -27,7 +28,7 @@ export function greedySetCover(vm: VisibilityMatrix): Set<number> {
     let bestCandidate = -1;
     let maxNewCovered = -1;
 
-    for (let c = 0; c < numCandidtaes; c++) {
+    for (let c = 2; c < numCandidtaes; c++) {
       // Skip if the set already contains this candidate.
       if (Q.has(c)) continue;
 
@@ -84,8 +85,11 @@ export function localSearchDominatingSet(
 
   let iterations = 0;
   let improved = true;
+  const iterationGuards: number[][] = [];
 
   while (improved) {
+    iterationGuards.push(Array.from(Q)); // Record iteration
+
     improved = false;
 
     // 1. PRUNING
@@ -122,7 +126,7 @@ export function localSearchDominatingSet(
     // Replace 2 guards with 1 guard.
 
     const guardArray = Array.from(Q);
-    for (let i = 0; i < guardArray.length && !improved; i++) {
+    for (let i = 2; i < guardArray.length && !improved; i++) {
       const guard1 = guardArray[i];
 
       for (let j = i + 1; j < guardArray.length && !improved; j++) {
@@ -184,5 +188,6 @@ export function localSearchDominatingSet(
     guardPoints: guards.map((idx) => vm.candidates[idx]),
     iterations,
     initialGreedySize,
+    iterationGuards,
   } as DominatingSetResult;
 }

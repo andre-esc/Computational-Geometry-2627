@@ -152,4 +152,21 @@ export class GPolygon {
 
     // Returns a copy of the GPolygon's points
     public getPoints = (): XY[] => this.poly.points.map(({ x, y }) => ({ x: x, y: y }));
+
+    public setVerticesMoveable = (moveable: boolean) => {
+        for (const c of this.controls) {
+            c.setMoveable(moveable);
+        }
+    }
+
+    public setVertexColor = (vertex: number, color: string) => {
+        this.controls[vertex].setColor(color);
+    }
+
+    // Sets vertices in the set to the color, sets all others to default
+    public setVertexColors = (vertices: Set<number>, color: string) => {
+        for (let i = 0; i < this.controls.length; i++) {
+            this.controls[i].setColor(vertices.has(i) ? color : "white")
+        }
+    }
 };
