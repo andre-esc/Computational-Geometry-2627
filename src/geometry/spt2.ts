@@ -73,7 +73,7 @@ function findTangentToFunnel(pointRef: XY[], funnel: PointIndex[], apexAt: numbe
         const firstTurn = orient(pointRef[target], pointRef[funnel[edge[0]]], pointRef[funnel[edge[1]]]);
         const secondTurn = orient(pointRef[target], pointRef[funnel[edge[1]]], pointRef[funnel[edge[2]]]);
 
-        if (firstTurn * secondTurn < 0) return edge[1];
+        if (firstTurn * secondTurn <= 0) return edge[1];
         else return edge[0];
     }
 }

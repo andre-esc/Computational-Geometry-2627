@@ -41,16 +41,16 @@ function * visHelper(pointRef: XY[], spt: PointIndex[], from: 0 | 1) {
             const v = pointRef[vIndex];
             const u = pointRef[uIndex];
 
-            console.log(`p${from} SPT: checking ${spt[spt[i]]} ${spt[i]} ${i}`);
+            // console.log(`p${from} SPT: checking ${spt[spt[i]]} ${spt[i]} ${i}`);
 
             // If we're currently checking a turn adjacent to a concave base edge vertex
             if (uIndex === from && v.y > u.y && concaveDirection * orient(u, v, w) > 0) {
-                console.log("CONCAVE OBSTRUCTION!");
+                // console.log("CONCAVE OBSTRUCTION!");
                 yield { uIndex, vIndex, ccwiseVisRegionStart: from === 1 } as ShadowProjection;
             }
             // If we're checking a regular turn
             else if (concaveDirection * orient(u, v, w) < 0) {
-                console.log("OBSTRUCTION!");
+                // console.log("OBSTRUCTION!");
                 yield { uIndex, vIndex, ccwiseVisRegionStart: from === 0 } as ShadowProjection;
             }
 
@@ -130,7 +130,7 @@ export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
     ll.next.prev = ll;
     ll = ll.next;
 
-    console.log("linked list:", ll);
+    // console.log("linked list:", ll);
 
     //// 2. Check if remaining points satisfy the visibility condition (p0/p1 shortest paths always turn left/right)
 
@@ -139,8 +139,8 @@ export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
     const p0spt = computeShortestPathTree(polygon, triangles, dualTree, commonEdgeMatrix, 0, rootIndex);
     const p1spt = computeShortestPathTree(polygon, triangles, dualTree, commonEdgeMatrix, 1, rootIndex);
 
-    console.log(`p0 SPT: ${p0spt}`);
-    console.log(`p1 SPT: ${p1spt}`);
+    // console.log(`p0 SPT: ${p0spt}`);
+    // console.log(`p1 SPT: ${p1spt}`);
 
     const p0visibilityGenerator = visHelper(polygon, p0spt, 0);
     let p0visibility = p0visibilityGenerator.next();
@@ -170,7 +170,7 @@ export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
 
     //// 3. Extract visibility polygon from linked list
 
-    console.log("Extraction");
+    // console.log("Extraction");
 
     const visPolygon: XY[] = [];
 
@@ -178,7 +178,7 @@ export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
     let i = 0;
 
     while (ll !== null) {
-        console.log(ll);
+        // console.log(ll);
         visPolygon.push(ll.point.point);
 
         ll = ll.next;
@@ -187,7 +187,7 @@ export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
         if (i > 50) break;  // To avoid infinite loops, just in case
     }
 
-    console.log(visPolygon);
+    // console.log(visPolygon);
 
     return [isWeaklyVisible, visPolygon];
 }

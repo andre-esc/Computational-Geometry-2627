@@ -63,4 +63,15 @@ export class PointControl {
         this.control.on("contextmenu", _e => this.onRightClick(this));
         this.control.on("mousedblclick", _e => this.onDoubleClick(this));
     }
+
+    public setMoveable = (moveable: boolean) => {
+        this.control.set({
+            selectable: moveable,
+            evented: moveable,
+        })
+    }
+
+    public setColor = (color: string) => {
+        this.circle.set("fill", color);
+    }
 };

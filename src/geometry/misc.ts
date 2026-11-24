@@ -37,11 +37,11 @@ export function isConvex(n1: XY, p: XY, n2: XY) {
 }
 
 export function isInTriangle(p: XY, t1: XY, t2: XY, t3: XY) {
-  const e1orient = Math.sign(orient(p, t1, t2));
-  const e2orient = Math.sign(orient(p, t2, t3));
-  const e3orient = Math.sign(orient(p, t3, t1));
+  const e1orient = orient(p, t1, t2);
+  const e2orient = orient(p, t2, t3);
+  const e3orient = orient(p, t3, t1);
 
-  return e1orient === e2orient && e2orient === e3orient;
+  return e1orient * e2orient > 0 && e3orient * e2orient > 0;
 }
 
 // Comparison function for leftmost points in lexicographic order

@@ -7,6 +7,53 @@ import isWeaklyVisible from "../geometry/weakVisibility";
 
 import { Polygon, type TPointerEventInfo } from "fabric";
 
+const demoPoly = [
+    {
+        "x": 100,
+        "y": 260
+    },
+    {
+        "x": 700,
+        "y": 260
+    },
+    {
+        "x": 600,
+        "y": 250
+    },
+    {
+        x: 480,
+        y: 130
+    },
+    {
+        x: 520,
+        y: 100
+    },
+    {
+        x: 470,
+        y: 120
+    },
+    {
+        x: 415,
+        y: 60,
+    },
+    {
+        x: 430,
+        y: 20,
+    },
+    {
+        x: 370,
+        y: 20,
+    },
+    {
+        x: 385,
+        y: 60,
+    },
+    {
+        "x": 200,
+        "y": 250
+    }
+]
+
 export default class WVDemo extends Demo {
     private readonly poly: GPolygon;
     private readonly visPoly: Polygon;
@@ -14,6 +61,7 @@ export default class WVDemo extends Demo {
     constructor(canvasId = "wvDemo", width = 760, height = 300) {
         super(canvasId, width, height);
 
+        // this.poly = new GPolygon(demoPoly, this.canvas);
         this.poly = new GPolygon([
             { x: 110, y: 265 },   // u — base-edge left
             { x: 650, y: 265 },   // v — base-edge right

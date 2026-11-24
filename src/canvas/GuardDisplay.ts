@@ -81,11 +81,32 @@ export class GuardDisplay {
         this.canvas.requestRenderAll();
     }
 
-    public toggleGuardVisible(index: PointIndex) {
-        const isVisible = this.visibilityPolygons[index].get("visible");
-        this.visibilityPolygons[index].set("visible", !isVisible);
+    public getVisibleGuards(): number[] {
+        return this.visibilityPolygons.reduce<number[]>((acc, vp, i) => {
+            if (vp.get("visible")) acc.push(i);
 
-        console.log(this.visibilityPolygons[index].points)
+            return acc;
+        }, []);
+    }
+
+    public isGuardVisible(index: PointIndex) {
+        return this.visibilityPolygons[index].get("visible");
+    }
+
+    public toggleGuardVisible(index: PointIndex) {
+        const isVisible = this.isGuardVisible(index);
+
+        this.setGuardVisible(index, !isVisible);
+    }
+
+    public setGuardVisible(index: PointIndex, visible: boolean) {
+        this.visibilityPolygons[index].set("visible", visible);
+
+        this.canvas.requestRenderAll();
+    }
+
+    public setGuardColor(index: PointIndex, color: string) {
+        this.visibilityPolygons[index].set("fill", color);
 
         this.canvas.requestRenderAll();
     }
