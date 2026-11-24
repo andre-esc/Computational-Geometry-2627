@@ -1,18 +1,6 @@
 import { Canvas, Polygon, type XY } from "fabric";
-import calculateVisibilityPolygonFromPoint from "../geometry/visibilityPolygon";
-import isPolygonSimple from "../geometry/simple";
+import computeVisibilityPolygonFromPoint from "../geometry/visibilityPolygon";
 import type { PointIndex } from "../types/geometry";
-
-export const GUARD_COLORS = [
-    "#4c82f7",
-    "#e76f51",
-    "#2a9d8f",
-    "#9b5de5",
-    "#f4a261",
-    "#00a6a6",
-    "#d45087",
-    "#6a994e",
-];
 
 export class GuardDisplay {
     private readonly canvas: Canvas;
@@ -20,20 +8,23 @@ export class GuardDisplay {
     private polyPoints: XY[];
     private readonly visibilityPolygons: Polygon[] = [];
 
-    private createVisibilityPolygon(points: XY[], index: number) {
-        const color = this.getGuardColor(index);
+    private createVisibilityPolygon(points: XY[]) {
         return new Polygon(points, {
             visible: false,
             selectable: false,
             evented: false,
-            fill: `${color}20`,
-            stroke: `${color}80`,
+            fill: "rgba(0,255,0,0.05)",
+            stroke: "rgba(0,0,0,0.1)",
         })
     }
 
     private initializeVisibilityPolygons() {
         for (let i = 0; i < this.polyPoints.length; i++) {
-            const polygon = this.createVisibilityPolygon([], i);
+            // if (i !== 1) continue;
+
+            const visPolyPoints = computeVisibilityPolygonFromPoint(this.polyPoints, i);
+
+            const polygon = this.createVisibilityPolygon(visPolyPoints);
             
             this.visibilityPolygons.push(polygon);
             this.canvas.add(polygon);
@@ -42,15 +33,17 @@ export class GuardDisplay {
 
     private updateVisibilityPolygons() {
         for (let i = 0; i < this.polyPoints.length; i++) {
-            const visPolyPoints = calculateVisibilityPolygonFromPoint(this.polyPoints, i);
+            // if (i !== 1) continue;
+
+            const visPolyPoints = computeVisibilityPolygonFromPoint(this.polyPoints, i);
 
             this.visibilityPolygons[i].set({
                 points: visPolyPoints,
                 dirty: true,
             });
             this.visibilityPolygons[i].setBoundingBox(true);
+            this.canvas.requestRenderAll();
         }
-        this.canvas.requestRenderAll();
     }
 
     public constructor(points: XY[], canvas: Canvas) {
@@ -58,23 +51,22 @@ export class GuardDisplay {
         this.canvas = canvas;
 
         this.initializeVisibilityPolygons();
-        this.updateVisibilityPolygons();
     }
 
     public updatePolygon(newPolygon: XY[], added: PointIndex[], removed: PointIndex[]) {
         this.polyPoints = newPolygon;
 
-        const topologyChanged = added.length > 0 || removed.length > 0 ||
-            this.visibilityPolygons.length !== newPolygon.length;
-        if (topologyChanged) {
-            for (const polygon of this.visibilityPolygons) this.canvas.remove(polygon);
-            this.visibilityPolygons.splice(0, this.visibilityPolygons.length);
-            this.initializeVisibilityPolygons();
+        for (const i of added) {
+            const newPoly = this.createVisibilityPolygon([]);
+
+            this.visibilityPolygons.splice(i, 0, newPoly);
+            this.canvas.add(newPoly);
         }
 
-        if (!isPolygonSimple(newPolygon)) {
-            this.setVisibleGuards(new Set());
-            return;
+        for (const i of removed) {
+            const removed = this.visibilityPolygons.splice(i, 1);
+
+            this.canvas.remove(removed[0]);
         }
 
         this.updateVisibilityPolygons();
@@ -114,15 +106,8 @@ export class GuardDisplay {
     }
 
     public setGuardColor(index: PointIndex, color: string) {
-        this.visibilityPolygons[index].set({
-            fill: `${color}18`,
-            stroke: `${color}55`,
-        });
+        this.visibilityPolygons[index].set("fill", color);
 
         this.canvas.requestRenderAll();
-    }
-
-    public getGuardColor(index: PointIndex): string {
-        return GUARD_COLORS[index % GUARD_COLORS.length];
     }
 }

@@ -14,7 +14,6 @@ export default class WVDemo extends Demo {
     constructor(canvasId = "wvDemo", width = 760, height = 300) {
         super(canvasId, width, height);
 
-        // this.poly = new GPolygon(demoPoly, this.canvas);
         this.poly = new GPolygon([
             { x: 110, y: 265 },   // u — base-edge left
             { x: 650, y: 265 },   // v — base-edge right

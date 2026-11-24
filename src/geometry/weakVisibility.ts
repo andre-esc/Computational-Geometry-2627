@@ -1,14 +1,19 @@
 import type { PointIndex } from "../types/geometry";
-import type { BoundaryCoord } from "./boundaryCoord";
+import type { LinkedList } from "../types/util";
+
 import { getCircular } from "../util/circularList";
+
+import type { BoundaryCoord } from "./boundaryCoord";
 import { orient } from "./misc";
 import { shootRayToFirstBoundaryHit } from "./visibility";
-
 import triangulate from "./triangulation";
 import computeShortestPathTree from "./spt2";
 
 import type { XY } from "fabric";
-import type { LinkedList } from "../types/util";
+
+// ---------------------- AI USAGE --------------------------
+//    The following section is [AI:0] on the 0rwx scale.
+// ----------------------------------------------------------
 
 type ShadowProjection = {
     uIndex: PointIndex, vIndex: PointIndex,  // Sightline projecting the shadow
@@ -41,24 +46,18 @@ function * visHelper(pointRef: XY[], spt: PointIndex[], from: 0 | 1) {
             const v = pointRef[vIndex];
             const u = pointRef[uIndex];
 
-            // console.log(`p${from} SPT: checking ${spt[spt[i]]} ${spt[i]} ${i}`);
-
             // If we're currently checking a turn adjacent to a concave base edge vertex
             if (uIndex === from && v.y > u.y && concaveDirection * orient(u, v, w) > 0) {
-                // console.log("CONCAVE OBSTRUCTION!");
                 yield { uIndex, vIndex, ccwiseVisRegionStart: from === 1 } as ShadowProjection;
             }
             // If we're checking a regular turn
             else if (concaveDirection * orient(u, v, w) < 0) {
-                // console.log("OBSTRUCTION!");
                 yield { uIndex, vIndex, ccwiseVisRegionStart: from === 0 } as ShadowProjection;
             }
 
         }
     }
 }
-
-
 
 // Helper function for projecting a sightline onto the polygon
 function projectShadow(
@@ -71,7 +70,6 @@ function projectShadow(
     const edgeBeforeV = (vIndex - 1 + polygon.length) % polygon.length;
 
     const projection = shootRayToFirstBoundaryHit(u, v, polygon, [edgeBeforeV, vIndex]);
-    // console.log(projection);
 
     if (projection === null) throw new Error("Sightline causes shadow, but does not project onto boundary.");
 
@@ -109,17 +107,12 @@ export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
     ll.next.prev = ll;
     ll = ll.next;
 
-    // console.log("linked list:", ll);
-
     //// 2. Check if remaining points satisfy the visibility condition (p0/p1 shortest paths always turn left/right)
 
     const { triangles, dualTree, rootIndex, commonEdgeMatrix } = triangulate(polygon);
 
     const p0spt = computeShortestPathTree(polygon, triangles, dualTree, commonEdgeMatrix, 0, rootIndex);
     const p1spt = computeShortestPathTree(polygon, triangles, dualTree, commonEdgeMatrix, 1, rootIndex);
-
-    // console.log(`p0 SPT: ${p0spt}`);
-    // console.log(`p1 SPT: ${p1spt}`);
 
     const p0visibilityGenerator = visHelper(polygon, p0spt, 0);
     let p0visibility = p0visibilityGenerator.next();
@@ -149,15 +142,12 @@ export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
 
     //// 3. Extract visibility polygon from linked list
 
-    // console.log("Extraction");
-
     const visPolygon: XY[] = [];
 
     ll!.prev!.next = null;  // Sever the linked list to mark where to stop
     let i = 0;
 
     while (ll !== null) {
-        // console.log(ll);
         visPolygon.push(ll.point.point);
 
         ll = ll.next;
@@ -165,8 +155,6 @@ export default function isWeaklyVisible(polygon: XY[]): [boolean, XY[]] {
         i++;
         if (i > 50) break;  // To avoid infinite loops, just in case
     }
-
-    // console.log(visPolygon);
 
     return [isWeaklyVisible, visPolygon];
 }

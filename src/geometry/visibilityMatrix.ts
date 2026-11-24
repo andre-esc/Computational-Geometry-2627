@@ -1,6 +1,11 @@
-import type { XY } from "fabric";
 import type { WitnessPoint } from "./witnessSet";
 import { isSegmentInsidePolygon } from "./misc";
+
+import type { XY } from "fabric";
+
+// ---------------------- AI USAGE --------------------------
+//    The following section is [AI:0] on the 0rwx scale.
+// ----------------------------------------------------------
 
 export interface VisibilityMatrix {
   candidates: XY[]; // The set C of all vertices of the polygon

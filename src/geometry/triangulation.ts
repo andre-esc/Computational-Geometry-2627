@@ -5,6 +5,10 @@ import type { PointIndex, IndexTriangle, TriangleIndex } from "../types/geometry
 
 import type { XY } from "fabric";
 
+// ---------------------- AI USAGE --------------------------
+//    The following section is [AI:0] on the 0rwx scale.
+// ----------------------------------------------------------
+
 function isAnEar(index: number, pointRef: XY[], availablePoints: number[]) {
     if (availablePoints.length <= 3) return true;
     
@@ -34,12 +38,8 @@ function isAnEar(index: number, pointRef: XY[], availablePoints: number[]) {
 function findEarIndex(pointRef: XY[], availablePoints: number[]): number {
     let i = 0;
 
-
-    // console.log(availablePoints);
     for (; i < availablePoints.length; i++) {
         if (isAnEar(i, pointRef, availablePoints)) {
-            // console.log("Found ear", availablePoints[i], "at index", i, "of polygon", availablePoints);
-
             return i;
         }
     }
@@ -93,8 +93,7 @@ export default function triangulate(points: XY[]): TriangulationDualTree {
 
             const newPoints = availablePoints.slice();
             newPoints.splice(earIndex, 1);
-            console.log("removed ear", availablePoints[earIndex], "new poly", newPoints);
-
+            
             triangle = [n1, availablePoints[earIndex], n2];
 
             res = _triangulate(newPoints);
@@ -131,9 +130,6 @@ export default function triangulate(points: XY[]): TriangulationDualTree {
     }
 
     const triangles = _triangulate(points.map((_, i) => i));
-
-    console.log("triangulation", triangles);
-    console.log("root index", edgeMap.get("0 1"));
     
     // Adjacency matrix storing the common edges
     const commonEdgeMatrix = new Array(triangles.length).fill(null).map(() => new Array<[PointIndex, PointIndex] | null>(triangles.length).fill(null));
@@ -148,18 +144,8 @@ export default function triangulate(points: XY[]): TriangulationDualTree {
         }
     }
 
-    console.log("common edge matrix", commonEdgeMatrix);
-
     const rootIndex = edgeMap.get("0 1")![0];  // Boundary edges always have one element (triangle) in edgeMap
     const dualTree = getSpanningTree(dualGraphAdjacencyList, rootIndex);
-
-    console.log("root index", rootIndex);
-    console.log("adjacency list", dualGraphAdjacencyList);
-    console.log("dual tree", dualTree);
-
-    // console.log("Weakly visible ?", isWeaklyVisible(points, triangles, tree, commonEdgeMatrix, rootIndex));
-
-    // return []
 
     return { triangles, dualTree, rootIndex, commonEdgeMatrix };
 }
