@@ -51,8 +51,6 @@ export function computeBoundaryGuardSet(polygon: XY[]) {
     }
   }
   if (trimmed.trimmedRight > 0) {
-    console.log("Before shifting", guardSet.dominatingSet);
-
     guardSet.dominatingSet.guards.push(1);
     guardSet.dominatingSet.guardPoints.push(polygon[1]);
 

@@ -130,7 +130,6 @@ export function computeVisibleIntervalsForVertex(
           x: polygon[j].x + (polygon[j].x - guard.x),
           y: polygon[j].y + (polygon[j].y - guard.y),
         },
-        // { x: -guard.x, y: -guard.y },
         polygon,
         [prevEdge, nextEdge],
       );
@@ -194,9 +193,6 @@ export function computeVisibleIntervalsForVertex(
     intervals.push({ start: currentStart, end: uniqueCuts[0] });
   }
 
-
-  // console.log(`p${guardIndex}:`, intervals);
-
   return { intervals, constructedEdges };
 }
 
@@ -252,7 +248,6 @@ function recordConstructedEdge(
 export function getConstructedEdges(polygon: XY[], guards: number[]) {
     const constructedEdges: ConstructedEdge[] = [];
 
-    // computeVisibleIntervalsForVertex()
     for (const g of guards) {
         const { constructedEdges: c } = computeVisibleIntervalsForVertex(g, polygon);
 
