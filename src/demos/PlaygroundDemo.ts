@@ -3,28 +3,25 @@ import { GPolygon } from "../canvas/GPolygon";
 import { Circle, Polygon, type TPointerEventInfo, type XY } from "fabric";
 import isWeaklyVisible from "../geometry/weakVisibility";
 import isPolygonSimple from "../geometry/simple";
-import { computeBoundaryGuardSet, computeFullGuardSet } from "../geometry/boundaryGuard";
+import {
+    checkBoundaryGuard,
+    computeBoundaryGuardSet,
+    computeFullGuardSet,
+    computeFullGuardSetFromGuards,
+} from "../geometry/boundaryGuard";
 import calculateVisibilityPolygonFromPoint from "../geometry/visibilityPolygon";
+import { GUARD_COLORS } from "../canvas/GuardDisplay";
 import type { Scenario } from "./scenarios";
 
 export type StatusType = "ok" | "warn" | "error" | "info";
-
-const GUARD_COLORS = [
-    "#4c82f7",
-    "#e76f51",
-    "#2a9d8f",
-    "#9b5de5",
-    "#f4a261",
-    "#00a6a6",
-    "#d45087",
-    "#6a994e",
-];
 
 export default class PlaygroundDemo extends Demo {
     private readonly poly: GPolygon;
     private guardCircles: Circle[] = [];
     private visPolygons: Polygon[] = [];
+    private holeTriangles: Polygon[] = [];
     private statusCallback: ((msg: string, type: StatusType) => void) | null = null;
+    private scenarioBoundaryGuards?: number[];
 
     constructor(canvasId = "playgroundCanvas", width = 920, height = 520) {
         super(canvasId, width, height);
@@ -41,6 +38,7 @@ export default class PlaygroundDemo extends Demo {
         ], this.canvas);
 
         this.poly.onPolygonChanged = () => {
+            this.scenarioBoundaryGuards = undefined;
             this.clearOverlay(false);
         };
     }
@@ -54,8 +52,10 @@ export default class PlaygroundDemo extends Demo {
     public clearOverlay(notify = true) {
         for (const c of this.guardCircles) this.canvas.remove(c);
         for (const p of this.visPolygons) this.canvas.remove(p);
+        for (const triangle of this.holeTriangles) this.canvas.remove(triangle);
         this.guardCircles = [];
         this.visPolygons = [];
+        this.holeTriangles = [];
         this.poly.setFill("rgba(0,0,0,0.08)");
         this.poly.setStroke("rgb(80,80,80)");
         this.canvas.requestRenderAll();
@@ -102,12 +102,26 @@ export default class PlaygroundDemo extends Demo {
         this.clearOverlay(false);
 
         try {
-            const { dominatingSet } = computeBoundaryGuardSet(pts);
-            this.renderGuards(pts, dominatingSet.guards);
+            const presetGuards = this.getScenarioBoundaryGuards(pts);
+            let guards: number[];
+            let details: string;
+            if (presetGuards) {
+                guards = presetGuards;
+                details = " (preset boundary-covering set).";
+            } else {
+                const { dominatingSet } = computeBoundaryGuardSet(pts);
+                guards = dominatingSet.guards;
+                details =
+                    ` (greedy init: ${dominatingSet.initialGreedySize}, ` +
+                    `${dominatingSet.iterations} local-search iteration(s)).`;
+            }
+            const fullGuardSet = computeFullGuardSetFromGuards(pts, guards);
+            this.renderHoleTriangles(fullGuardSet.extraGuardTriangles);
+            this.renderGuards(pts, guards);
             this.emit(
-                `Boundary guard: ${dominatingSet.guards.length} guard${dominatingSet.guards.length !== 1 ? "s" : ""} ` +
-                `(greedy init: ${dominatingSet.initialGreedySize}, ` +
-                `${dominatingSet.iterations} local-search iteration${dominatingSet.iterations !== 1 ? "s" : ""}).`,
+                `Boundary guard: ${guards.length} guard${guards.length !== 1 ? "s" : ""}` +
+                    details +
+                    ` ${fullGuardSet.extraGuardTriangles.length} interior hole candidate(s) highlighted.`,
                 "ok"
             );
         } catch (e) {
@@ -131,10 +145,15 @@ export default class PlaygroundDemo extends Demo {
         this.clearOverlay(false);
 
         try {
-            const guards = computeFullGuardSet(pts).totalGuards;
-            this.renderGuards(pts, guards);
+            const boundaryGuards = this.getScenarioBoundaryGuards(pts);
+            const fullGuardSet = (boundaryGuards
+                ? computeFullGuardSetFromGuards(pts, boundaryGuards)
+                : computeFullGuardSet(pts));
+            this.renderHoleTriangles(fullGuardSet.extraGuardTriangles);
+            this.renderGuards(pts, fullGuardSet.totalGuards);
             this.emit(
-                `Full guard set: ${guards.length} guard${guards.length !== 1 ? "s" : ""} covering the entire interior.`,
+                `Full guard set: ${fullGuardSet.totalGuards.length} guard(s); ` +
+                `${fullGuardSet.extraGuardTriangles.length} interior hole candidate(s) highlighted.`,
                 "ok"
             );
         } catch (e) {
@@ -186,10 +205,38 @@ export default class PlaygroundDemo extends Demo {
         this.canvas.requestRenderAll();
     }
 
+    private renderHoleTriangles(triangles: [number, [XY, XY, XY]][]) {
+        for (const [, points] of triangles) {
+            const triangle = new Polygon(points, {
+                fill: "rgba(255,0,0,0.2)",
+                stroke: "rgb(255,0,0)",
+                strokeWidth: 2,
+                strokeDashArray: [5, 5],
+                selectable: false,
+                evented: false,
+            });
+            this.canvas.add(triangle);
+            this.holeTriangles.push(triangle);
+        }
+    }
+
     public loadScenario(scenario: Scenario) {
         this.clearOverlay(false);
         this.poly.loadPoints(scenario.points);
+        this.scenarioBoundaryGuards = scenario.boundaryGuards;
         this.emit(`Loaded ${scenario.name}. ${scenario.description}`, "info");
+    }
+
+    private getScenarioBoundaryGuards(points: XY[]): number[] | undefined {
+        const guards = this.scenarioBoundaryGuards;
+        if (
+            guards &&
+            guards.every(guard => Number.isInteger(guard) && guard >= 0 && guard < points.length) &&
+            checkBoundaryGuard(points, guards)
+        ) {
+            return guards;
+        }
+        return undefined;
     }
 
     protected override onDoubleClick(e: TPointerEventInfo<PointerEvent>): void {

@@ -3,7 +3,7 @@ import calculateVisibilityPolygonFromPoint from "../geometry/visibilityPolygon";
 import isPolygonSimple from "../geometry/simple";
 import type { PointIndex } from "../types/geometry";
 
-const GUARD_COLORS = [
+export const GUARD_COLORS = [
     "#4c82f7",
     "#e76f51",
     "#2a9d8f",
@@ -114,7 +114,10 @@ export class GuardDisplay {
     }
 
     public setGuardColor(index: PointIndex, color: string) {
-        this.visibilityPolygons[index].set("fill", color);
+        this.visibilityPolygons[index].set({
+            fill: `${color}18`,
+            stroke: `${color}55`,
+        });
 
         this.canvas.requestRenderAll();
     }

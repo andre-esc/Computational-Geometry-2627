@@ -5,17 +5,14 @@ export interface Scenario {
     name: string;
     description: string;
     points: XY[];
+    boundaryGuards?: number[];
 }
 
 /**
  * All points are designed for a 920×520 canvas.
- * p0 / p1 are always the base-edge endpoints (at y ≈ 450).
+ * p0 / p1 are the base-edge endpoints.
  * The WV test scenarios are weakly visible from that base edge; the explicitly
  * named bent-corridor example is intentionally not.
- *
- * These shapes are intentionally crafted so that the boundary-guard
- * set leaves uncovered interior pockets, exercising the hole-guarding
- * stage of the algorithm.
  */
 export const SCENARIOS: Scenario[] = [
     {
@@ -54,23 +51,23 @@ export const SCENARIOS: Scenario[] = [
 
     {
         id: "interior-hole-example",
-        name: "Interior guard candidate",
+        name: "Hourglass interior visibility hole",
         description:
-            "A weakly visible polygon whose boundary guards produce a candidate triangle " +
-            "from intersecting constructed edges. The candidate is not necessarily an uncovered hole.",
+            "This hourglass-shaped polygon is weakly visible from its base edge. Guards p0, p5 and p8 " +
+            "cover the boundary but leave an interior hole; the algorithm adds p2 to fill it.",
+        boundaryGuards: [0, 5, 8],
         points: [
-            { x: 90,  y: 450 },   // p0 — base left
-            { x: 830, y: 450 },   // p1 — base right
-            { x: 830, y: 130 },
-            { x: 505, y: 130 },
-            { x: 505, y: 180 },
-            { x: 410, y: 180 },
-            { x: 410, y: 315 },
-            { x: 305, y: 315 },
-            { x: 305, y: 280 },
-            { x: 190, y: 280 },
-            { x: 190, y: 130 },
-            { x: 90,  y: 130 },
+            { x: 80, y: 450 },    // p0 — base left
+            { x: 840, y: 450 },   // p1 — base right
+            { x: 632.7, y: 397.4 },
+            { x: 645.6, y: 285.5 },
+            { x: 590, y: 215.1 },
+            { x: 671.6, y: 146.2 },
+            { x: 476.2, y: 126.2 },
+            { x: 295.5, y: 146.2 },
+            { x: 324.9, y: 215.1 },
+            { x: 386.4, y: 285.5 },
+            { x: 298.8, y: 397.4 },
         ],
     },
 

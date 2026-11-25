@@ -955,10 +955,10 @@
               <span class="demo-title">Interior hole guarding</span>
             </div>
             <div class="demo-instructions">
-              This weakly visible example has boundary guards that cover \(\partial P\) but leave a large interior hole.
-              Click <strong>Find boundary guards</strong> to show their regions, then <strong>Next step</strong>
-              to add the guard that fills each remaining hole. You can also double-click vertices to select a custom
-              set that guards the boundary.
+              This hourglass-shaped weakly visible example has preset guards \(p_0,p_5,p_8\) that cover
+              \(\partial P\) but leave an interior hole. Click <strong>Find boundary guards</strong> to show
+              their regions, then <strong>Next step</strong> to add the algorithm's guard \(p_2\) and fill
+              the hole. You can also double-click vertices to select a custom set that guards the boundary.
             </div>
             <div class="hole-guard-controls">
               <button id="holeGuard_start" class="btn btn-primary">Find boundary guards</button>
@@ -1132,7 +1132,7 @@
       Ready — draw a weakly-visible polygon then click one of the buttons above.
     </div>
     <div class="pg-legend">
-      Each guard and its visible area use a distinct color.
+      Each guard and its visible area use a distinct color. Red dashed triangles mark interior hole candidates.
     </div>
   </div>
 

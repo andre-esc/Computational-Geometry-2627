@@ -1,7 +1,7 @@
 import Demo from "./Demo";
 
 import { GPolygon } from "../canvas/GPolygon";
-import { GuardDisplay } from "../canvas/GuardDisplay";
+import { GUARD_COLORS, GuardDisplay } from "../canvas/GuardDisplay";
 
 import { Circle, Point, Polygon, type TPointerEventInfo, type XY } from "fabric";
 import isWeaklyVisible from "../geometry/weakVisibility";
@@ -13,12 +13,14 @@ export default class HoleGuardingDemo extends Demo {
     private readonly poly: GPolygon;
     private readonly visibility: GuardDisplay;
 
+    private guardCircles: Circle[] = [];
     private readonly triangle: Polygon;
     private readonly intersectionPoint: Circle;
 
     private isDemoActive = false;
     private guardSet?: FullGuardSet;
     private currentTriangle = 0;
+    private boundaryGuardExample?: number[];
 
     private readonly startButton = document.getElementById("holeGuard_start") as HTMLButtonElement;
     private readonly customButton = document.getElementById("holeGuard_custom") as HTMLButtonElement;
@@ -26,13 +28,45 @@ export default class HoleGuardingDemo extends Demo {
     private readonly statusElement = document.getElementById("holeGuard_status");
 
     private readonly setVisibleGuards = (guards: Set<number>) => {
-        this.visibility.setVisibleGuards(new Set(guards));
-        this.poly.setVertexColors(guards, "rgb(0,255,0)");
+        const orderedGuards = [...guards];
+        const visibleGuards = new Set(orderedGuards);
+        const points = this.poly.getPoints();
+
+        this.visibility.setVisibleGuards(visibleGuards);
+        this.poly.setVertexColors(new Set(), "white");
+        for (const circle of this.guardCircles) this.canvas.remove(circle);
+        this.guardCircles = [];
+
+        orderedGuards.forEach((guard, index) => {
+            const color = GUARD_COLORS[index % GUARD_COLORS.length];
+            const point = points[guard];
+            this.visibility.setGuardColor(guard, color);
+
+            const circle = new Circle({
+                left: point.x - 9,
+                top: point.y - 9,
+                radius: 9,
+                fill: color,
+                stroke: "#ffffff",
+                strokeWidth: 2.5,
+                selectable: false,
+                evented: false,
+            });
+            this.canvas.add(circle);
+            this.guardCircles.push(circle);
+        });
+
+        this.canvas.requestRenderAll();
     }
 
-    private readonly setGuardVisible = (guard: number) => {
-        this.visibility.setGuardVisible(guard, true);
-        this.poly.setVertexColor(guard, "rgb(0,255,0)");
+    private readonly toggleGuard = (guard: number) => {
+        const guards = new Set(this.visibility.getVisibleGuards());
+        if (guards.has(guard)) {
+            guards.delete(guard);
+        } else {
+            guards.add(guard);
+        }
+        this.setVisibleGuards(guards);
     }
 
     private readonly setActiveTriangle = (triangle: [XY, XY, XY]) => {
@@ -93,6 +127,7 @@ export default class HoleGuardingDemo extends Demo {
 
         const example = SCENARIOS.find(scenario => scenario.id === "interior-hole-example");
         if (!example) throw new Error("The interior hole example scenario is missing.");
+        this.boundaryGuardExample = example.boundaryGuards;
         this.poly = new GPolygon(example.points, this.canvas);
 
         this.visibility = new GuardDisplay(this.poly.getPoints(), this.canvas);
@@ -116,8 +151,10 @@ export default class HoleGuardingDemo extends Demo {
 
         this.poly.onPolygonChanged = ({ polygon, added, removed }) => {
             const points = polygon.getPoints();
+            this.boundaryGuardExample = undefined;
 
             this.visibility.updatePolygon(points, added, removed);
+            this.setVisibleGuards(new Set());
 
             if (!isPolygonSimple(polygon.getPoints())) {
                 polygon.setStroke("rgb(255,0,0)");
@@ -137,23 +174,29 @@ export default class HoleGuardingDemo extends Demo {
         }
 
         this.poly.onVertexDoubleClicked = (_polygon, i) => {
-            const isGuardVisible = this.visibility.isGuardVisible(i);
-
-            this.visibility.toggleGuardVisible(i);
-            this.poly.setVertexColor(i, isGuardVisible ? "white" : "rgb(0,255,0)");
+            this.toggleGuard(i);
         }
 
         this.startButton.onclick = _e => {
             const points = this.poly.getPoints();
 
             if (!this.verify(false)) return;
+            if (
+                this.boundaryGuardExample &&
+                !checkBoundaryGuard(points, this.boundaryGuardExample)
+            ) {
+                this.setStatus("The preset guards no longer cover the polygon boundary.", "error");
+                return;
+            }
 
             this.isDemoActive = true;
             
             this.poly.setVerticesMoveable(false);
             this.setTriangleVisible(false);
 
-            const guardSet = computeFullGuardSet(points);
+            const guardSet = this.boundaryGuardExample
+                ? computeFullGuardSetFromGuards(points, this.boundaryGuardExample)
+                : computeFullGuardSet(points);
             this.guardSet = guardSet;
 
             this.nextButton.disabled = false;
@@ -166,7 +209,8 @@ export default class HoleGuardingDemo extends Demo {
                 this.setActiveTriangle(guardSet.extraGuardTriangles[0][1]);
             }
             this.setStatus(
-                `Boundary stage: ${guardSet.guardsBefore.length} guard(s) cover ∂P; ` +
+                `${this.boundaryGuardExample ? "Preset boundary stage" : "Boundary stage"}: ` +
+                `${guardSet.guardsBefore.length} guard(s) cover ∂P; ` +
                 `${guardSet.extraGuardTriangles.length} interior candidate triangle(s) found. ` +
                 `Click Next step to inspect the proposed guards.`,
             );
@@ -222,7 +266,7 @@ export default class HoleGuardingDemo extends Demo {
             } else {
                 const [guard, triangle] = this.guardSet.extraGuardTriangles[this.currentTriangle];
 
-                this.setGuardVisible(guard);
+                this.setVisibleGuards(new Set([...this.visibility.getVisibleGuards(), guard]));
                 this.setActiveTriangle(triangle);
                 this.setStatus(
                     `Candidate ${this.currentTriangle + 1} of ${this.guardSet.extraGuardTriangles.length}: ` +
