@@ -21,10 +21,11 @@ export function collectUniqueBoundaryCuts(polygon: XY[]): { boundaryCuts: Bounda
   let boundaryCuts: BoundaryCoord[] = [];
   let constructedEdges: ConstructedEdge[] = [];
   for (var index = 0; index < polygon.length; index++) {
-    let {cutEndpoints, constructedEdges} = computeVertexBoundaryCutEndpoints(index, polygon);
+    let { cutEndpoints, constructedEdges: vertexConstructedEdges } =
+      computeVertexBoundaryCutEndpoints(index, polygon);
     // Push all the cuts & the vertex
     boundaryCuts.push(...cutEndpoints);
-    constructedEdges.push(...constructedEdges);
+    constructedEdges.push(...vertexConstructedEdges);
     boundaryCuts.push({
       edgeIndex: index,
       t: 0,

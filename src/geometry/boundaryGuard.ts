@@ -80,7 +80,7 @@ export function computeFullGuardSetConvex(polygon: XY[]): FullGuardSet {
   const { dominatingSet: { guards }, constructedEdges } = computeBoundaryGuardSetConvex(polygon);
   const edges = constructedEdges.filter(e => guards.includes(e.guard));
 
-  const extra = guardHoles(polygon, edges);
+  const extra = guardHoles(polygon, edges, guards);
 
   return {
     guardsBefore: guards,
@@ -121,7 +121,7 @@ export function computeFullGuardSet(polygon: XY[]): FullGuardSet {
 
 // Computes a full guard set given existing guards
 export function computeFullGuardSetFromGuards(polygon: XY[], guards: number[]): FullGuardSet {
-  const extra = guardHoles(polygon, getConstructedEdges(polygon, guards));
+  const extra = guardHoles(polygon, getConstructedEdges(polygon, guards), guards);
 
   return {
       guardsBefore: guards,

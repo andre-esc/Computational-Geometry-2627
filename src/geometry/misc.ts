@@ -287,9 +287,11 @@ export interface ConstructedEdge {
 
 export function onBase(e: ConstructedEdge, polygon: XY[]): boolean {
   const a = polygon[0], b = polygon[1];
+  const minX = Math.min(a.x, b.x);
+  const maxX = Math.max(a.x, b.x);
   return (
     Math.abs(e.lower.point.y - a.y) < 1e-6 &&
-    e.lower.point.x >= a.x - 1e-6 &&
-    e.lower.point.x <= b.x + 1e-6
+    e.lower.point.x >= minX - 1e-6 &&
+    e.lower.point.x <= maxX + 1e-6
   );
 }
