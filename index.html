@@ -7,7 +7,7 @@
   <title>INFO-420: Vertex Guarding a WV-Polygon</title>
 
   <!-- Tailwind CSS (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- <script src="https://cdn.tailwindcss.com"></script> -->
 
   <!-- MathJax -->
   <script>
@@ -28,11 +28,10 @@
     };
   </script>
   <script id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" crossorigin="anonymous" integrity="">
   </script>
 
   <link rel="stylesheet" href="/src/style.css" />
-  <link rel="stylesheet" href="/src/illustrations.css" />
 </head>
 <body>
 
@@ -102,6 +101,20 @@
          ═══════════════════════════════════════════ -->
     <section id="sec-intro">
       <h2 class="sec-heading"><span class="sec-num">1</span> Introduction</h2>
+      
+      <p>
+      The concept of "guarding" a polygon is a highly studied aspect of computational geometry, particularly in association with the Art Gallery problem. To <i>guard</i> a polygon is to place points, called <i>guards</i>, in such a way that every point of the polygon is visible from at least one guard (a point is <i>visible</i> from another point if the line segment connecting them is not obstructed—in the context of polygon guarding, this means that the segment is fully contained within the polygon).
+      </p>
+
+      <p>
+      There exist many variants to this problem, which vary the properties of the polygon to be guarded, where we can place guards, or even whether the guards are allowed to move within the polygon. The general Art Gallery problem has been proven to be \(\exists\mathbb{R}\)-complete <a href="#ref-agp">[1]</a> (meaning that any problem expressed over integer or real number values can be reduced to an instance of the Art Gallery problem). In the case of guarding a simple polygon with guards limited to being placed on polygon vertices, the problem of finding the minimum number of guards (or, more precisely, determining whether a polygon can be guarded with at most $k$ guards) is NP-hard @nphard, and even APX-hard @modi2018art (meaning that any NP problem admitting a constant-factor polynomial-time approximation algorithm admits a PTAS that reduces it to this problem). 
+      </p>
+
+      Subir K. Ghosh presented an $O(log n)$-approximation algorithm for vertex-guarding a _simple_ polygon @ghosh, and conjectured that it must be possible to find a polynomial-time _constant_-approximation algorithm. Bhattacharya et al. later proposed a 6-approximation algorithm that turned out to be false, as their algorithm guaranteed the polynomial-time guarding of a simple polygon's boundary (up to an approximation), but not its interior @bhattacharyaApproximabilityGuardingWeak2017.
+
+      This project aims to demonstrate the constant-factor polynomial-time approximation algorithm discovered by Ashur et al. for vertex-guarding a _weakly visible polygon_ (noted WV-polygons), building upon Bhattacharya et al.'s previous results and confirming Ghosh's conjecture for this subset of simple polygons @Ashur_Filtser_Katz_2021. This algorithm works by analyzing the geometric properties of a vertex guard of the polygon's _boundary_, then by adding subsequent guards to cover any unguarded regions within the polygon's interior.
+
+      In the following sections, we first discuss how to characterize and detect WV-polygons, then we show how to compute a boundary guard for a WV-polygon, and finally we demonstrate how the algorithm guards the rest of the polygon.
 
       <p>
         The concept of <em>guarding</em> a polygon is a highly studied aspect of computational
@@ -202,120 +215,52 @@
           For each diagonal \(uv\) with unprocessed vertex \(w\), we find the tangent \(x\) to the
           funnel \(F(uav)\).  Assuming \(x \in \pi(a,u)\), we split \(F(uav)\) into
           \(F(uxw)\) and \(F(wau)\), adding edge \(xw\) to \(\pi(s,x)\) and gradually building
-          \(\SPT_P(s)\).
+          \\(\\SPT_P(s)\\).
         </p>
 
         <!-- Illustration: Funnel F(u,a,v) -->
         <div class="illus-wrapper" role="img" aria-label="Diagram of funnel F(u,a,v) in the shortest-path tree">
           <figure class="illus-figure">
-              <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 500 220">
-                <!-- Generator: Adobe Illustrator 30.3.0, SVG Export Plug-In . SVG Version: 2.1.3 Build 182)  -->
-                <defs>
-                  <style>
-                    .st0, .st1, .st2, .st3 {
-                      fill: none;
-                    }
-              
-                    .st1 {
-                      stroke: #c0652a;
-                    }
-              
-                    .st1, .st3 {
-                      stroke-linejoin: round;
-                      stroke-width: 2px;
-                    }
-              
-                    .st4, .st5, .st6, .st7, .st8, .st9, .st10, .st11 {
-                      isolation: isolate;
-                    }
-              
-                    .st4, .st6 {
-                      opacity: .7;
-                    }
-              
-                    .st4, .st12, .st11 {
-                      fill: #c0652a;
-                    }
-              
-                    .st5 {
-                      font-size: 11px;
-                    }
-              
-                    .st5, .st7 {
-                      fill: #9a8878;
-                    }
-              
-                    .st5, .st7, .st8, .st10 {
-                      font-family: Georgia-Italic, Georgia;
-                      font-style: italic;
-                    }
-              
-                    .st6, .st9 {
-                      fill: #2d8f7a;
-                    }
-              
-                    .st2 {
-                      stroke: #bbb0a0;
-                      stroke-dasharray: 5 3;
-                      stroke-width: 1.5px;
-                    }
-              
-                    .st7 {
-                      font-size: 13px;
-                    }
-              
-                    .st8 {
-                      font-size: 14px;
-                    }
-              
-                    .st8, .st10 {
-                      fill: #2c2416;
-                    }
-              
-                    .st9, .st11 {
-                      font-family: Georgia, Georgia;
-                      font-size: 12px;
-                    }
-              
-                    .st10 {
-                      font-size: 15px;
-                    }
-              
-                    .st13 {
-                      fill: #3c3428;
-                    }
-              
-                    .st3 {
-                      stroke: #2d8f7a;
-                    }
-                  </style>
-                </defs>
-                <polygon class="st0" points="250 42 317 134.1 428 192 72 192 180.4 134.1 250 42"/>
-                <polyline class="st1" points="250 42 180.4 134.1 72 192"/>
-                <polyline class="st3" points="250 42 317 134.1 428 192"/>
-                <line class="st2" x1="72" y1="192" x2="428" y2="192"/>
-                <circle class="st12" cx="250" cy="42" r="5"/>
-                <circle class="st4" cx="180.4" cy="134.1" r="4"/>
-                <circle class="st6" cx="317" cy="134.1" r="4"/>
-                <circle class="st13" cx="72" cy="192" r="5"/>
-                <circle class="st13" cx="428" cy="192" r="5"/>
-                <text class="st10" transform="translate(245.7 27)"><tspan x="0" y="0">a</tspan></text>
-                <text class="st8" transform="translate(48 206)"><tspan x="0" y="0">u</tspan></text>
-                <text class="st8" transform="translate(444.2 206)"><tspan x="0" y="0">v</tspan></text>
-                <text class="st11" transform="translate(135 117)"><tspan x="0" y="0">π(a, u)</tspan></text>
-                <text class="st9" transform="translate(324.6 118)"><tspan x="0" y="0">π(a, v)</tspan></text>
-                <text class="st7" transform="translate(223.6 152)"><tspan x="0" y="0">F(u, a, v)</tspan></text>
-                <text class="st5" transform="translate(220.5 210)"><tspan x="0" y="0">diagonal uv</tspan></text>
-              </svg>
+            <svg viewBox="0 0 500 220" fill="none" xmlns="http://www.w3.org/2000/svg" width="460" height="202">
+              <!-- Funnel interior shading -->
+              <polygon points="250,42 356,108 428,192 72,192 144,108"
+                fill="rgba(192,101,42,0.07)"/>
+              <!-- Left chain: a → L1 → u  (terracotta) -->
+              <polyline points="250,42 144,108 72,192"
+                stroke="#c0652a" stroke-width="2" stroke-linejoin="round"/>
+              <!-- Right chain: a → R1 → v  (teal) -->
+              <polyline points="250,42 356,108 428,192"
+                stroke="#2d8f7a" stroke-width="2" stroke-linejoin="round"/>
+              <!-- Dashed diagonal u — v -->
+              <line x1="72" y1="192" x2="428" y2="192"
+                stroke="#bbb0a0" stroke-width="1.5" stroke-dasharray="5 3"/>
+              <!-- Key vertices -->
+              <circle cx="250" cy="42" r="5"   fill="#c0652a"/>
+              <circle cx="144" cy="108" r="4"  fill="#c0652a" opacity="0.7"/>
+              <circle cx="356" cy="108" r="4"  fill="#2d8f7a" opacity="0.7"/>
+              <circle cx="72"  cy="192" r="5"  fill="#3c3428"/>
+              <circle cx="428" cy="192" r="5"  fill="#3c3428"/>
+              <!-- Labels: main vertices -->
+              <text x="250" y="27" text-anchor="middle" font-size="15" font-family="Georgia,serif" font-style="italic" fill="#2c2416">a</text>
+              <text x="52"  y="206" text-anchor="middle" font-size="14" font-family="Georgia,serif" font-style="italic" fill="#2c2416">u</text>
+              <text x="448" y="206" text-anchor="middle" font-size="14" font-family="Georgia,serif" font-style="italic" fill="#2c2416">v</text>
+              <!-- Path labels -->
+              <text x="174" y="78" text-anchor="end"   font-size="12" font-family="Georgia,serif" fill="#c0652a">π(a, u)</text>
+              <text x="326" y="74" text-anchor="start" font-size="12" font-family="Georgia,serif" fill="#2d8f7a">π(a, v)</text>
+              <!-- Funnel region label -->
+              <text x="250" y="152" text-anchor="middle" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#9a8878">F(u, a, v)</text>
+              <!-- Diagonal label -->
+              <text x="250" y="210" text-anchor="middle" font-size="11" font-family="Georgia,serif" font-style="italic" fill="#9a8878">diagonal uv</text>
+            </svg>
           </figure>
           <figcaption class="illus-caption">
-            The funnel \(F(u,a,v)\): paths \(\pi(a,u)\) (terracotta) and \(\pi(a,v)\) (teal)
-            diverge from the common ancestor \(a\) across the diagonal \(uv\).
+            The funnel \\(F(u,a,v)\\): paths \\(\\pi(a,u)\\) (terracotta) and \\(\\pi(a,v)\\) (teal)
+            diverge from the common ancestor \\(a\\) across the diagonal \\(uv\\).
           </figcaption>
         </div>
 
         <p>
-          To test weak visibility of \(P\) from \(uv\) we:
+          To test weak visibility of \\(P\\) from \\(uv\\) we:
         </p>
         <ol class="paper-list">
           <li>Compute \(\SPT_P(u)\) and \(\SPT_P(v)\).</li>
@@ -329,47 +274,21 @@
           \(O(n^3)\).
         </p>
 
-        <!-- Examples: Weak Visibility -->
+        <!-- Demo: Weak Visibility -->
         <div class="demo-wrapper">
           <div class="demo-header">
-            <span class="demo-tag">examples</span>
+            <span class="demo-tag">↯ live</span>
             <span class="demo-title">Weak visibility detection</span>
           </div>
           <div class="demo-instructions">
-            Compare the two polygons: every point in a weakly visible polygon sees some point on its green base edge;
-            the bent corridor has points that cannot see any point on its base edge.
+            <div>This demo demonstrates the weak visibility property. If the polygon is not weakly visible, it displays the base edge's visibility polygon to show which areas are occluded.</div>
+            Drag vertices to reshape the polygon.  <kbd>Double-click</kbd> empty canvas to add a vertex.
+            <kbd>Right-click</kbd> a vertex to remove it.
+            <!-- The polygon turns <span class="legend-wv-ok">dark</span> when weakly visible from the green base edge,
+            and <span class="legend-wv-warn">yellow</span> (with the WV-polygon shown) when it is not. -->
           </div>
-          <div class="wv-comparison">
-            <figure class="wv-example">
-              <figcaption>
-                <strong class="wv-example-result wv-example-result--yes">Weakly visible</strong>
-                <span>Every point sees the base edge.</span>
-              </figcaption>
-              <svg viewBox="0 0 360 205" role="img" aria-labelledby="wv-yes-title wv-yes-desc">
-                <title id="wv-yes-title">Weakly visible W-shaped polygon</title>
-                <desc id="wv-yes-desc">A W-shaped polygon above a green base edge.</desc>
-                <polygon points="24,174 336,174 298,35 235,115 180,35 121,115 63,35"
-                         class="wv-polygon-shape" />
-                <line x1="24" y1="174" x2="336" y2="174" class="wv-base-edge" />
-                <text x="24" y="195" class="wv-base-label">base edge uv</text>
-              </svg>
-            </figure>
-            <figure class="wv-example">
-              <figcaption>
-                <strong class="wv-example-result wv-example-result--no">Not weakly visible</strong>
-                <span>The far arm is hidden around the bend.</span>
-              </figcaption>
-              <svg viewBox="0 0 360 205" role="img" aria-labelledby="wv-no-title wv-no-desc">
-                <title id="wv-no-title">Bent corridor that is not weakly visible</title>
-                <desc id="wv-no-desc">An L-shaped corridor with a short green base edge at its lower left; the far arm is hidden from the base.</desc>
-                <polygon points="24,174 92,174 92,112 324,112 324,50 24,50"
-                         class="wv-polygon-shape" />
-                <line x1="24" y1="174" x2="92" y2="174" class="wv-base-edge" />
-                <text x="24" y="195" class="wv-base-label">base edge uv</text>
-                <path d="M92 162 L178 112" class="wv-hidden-sightline" />
-                <text x="178" y="100" class="wv-hidden-label">hidden region</text>
-              </svg>
-            </figure>
+          <div class="demo-canvas-wrap">
+            <canvas id="wvDemo"></canvas>
           </div>
         </div>
       </section>
@@ -427,23 +346,101 @@
 
           <!-- Illustration: vis-graph ↔ dominating set parallel -->
           <div class="illus-wrapper" role="img" aria-label="Visibility graph of G∪W: guards form a dominating set over witnesses">
-            <figure class="illus-figure illus-figure--split">
+            <figure class="illus-figure" style="flex-direction:column;gap:0;padding:0;background:#fdfaf6;">
               <!-- Two panels: left = polygon with sightlines; right = resulting bipartite graph -->
-              <div class="illus-split-grid">
+              <div style="display:grid;grid-template-columns:1fr 1fr;width:100%;border-bottom:1px solid #e8e0d4;">
                 <!-- Left panel: polygon, guard vertices, witnesses, sightlines -->
-                <div class="illus-panel illus-panel--left">
-                  <span class="illus-panel-label">Polygon + sightlines</span>
-                  <img src="public/svg/vismatrix-sightlines.png" />
+                <div style="padding:14px 10px 10px;border-right:1px solid #e8e0d4;display:flex;flex-direction:column;align-items:center;gap:5px;">
+                  <span style="font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#5a5248;font-family:sans-serif;">Polygon + sightlines</span>
+                  <svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" width="225" height="188">
+                    <!-- Polygon fill -->
+                    <polygon points="20,180 60,70 120,30 180,65 220,180"
+                      fill="rgba(44,36,22,0.04)" stroke="#c8bfb0" stroke-width="1.5"/>
+                    <!-- Witnesses (small dots on boundary) -->
+                    <!-- w1 on edge 20,180–60,70 at t=0.4: (20+40*.4, 180-110*.4)=(36,136) -->
+                    <circle cx="36"  cy="136" r="3.5" fill="#6b7ec0"/>
+                    <!-- w2 on edge 60,70–120,30 at t=0.5: (90,50) -->
+                    <circle cx="90"  cy="50"  r="3.5" fill="#6b7ec0"/>
+                    <!-- w3 on edge 120,30–180,65 at t=0.5: (150,47.5) -->
+                    <circle cx="150" cy="48"  r="3.5" fill="#6b7ec0"/>
+                    <!-- w4 on edge 180,65–220,180 at t=0.4: (196,109) -->
+                    <circle cx="196" cy="109" r="3.5" fill="#6b7ec0"/>
+                    <!-- w5 on base 20,180–220,180 at t=0.5: (120,180) -->
+                    <circle cx="120" cy="180" r="3.5" fill="#6b7ec0"/>
+                    <!-- Guards at vertices (guards selected: v1=60,70, v3=180,65) -->
+                    <!-- Sightlines from guard g1=(60,70) -->
+                    <line x1="60"  y1="70"  x2="36"  y2="136" stroke="#c0652a" stroke-width="1.2" stroke-dasharray="4 2.5" opacity="0.75"/>
+                    <line x1="60"  y1="70"  x2="90"  y2="50"  stroke="#c0652a" stroke-width="1.2" stroke-dasharray="4 2.5" opacity="0.75"/>
+                    <line x1="60"  y1="70"  x2="150" cy="48"  stroke="#c0652a" stroke-width="1.2" stroke-dasharray="4 2.5" opacity="0.75"/>
+                    <line x1="60"  y1="70"  x2="120" y2="180" stroke="#c0652a" stroke-width="1.2" stroke-dasharray="4 2.5" opacity="0.75"/>
+                    <!-- Sightlines from guard g2=(180,65) -->
+                    <line x1="180" y1="65"  x2="150" y2="48"  stroke="#2d8f7a" stroke-width="1.2" stroke-dasharray="4 2.5" opacity="0.75"/>
+                    <line x1="180" y1="65"  x2="196" y2="109" stroke="#2d8f7a" stroke-width="1.2" stroke-dasharray="4 2.5" opacity="0.75"/>
+                    <line x1="180" y1="65"  x2="120" y2="180" stroke="#2d8f7a" stroke-width="1.2" stroke-dasharray="4 2.5" opacity="0.75"/>
+                    <!-- Guard vertex circles -->
+                    <circle cx="60"  cy="70"  r="6" fill="#c0652a"/>
+                    <circle cx="180" cy="65"  r="6" fill="#2d8f7a"/>
+                    <!-- Non-guard polygon vertices -->
+                    <circle cx="20"  cy="180" r="4" fill="#b0a898" stroke="none"/>
+                    <circle cx="120" cy="30"  r="4" fill="#b0a898" stroke="none"/>
+                    <circle cx="220" cy="180" r="4" fill="#b0a898" stroke="none"/>
+                    <!-- Labels -->
+                    <text x="52"  y="63" text-anchor="middle" font-size="11" font-family="Georgia,serif" font-style="italic" fill="#c0652a">g₁</text>
+                    <text x="188" y="58" text-anchor="start"  font-size="11" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">g₂</text>
+                    <text x="27"  y="140" text-anchor="end"   font-size="10" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w₁</text>
+                    <text x="90"  y="43"  text-anchor="middle" font-size="10" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w₂</text>
+                    <text x="150" y="40"  text-anchor="middle" font-size="10" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w₃</text>
+                    <text x="203" y="108" text-anchor="start"  font-size="10" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w₄</text>
+                    <text x="120" y="195" text-anchor="middle" font-size="10" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w₅</text>
+                    <!-- Legend -->
+                    <circle cx="12" cy="168" r="5" fill="#c0652a"/>
+                    <text x="21" y="172" font-size="9.5" font-family="sans-serif" fill="#5a5248">guard ∈ G</text>
+                    <circle cx="12" cy="183" r="3.5" fill="#6b7ec0"/>
+                    <text x="21" y="187" font-size="9.5" font-family="sans-serif" fill="#5a5248">witness ∈ W</text>
+                  </svg>
                 </div>
                 <!-- Right panel: bipartite visibility graph -->
-                <div class="illus-panel">
-                  <span class="illus-panel-label">Visibility graph (bipartite)</span>
-                  <img src="public/svg/vismatrix-bipartite.png" width=80% />
+                <div style="padding:14px 10px 10px;display:flex;flex-direction:column;align-items:center;gap:5px;">
+                  <span style="font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#5a5248;font-family:sans-serif;">Visibility graph (bipartite)</span>
+                  <svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" width="225" height="188">
+                    <!-- Guards on left, witnesses on right -->
+                    <!-- g1=(60,60), g2=(60,140) -->
+                    <!-- w1=(180,30), w2=(180,70), w3=(180,110), w4=(180,150), w5=(180,185) -->
+                    <!-- edges: g1-w1, g1-w2, g1-w3, g1-w5; g2-w3, g2-w4, g2-w5 -->
+                    <line x1="72"  y1="60"  x2="168" y2="30"  stroke="#c0652a" stroke-width="1.3" opacity="0.6"/>
+                    <line x1="72"  y1="60"  x2="168" y2="70"  stroke="#c0652a" stroke-width="1.3" opacity="0.6"/>
+                    <line x1="72"  y1="60"  x2="168" y2="110" stroke="#c0652a" stroke-width="1.3" opacity="0.6"/>
+                    <line x1="72"  y1="60"  x2="168" y2="170" stroke="#c0652a" stroke-width="1.3" opacity="0.6"/>
+                    <line x1="72"  y1="140" x2="168" y2="110" stroke="#2d8f7a" stroke-width="1.3" opacity="0.6"/>
+                    <line x1="72"  y1="140" x2="168" y2="150" stroke="#2d8f7a" stroke-width="1.3" opacity="0.6"/>
+                    <line x1="72"  y1="140" x2="168" y2="170" stroke="#2d8f7a" stroke-width="1.3" opacity="0.6"/>
+                    <!-- Guard nodes -->
+                    <circle cx="72" cy="60"  r="8" fill="#c0652a"/>
+                    <circle cx="72" cy="140" r="8" fill="#2d8f7a"/>
+                    <text x="58" y="57"  text-anchor="end" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#c0652a">g₁</text>
+                    <text x="58" y="145" text-anchor="end" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">g₂</text>
+                    <!-- Witness nodes -->
+                    <circle cx="168" cy="30"  r="5.5" fill="#6b7ec0"/>
+                    <circle cx="168" cy="70"  r="5.5" fill="#6b7ec0"/>
+                    <circle cx="168" cy="110" r="5.5" fill="#6b7ec0"/>
+                    <circle cx="168" cy="150" r="5.5" fill="#6b7ec0"/>
+                    <circle cx="168" cy="170" r="5.5" fill="#6b7ec0"/>
+                    <text x="182" y="34"  font-size="12" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w₁</text>
+                    <text x="182" y="74"  font-size="12" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w₂</text>
+                    <text x="182" y="114" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w₃</text>
+                    <text x="182" y="154" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w₄</text>
+                    <text x="182" y="174" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w₅</text>
+                    <!-- Column labels -->
+                    <text x="72"  y="12" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#5a5248" font-weight="600">G (guards)</text>
+                    <text x="168" y="12" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#5a5248" font-weight="600">W (witnesses)</text>
+                    <!-- Every witness has at least one edge = dominated -->
+                    <text x="120" y="195" text-anchor="middle" font-size="9.5" font-family="sans-serif" fill="#888">every w ∈ W is adjacent to some g ∈ G</text>
+                  </svg>
                 </div>
               </div>
-              <div class="illus-split-caption">
-                <strong>Left:</strong> sightlines from guards \(g_1, g_2\) to witnesses \(w_1, \ldots, w_5\) on the polygon boundary. &nbsp;
-                <strong>Right:</strong> bipartite visibility graph — finding a minimum vertex guard for \(W\)
+              <div style="padding:7px 16px 9px;font-size:12.5px;color:#7a7060;font-family:sans-serif;text-align:center;font-style:italic;line-height:1.5;">
+                <strong>Left:</strong> sightlines from guards \\(g_1, g_2\\) to witnesses \\(w_1, \\ldots, w_5\\) on the polygon boundary. &nbsp;
+                <strong>Right:</strong> bipartite visibility graph — finding a minimum vertex guard for \\(W\\)
                 is exactly finding a minimum dominating set of this graph.
               </div>
             </figure>
@@ -461,11 +458,39 @@
           <!-- Illustration: terrain-like property (a sees c, b sees d ⟹ a sees d) -->
           <div class="illus-wrapper" role="img" aria-label="Illustration of the terrain-like property">
             <figure class="illus-figure">
-                <img src="public/svg/terrain-like.png"/>
+              <svg viewBox="0 0 500 215" fill="none" xmlns="http://www.w3.org/2000/svg" width="460" height="198">
+                <!-- Polygon boundary -->
+                <polygon points="250,22 388,58 458,142 428,196 72,196 42,142 112,58"
+                  fill="rgba(44,36,22,0.04)" stroke="#c8bfb0" stroke-width="1.5"/>
+                <!-- Sightline a→c (teal dashed) -->
+                <line x1="112" y1="58" x2="388" y2="58"
+                  stroke="#2d8f7a" stroke-width="1.5" stroke-dasharray="6 3"/>
+                <!-- Sightline b→d (teal dashed) -->
+                <line x1="250" y1="22" x2="458" y2="142"
+                  stroke="#2d8f7a" stroke-width="1.5" stroke-dasharray="6 3"/>
+                <!-- Implied sightline a→d (terracotta solid) -->
+                <line x1="112" y1="58" x2="458" y2="142"
+                  stroke="#c0652a" stroke-width="2"/>
+                <!-- Labeled vertices -->
+                <circle cx="112" cy="58"  r="5.5" fill="#c0652a"/>
+                <circle cx="250" cy="22"  r="5"   fill="#2d8f7a"/>
+                <circle cx="388" cy="58"  r="5"   fill="#2d8f7a"/>
+                <circle cx="458" cy="142" r="5.5" fill="#c0652a"/>
+                <!-- Vertex labels -->
+                <text x="94"  y="55"  text-anchor="end"    font-size="14" font-family="Georgia,serif" font-style="italic" fill="#2c2416">a</text>
+                <text x="250" y="13"  text-anchor="middle" font-size="14" font-family="Georgia,serif" font-style="italic" fill="#2c2416">b</text>
+                <text x="406" y="55"  text-anchor="start"  font-size="14" font-family="Georgia,serif" font-style="italic" fill="#2c2416">c</text>
+                <text x="475" y="147" text-anchor="start"  font-size="14" font-family="Georgia,serif" font-style="italic" fill="#2c2416">d</text>
+                <!-- Legend -->
+                <line x1="30" y1="176" x2="58" y2="176" stroke="#2d8f7a" stroke-width="1.5" stroke-dasharray="6 3"/>
+                <text x="65" y="180" font-size="11.5" font-family="sans-serif" fill="#5a5248">a sees c &amp; b sees d (given)</text>
+                <line x1="30" y1="196" x2="58" y2="196" stroke="#c0652a" stroke-width="2"/>
+                <text x="65" y="200" font-size="11.5" font-family="sans-serif" fill="#5a5248">terrain-like ⟹ a must see d</text>
+              </svg>
             </figure>
             <figcaption class="illus-caption">
-              If \(a, b, c, d\) appear in CCW order along \(\partial P\) and \(a\) sees \(c\)
-              while \(b\) sees \(d\), the terrain-like property forces \(a\) to also see \(d\).
+              If \\(a, b, c, d\\) appear in CCW order along \\(\\partial P\\) and \\(a\\) sees \\(c\\)
+              while \\(b\\) sees \\(d\\), the terrain-like property forces \\(a\\) to also see \\(d\\).
               Any blocking edge would create a boundary crossing that contradicts weak visibility.
             </figcaption>
           </div>
@@ -539,28 +564,27 @@
             iterations.
           </p>
 
-          <!-- Demo: Boundary guard / per-vertex visibility -->
+          <!-- Demo: Boundary guard -->
           <div class="demo-wrapper">
             <div class="demo-header">
               <span class="demo-tag">↯ live</span>
-              <span class="demo-title">Per-vertex visibility regions</span>
+              <span class="demo-title">Boundary guarding</span>
             </div>
             <div class="demo-instructions">
-              Select a vertex key to show or hide its colored visibility region; double-click a vertex to toggle it on the canvas.
-              Use <strong>Show all</strong> to compare regions. Drag vertices to reshape;
-              <kbd>Double-click</kbd> empty canvas to add a vertex.
+              <div>This demo shows the iterative refinement of a boundary guard, starting with an initial guarding set and performing the local search algorithm to reduce its cardinality as much as possible.</div>
+              Drag vertices to reshape.  <kbd>Double-click</kbd> a vertex to toggle its visibility
+              region.  <kbd>Double-click</kbd> empty canvas to add a vertex.
               <kbd>Right-click</kbd> a vertex to remove it.
             </div>
-            <div class="vis-region-controls">
-              <div class="vis-region-actions">
-                <button id="visPolyShowAll" class="btn" type="button">Show all</button>
-                <button id="visPolyHideAll" class="btn" type="button">Hide all</button>
-                <span id="visPolyStatus" role="status" aria-live="polite"></span>
-              </div>
-              <div id="visPolyLegend" class="vis-region-legend" role="group" aria-label="Visibility regions by vertex"></div>
-            </div>
             <div class="demo-canvas-wrap">
-              <canvas id="visPolyDemo"></canvas>
+              <canvas id="boundaryGuardingDemo"></canvas>
+            </div>
+            <div class="demo-footer">
+              <div>
+                <button id="boundaryGuarding_start" class="btn btn-demo">Start</button>
+                <button id="boundaryGuarding_next" class="btn btn-demo" disabled>Next</button>
+              </div>
+              <span id="boundaryGuarding_info" class="demo-info">Click to start the boundary guarding.</span>
             </div>
           </div>
         </section>
@@ -606,11 +630,50 @@
           <!-- Illustration: upper/lower edge + pocket C_xy -->
           <div class="illus-wrapper" role="img" aria-label="Diagram: upper and lower constructed edges with pockets">
             <figure class="illus-figure">
-              <img src="public/svg/constructed-edges-pockets.png" width=80%/>
+              <svg viewBox="0 0 500 220" fill="none" xmlns="http://www.w3.org/2000/svg" width="460" height="202">
+                <!-- Polygon outline (WV from uv at bottom) -->
+                <polyline points="40,185 120,80 200,145 280,55 360,145 440,185"
+                  stroke="#c8bfb0" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+                <line x1="40" y1="185" x2="440" y2="185" stroke="#c8bfb0" stroke-width="1.5"/>
+                <!-- Pocket C_xy shaded (between x=120,y=80 and y=200,y=145, below line xy) -->
+                <polygon points="120,80 200,145 165,185 90,185"
+                  fill="rgba(192,101,42,0.13)" stroke="none"/>
+                <!-- Constructed edge xy: upper edge -->
+                <line x1="120" y1="80" x2="200" y2="145"
+                  stroke="#c0652a" stroke-width="2.2"/>
+                <!-- Pocket C_x'y' shaded (between x'=280,y=55 and y'=360,y=145, above) -->
+                <polygon points="280,55 360,145 390,185 250,185"
+                  fill="rgba(45,143,122,0.12)" stroke="none"/>
+                <!-- Constructed edge x'y': lower edge -->
+                <line x1="280" y1="55" x2="360" y2="145"
+                  stroke="#2d8f7a" stroke-width="2.2"/>
+                <!-- Guard (vertex v) label -->
+                <circle cx="240" cy="30" r="0" /><!-- spacer -->
+                <!-- Vertex x, y, x', y' -->
+                <circle cx="120" cy="80"  r="4.5" fill="#c0652a"/>
+                <circle cx="200" cy="145" r="4.5" fill="#c0652a"/>
+                <circle cx="280" cy="55"  r="4.5" fill="#2d8f7a"/>
+                <circle cx="360" cy="145" r="4.5" fill="#2d8f7a"/>
+                <text x="104" y="77"  text-anchor="end"    font-size="13" font-family="Georgia,serif" font-style="italic" fill="#c0652a">x</text>
+                <text x="216" y="142" text-anchor="start"  font-size="13" font-family="Georgia,serif" font-style="italic" fill="#c0652a">y</text>
+                <text x="263" y="52"  text-anchor="end"    font-size="13" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">x'</text>
+                <text x="376" y="142" text-anchor="start"  font-size="13" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">y'</text>
+                <!-- Pocket labels -->
+                <text x="135" y="148" text-anchor="middle" font-size="11.5" font-family="Georgia,serif" font-style="italic" fill="#c0652a">C&#x2093;&#x1D67;</text>
+                <text x="335" y="135" text-anchor="middle" font-size="11.5" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">C&#x2093;'&#x1D67;'</text>
+                <!-- uv base -->
+                <text x="40"  y="203" text-anchor="middle" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">u</text>
+                <text x="440" y="203" text-anchor="middle" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">v</text>
+                <!-- Legend -->
+                <line x1="30" y1="22" x2="58" y2="22" stroke="#c0652a" stroke-width="2.2"/>
+                <text x="65" y="26" font-size="11" font-family="sans-serif" fill="#5a5248">upper edge xy + pocket C&#x2093;&#x1D67;</text>
+                <line x1="30" y1="40" x2="58" y2="40" stroke="#2d8f7a" stroke-width="2.2"/>
+                <text x="65" y="44" font-size="11" font-family="sans-serif" fill="#5a5248">lower edge x'y' + pocket C&#x2093;'&#x1D67;'</text>
+              </svg>
             </figure>
             <figcaption class="illus-caption">
-              Constructed edge \(xy\) and each bounds
-              a pocket invisible from the guard respective g. \(\partial C_{xy}\) is the arc of
+              Constructed edges \(xy\) (upper, terracotta) and \(x'y'\) (lower, teal) each bound
+              a pocket invisible from their respective guards. \(\partial C_{xy}\) is the arc of
               \(\partial P\) enclosed in the pocket.
             </figcaption>
           </div>
@@ -629,20 +692,59 @@
           </div>
 
           <!-- Illustration: Claim 1 — two intersecting constructed edges, pocket of xy with y' on its boundary -->
-
-          <!-- --
           <div class="illus-wrapper" role="img" aria-label="Diagram: boundary leaning — y' on the boundary of pocket C_xy">
             <figure class="illus-figure">
-              <img src="public/svg/claim-1.png" width=80%/>
+              <svg viewBox="0 0 500 230" fill="none" xmlns="http://www.w3.org/2000/svg" width="460" height="212">
+                <!-- uv base -->
+                <line x1="30" y1="210" x2="470" y2="210" stroke="#8c7f70" stroke-width="2"/>
+                <text x="20"  y="226" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">u</text>
+                <text x="466" y="226" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">v</text>
+                <!-- Polygon boundary -->
+                <polyline points="30,210 90,120 170,55 260,40 350,90 430,160 470,210"
+                  stroke="#c8bfb0" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+                <!-- Pocket C_xy shaded -->
+                <polygon points="90,120 170,55 190,100 150,145 110,165 80,175 60,185"
+                  fill="rgba(192,101,42,0.13)" stroke="none"/>
+                <!-- Constructed edge xy (terracotta) -->
+                <line x1="90" y1="120" x2="260" y2="40" stroke="#c0652a" stroke-width="2.2"/>
+                <!-- Constructed edge x'y' (teal), intersecting xy at w -->
+                <line x1="170" y1="55" x2="350" y2="90" stroke="#2d8f7a" stroke-width="2.2"/>
+                <!-- Intersection w -->
+                <circle cx="221" cy="66" r="4.5" fill="#6b7ec0"/>
+                <text x="225" y="62" text-anchor="start" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">w</text>
+                <!-- Endpoints x, y, x', y' -->
+                <circle cx="90"  cy="120" r="4.5" fill="#c0652a"/>
+                <circle cx="260" cy="40"  r="4.5" fill="#c0652a"/>
+                <circle cx="170" cy="55"  r="4.5" fill="#2d8f7a"/>
+                <circle cx="350" cy="90"  r="4.5" fill="#2d8f7a"/>
+                <text x="76"  y="118" text-anchor="end"   font-size="13" font-family="Georgia,serif" font-style="italic" fill="#c0652a">x</text>
+                <text x="276" y="38"  text-anchor="start" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#c0652a">y</text>
+                <text x="156" y="52"  text-anchor="end"   font-size="13" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">x'</text>
+                <text x="366" y="88"  text-anchor="start" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">y'</text>
+                <!-- y' is IN ∂C_xy: highlight it on the polygon boundary inside the pocket -->
+                <!-- Actually y' (170,55) is on boundary of pocket; draw sightline from w to y' dashed -->
+                <line x1="221" y1="66" x2="170" y2="55"
+                  stroke="#2d8f7a" stroke-width="1.4" stroke-dasharray="4 2.5"/>
+                <!-- Pocket label -->
+                <text x="125" y="130" text-anchor="middle" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#c0652a">C&#x2093;&#x1D67;</text>
+                <!-- y' annotation: on ∂C_xy -->
+                <text x="156" y="40" text-anchor="end" font-size="10" font-family="sans-serif" fill="#2d8f7a">y' ∈ ∂C&#x2093;&#x1D67;</text>
+                <!-- Legend -->
+                <line x1="310" y1="155" x2="338" y2="155" stroke="#c0652a" stroke-width="2.2"/>
+                <text x="345" y="159" font-size="11" font-family="sans-serif" fill="#5a5248">edge xy + pocket C&#x2093;&#x1D67;</text>
+                <line x1="310" y1="173" x2="338" y2="173" stroke="#2d8f7a" stroke-width="2.2"/>
+                <text x="345" y="177" font-size="11" font-family="sans-serif" fill="#5a5248">edge x'y' (y' on same side as C&#x2093;&#x1D67;)</text>
+                <line x1="310" y1="191" x2="338" y2="191" stroke="#2d8f7a" stroke-width="1.4" stroke-dasharray="4 2.5"/>
+                <text x="345" y="195" font-size="11" font-family="sans-serif" fill="#5a5248">sightline w → y' (w = xy ∩ x'y')</text>
+              </svg>
             </figure>
             <figcaption class="illus-caption">
-              Edges \(xy\) and \(x'y'\) intersect at \(w\).  Since \(y'\) and
-              \(C_{xy}\) lie on the same side of \(xy\), the sightline \(wy'\) is inside \(C_{xy}\),
-              so \(y' \in C_{xy}\) and therefore \(y' \in \partial C_{xy}\).
+              Edges \\(xy\\) (terracotta) and \\(x'y'\\) (teal) intersect at \\(w\\).  Since \\(y'\\) and
+              \\(C_{xy}\\) lie on the same side of \\(xy\\), the sightline \\(wy'\\) is inside \\(C_{xy}\\),
+              so \\(y' \\in C_{xy}\\) and therefore \\(y' \\in \\partial C_{xy}\\).
             </figcaption>
           </div>
-          -->
-          
+
           <div class="theorem-box theorem-claim">
             <div class="theorem-label">Claim 2 <span class="star-marker">\((\star)\)</span> — Lifted pockets</div>
             <div class="theorem-body">
@@ -662,7 +764,53 @@
           </div>
 
           <!-- Illustration: Claim 2 — pocket not touching uv, z in C_xy with sightline to z' in uv -->
-        
+          <div class="illus-wrapper" role="img" aria-label="Diagram: lifted pocket — sightline from z in C_xy to z' on uv must cross xy">
+            <figure class="illus-figure">
+              <svg viewBox="0 0 500 230" fill="none" xmlns="http://www.w3.org/2000/svg" width="460" height="212">
+                <!-- uv base edge -->
+                <line x1="40" y1="210" x2="460" y2="210" stroke="#8c7f70" stroke-width="2"/>
+                <text x="30"  y="226" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">u</text>
+                <text x="456" y="226" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">v</text>
+                <!-- Polygon boundary above uv -->
+                <polyline points="40,210 110,120 200,55 310,80 390,130 460,210"
+                  stroke="#c8bfb0" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+                <!-- Pocket C_xy shaded (above xy, not touching uv) -->
+                <polygon points="200,55 310,80 290,120 215,105"
+                  fill="rgba(192,101,42,0.14)" stroke="none"/>
+                <!-- Constructed edge xy (not touching uv) -->
+                <line x1="200" y1="55" x2="310" y2="80"
+                  stroke="#c0652a" stroke-width="2.2"/>
+                <!-- Vertices x, y -->
+                <circle cx="200" cy="55"  r="4.5" fill="#c0652a"/>
+                <circle cx="310" cy="80"  r="4.5" fill="#c0652a"/>
+                <text x="186" y="52"  text-anchor="end"   font-size="13" font-family="Georgia,serif" font-style="italic" fill="#c0652a">x</text>
+                <text x="326" y="77"  text-anchor="start" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#c0652a">y</text>
+                <!-- Point z in C_xy -->
+                <circle cx="258" cy="82"  r="4.5" fill="#6b7ec0"/>
+                <text x="244" y="78"  text-anchor="end"   font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">z</text>
+                <!-- Point z' on uv -->
+                <circle cx="300" cy="210" r="4" fill="#8c7f70"/>
+                <text x="310" y="208"  text-anchor="start" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#6b6050">z'</text>
+                <!-- Sightline z → z' (purple dashed, crossing xy) -->
+                <line x1="258" y1="82" x2="300" y2="210"
+                  stroke="#6b7ec0" stroke-width="1.6" stroke-dasharray="5 3"/>
+                <!-- Crossing mark on xy -->
+                <circle cx="276" cy="135" r="0"/><!-- crossing ~midpoint -->
+                <!-- Pocket label -->
+                <text x="258" y="96"  text-anchor="middle" font-size="11.5" font-family="Georgia,serif" font-style="italic" fill="#c0652a">C&#x2093;&#x1D67;</text>
+                <!-- Legend -->
+                <line x1="22" y1="22" x2="50" y2="22" stroke="#c0652a" stroke-width="2.2"/>
+                <text x="57" y="26" font-size="11" font-family="sans-serif" fill="#5a5248">constructed edge xy (x ∉ uv)</text>
+                <line x1="22" y1="40" x2="50" y2="40" stroke="#6b7ec0" stroke-width="1.6" stroke-dasharray="5 3"/>
+                <text x="57" y="44" font-size="11" font-family="sans-serif" fill="#5a5248">sightline z → z' (crosses xy ⟹ z strictly above x)</text>
+              </svg>
+            </figure>
+            <figcaption class="illus-caption">
+              When \\(x \\notin uv\\), every \\(z \\in C_{xy}\\) must have a sightline to some \\(z' \\in uv\\).
+              Since \\(z' \\notin C_{xy}\\), the chord \\(zz'\\) crosses \\(xy\\), forcing \\(z\\) strictly
+              above \\(xy\\) and therefore strictly above its lower endpoint \\(x\\).
+            </figcaption>
+          </div>
         </section>
 
         <!-- ─── §2.3.2 Properties of holes ───────────────────────────── -->
@@ -670,7 +818,7 @@
           <h4 class="subsubsec-heading"><span class="sec-num">2.3.2</span> Properties of holes</h4>
 
           <p>
-            A <strong>hole</strong> \(H\) in \(P\) with respect to guard set \(G\) is a maximal
+            A <strong>hole</strong> \\(H\\) in \\(P\\) with respect to guard set \\(G\\) is a maximal
             convex connected subregion not visible from any guard.  Holes are convex because they
             are intersections of half-planes (the non-visible side of each constructed edge).
             Every hole touches at least one upper edge and one lower edge.
@@ -679,11 +827,48 @@
           <!-- Illustration: a hole H with one upper and one lower constructed edge -->
           <div class="illus-wrapper" role="img" aria-label="Diagram: a hole H bounded by one upper and one lower constructed edge">
             <figure class="illus-figure">
-              <img src="public/svg/hole-bounded.png" width=80%/>
+              <svg viewBox="0 0 500 230" fill="none" xmlns="http://www.w3.org/2000/svg" width="460" height="212">
+                <!-- uv base edge -->
+                <line x1="30" y1="210" x2="470" y2="210" stroke="#8c7f70" stroke-width="2"/>
+                <text x="20"  y="226" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">u</text>
+                <text x="466" y="226" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">v</text>
+                <!-- Polygon boundary -->
+                <polyline points="30,210 90,120 170,50 290,65 390,120 470,210"
+                  stroke="#c8bfb0" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+                <!-- Hole H (shaded convex region) -->
+                <polygon points="195,100 255,80 295,115 275,148 215,148"
+                  fill="rgba(107,126,192,0.18)" stroke="#6b7ec0" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <!-- Upper constructed edge x1y1 (terracotta): lower endpoint x1 on uv -->
+                <line x1="90" y1="210" x2="295" y2="115"
+                  stroke="#c0652a" stroke-width="2.2"/>
+                <!-- Lower constructed edge x2y2 (teal): upper endpoint y2 high -->
+                <line x1="195" y1="100" x2="390" y2="120"
+                  stroke="#2d8f7a" stroke-width="2.2"/>
+                <!-- Endpoints -->
+                <circle cx="90"  cy="210" r="4.5" fill="#c0652a"/>
+                <circle cx="295" cy="115" r="4.5" fill="#c0652a"/>
+                <circle cx="195" cy="100" r="4.5" fill="#2d8f7a"/>
+                <circle cx="390" cy="120" r="4.5" fill="#2d8f7a"/>
+                <!-- Labels -->
+                <text x="76"  y="208" text-anchor="end"   font-size="12" font-family="Georgia,serif" font-style="italic" fill="#c0652a">x₁</text>
+                <text x="311" y="112" text-anchor="start" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#c0652a">y₁</text>
+                <text x="181" y="97"  text-anchor="end"   font-size="12" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">x₂</text>
+                <text x="406" y="117" text-anchor="start" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">y₂</text>
+                <!-- H label -->
+                <text x="248" y="122" text-anchor="middle" font-size="14" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">H</text>
+                <!-- Legend -->
+                <line x1="22" y1="22" x2="50" y2="22" stroke="#c0652a" stroke-width="2.2"/>
+                <text x="57" y="26" font-size="11" font-family="sans-serif" fill="#5a5248">upper edge x₁y₁ (x₁ ∈ uv)</text>
+                <line x1="22" y1="40" x2="50" y2="40" stroke="#2d8f7a" stroke-width="2.2"/>
+                <text x="57" y="44" font-size="11" font-family="sans-serif" fill="#5a5248">lower edge x₂y₂</text>
+                <rect x="22" y="52" width="28" height="12" rx="2" fill="rgba(107,126,192,0.18)" stroke="#6b7ec0" stroke-width="1" stroke-dasharray="3 2"/>
+                <text x="57" y="62" font-size="11" font-family="sans-serif" fill="#5a5248">hole H (convex, unguarded)</text>
+              </svg>
             </figure>
             <figcaption class="illus-caption">
-              A hole \(H'\) (blue shaded) is a maximal convex unguarded subregion.  It is bounded by
-              an upper constructed edge  (magenta) and a lower constructed edge (terracotta).
+              A hole \\(H\\) (blue shaded) is a maximal convex unguarded subregion.  It is bounded by
+              an upper constructed edge \\(x_1 y_1\\) (terracotta) and a lower constructed edge
+              \\(x_2 y_2\\) (teal); note \\(x_1 \\in uv\\).
             </figcaption>
           </div>
 
@@ -735,12 +920,12 @@
 
           <!-- Illustration: two panels — wrong case (x_d y_d not touching uv) and correct case (both touch) -->
           <div class="illus-wrapper" role="img" aria-label="Two intersecting upper edges: wrong case vs correct case touching uv">
-            <figure class="illus-figure illus-figure--split">
+            <figure class="illus-figure" style="flex-direction:column;gap:0;padding:0;background:#fdfaf6;">
               <!-- Two columns: wrong + correct -->
-              <div class="illus-split-grid">
+              <div style="display:grid;grid-template-columns:1fr 1fr;width:100%;border-bottom:1px solid #e8e0d4;">
                 <!-- Wrong case: x_{d-1}y_{d-1} touches uv, x_d y_d does NOT -->
-                <div class="illus-panel illus-panel--left">
-                  <span class="illus-panel-label illus-panel-label--wrong">Incorrect — x<sub>d</sub> ∉ uv</span>
+                <div style="padding:16px 10px 10px;border-right:1px solid #e8e0d4;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                  <span style="font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#c0652a;font-family:sans-serif;">Incorrect — x<sub>d</sub> ∉ uv</span>
                   <svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.org/2000/svg" width="230" height="175">
                     <!-- uv -->
                     <line x1="10" y1="175" x2="230" y2="175" stroke="#8c7f70" stroke-width="1.8"/>
@@ -769,8 +954,8 @@
                   </svg>
                 </div>
                 <!-- Correct case: both touch uv -->
-                <div class="illus-panel">
-                  <span class="illus-panel-label illus-panel-label--correct">Correct — x<sub>d-1</sub>, x<sub>d</sub> ∈ uv</span>
+                <div style="padding:16px 10px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+                  <span style="font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#2d8f7a;font-family:sans-serif;">Correct — x<sub>d-1</sub>, x<sub>d</sub> ∈ uv</span>
                   <svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.org/2000/svg" width="230" height="175">
                     <!-- uv -->
                     <line x1="10" y1="175" x2="230" y2="175" stroke="#8c7f70" stroke-width="1.8"/>
@@ -800,10 +985,10 @@
                   </svg>
                 </div>
               </div>
-              <div class="illus-split-caption">
-                <strong>Left:</strong> if \(x_d \notin uv\), the pocket \(C_{x_d y_d}\) swallows all of \(uv\), contradicting weak visibility. &nbsp;
-                <strong>Right:</strong> both \(x_{d-1}, x_d \in uv\) — the intersection point \(p\) is well-defined and the
-                triangle \(\triangle x_{d-1}\,p\,x_d\) (blue) encloses the hole.
+              <div style="padding:7px 16px 9px;font-size:12.5px;color:#7a7060;font-family:sans-serif;text-align:center;font-style:italic;line-height:1.5;">
+                <strong>Left:</strong> if \\(x_d \\notin uv\\), the pocket \\(C_{x_d y_d}\\) swallows all of \\(uv\\), contradicting weak visibility. &nbsp;
+                <strong>Right:</strong> both \\(x_{d-1}, x_d \\in uv\\) — the intersection point \\(p\\) is well-defined and the
+                triangle \\(\\triangle x_{d-1}\\,p\\,x_d\\) (blue) encloses the hole.
               </div>
             </figure>
           </div>
@@ -930,9 +1115,9 @@
               </svg>
             </figure>
             <figcaption class="illus-caption">
-              The triangle \(\triangle x_{d-1}\,p\,x_d\) (blue) formed by two successive upper edges
-              \(x_{d-1}y_{d-1}\) (terracotta) and \(x_d y_d\) (teal), with both \(x_{d-1}, x_d \in uv\).
-              The hole \(H\) is contained inside this triangle; a vertex guard found via Claim 6 covers it.
+              The triangle \\(\\triangle x_{d-1}\\,p\\,x_d\\) (blue) formed by two successive upper edges
+              \\(x_{d-1}y_{d-1}\\) (terracotta) and \\(x_d y_d\\) (teal), with both \\(x_{d-1}, x_d \\in uv\\).
+              The hole \\(H\\) is contained inside this triangle; a vertex guard found via Claim 6 covers it.
             </figcaption>
           </div>
 
@@ -948,28 +1133,29 @@
             </div>
           </div>
 
-          <!-- Demo: Full guard -->
+          <!-- Demo: Full guard (placeholder) -->
           <div class="demo-wrapper">
             <div class="demo-header">
               <span class="demo-tag">↯ live</span>
-              <span class="demo-title">Interior hole guarding</span>
+              <span class="demo-title">Full guarding</span>
             </div>
             <div class="demo-instructions">
-              This hourglass-shaped weakly visible example has preset guards \(p_0,p_5,p_8\) that cover
-              \(\partial P\) but leave an interior hole. Click <strong>Find boundary guards</strong> to show
-              their regions, then <strong>Next step</strong> to add the algorithm's guard \(p_2\) and fill
-              the hole. You can also double-click vertices to select a custom set that guards the boundary.
-            </div>
-            <div class="hole-guard-controls">
-              <button id="holeGuard_start" class="btn btn-primary">Find boundary guards</button>
-              <button id="holeGuard_custom" class="btn">Fill holes from selected guards</button>
-              <button id="holeGuard_next" class="btn" disabled>Next step</button>
-              <span id="holeGuard_status" class="hole-guard-status" role="status" aria-live="polite">
-                Ready — the loaded polygon is weakly visible from its green base edge.
-              </span>
+              <div>This demo shows how <a href="#algo-1">Algorithm 1</a> guards holes in existing boundary guards, highlighting the checked constructed edges as well as the triangles found by the algorithm.</div>
+              Drag vertices to reshape.  <kbd>Double-click</kbd> a vertex to toggle its visibility
+              region.  <kbd>Double-click</kbd> empty canvas to add a vertex.
+              <kbd>Right-click</kbd> a vertex to remove it.
+              <br>
             </div>
             <div class="demo-canvas-wrap">
               <canvas id="holeGuardDemo"></canvas>
+            </div>
+            <div class="demo-footer">
+              <div>
+                <button id="holeGuard_start" class="btn btn-demo">Start</button>
+                <button id="holeGuard_custom" class="btn btn-demo">Start from existing</button>
+                <button id="holeGuard_next" class="btn btn-demo" disabled>Next</button>
+              </div>
+              <span id="holeGuard_info" class="demo-info">Click to start the full guarding from scratch, or guard existing holes.</span>
             </div>
           </div>
         </section>
@@ -1102,7 +1288,7 @@
   <div id="pg-toolbar">
     <div class="pg-toolbar-left">
       <span class="pg-title">Polygon Guard Playground</span>
-      <span class="pg-hint">Wheel to zoom · Space + drag to pan · Double-click to add vertex · Right-click to remove</span>
+      <span class="pg-hint">Double-click to add vertex · Right-click to remove</span>
     </div>
     <div class="pg-toolbar-right">
       <div class="pg-scenario-wrap">
@@ -1116,9 +1302,6 @@
       <button id="pg-btn-boundary" class="btn btn-primary">🛡 Boundary Guards</button>
       <button id="pg-btn-full"     class="btn btn-danger">🏠 All Guards</button>
       <div class="pg-divider"></div>
-      <button id="pg-btn-zoom-in"    class="btn" aria-label="Zoom in" title="Zoom in">＋</button>
-      <button id="pg-btn-zoom-out"   class="btn" aria-label="Zoom out" title="Zoom out">−</button>
-      <button id="pg-btn-zoom-reset" class="btn" title="Reset zoom and position">Reset view</button>
       <button id="pg-btn-clear"    class="btn btn-ghost">✕ Clear</button>
     </div>
   </div>
@@ -1132,21 +1315,11 @@
       Ready — draw a weakly-visible polygon then click one of the buttons above.
     </div>
     <div class="pg-legend">
-      Each guard and its visible area use a distinct color. Red dashed triangles mark interior hole candidates.
+      <span class="legend-dot" style="background:#4c82f7"></span> Boundary guard
+      &nbsp;
+      <span class="legend-dot" style="background:#e63946"></span> Full guard
     </div>
   </div>
-
-  <details class="pg-algorithm-guide">
-    <summary>Step-by-step: how the guard algorithm works</summary>
-    <ol>
-      <li><strong>Validate:</strong> confirm the polygon is simple and weakly visible from its green base edge. Non-WV examples stop here.</li>
-      <li><strong>Prepare:</strong> make the base edge convex, keeping track of any vertices that must be restored as guards.</li>
-      <li><strong>Choose boundary witnesses:</strong> project visibility cuts onto the polygon boundary and place a witness at the midpoint of each resulting boundary interval.</li>
-      <li><strong>Build visibility:</strong> test every polygon vertex against every witness; a pair is visible when the joining segment stays inside the polygon.</li>
-      <li><strong>Minimize boundary guards:</strong> greedily select vertices that cover the most uncovered witnesses, then prune redundant guards and try two-for-one swaps.</li>
-      <li><strong>Fill interior pockets (All Guards):</strong> inspect the constructed visibility edges for uncovered pockets and add a vertex guard for each detected triangle.</li>
-    </ol>
-  </details>
 
 </div><!-- /#tab-playground -->
 
