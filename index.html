@@ -103,18 +103,29 @@
       <h2 class="sec-heading"><span class="sec-num">1</span> Introduction</h2>
       
       <p>
-      The concept of "guarding" a polygon is a highly studied aspect of computational geometry, particularly in association with the Art Gallery problem. To <i>guard</i> a polygon is to place points, called <i>guards</i>, in such a way that every point of the polygon is visible from at least one guard (a point is <i>visible</i> from another point if the line segment connecting them is not obstructed—in the context of polygon guarding, this means that the segment is fully contained within the polygon).
+        The concept of "guarding" a polygon is a highly studied aspect of computational geometry, 
+        particularly in association with the Art Gallery problem. To <i>guard</i> a polygon is to 
+        place points, called <i>guards</i>, in such a way that every point of the polygon is visible 
+        from at least one guard (a point is <i>visible</i> from another point if the line segment 
+        connecting them is not obstructed—in the context of polygon guarding, this means that the segment 
+        is fully contained within the polygon).
       </p>
 
       <p>
-      There exist many variants to this problem, which vary the properties of the polygon to be guarded, where we can place guards, or even whether the guards are allowed to move within the polygon. The general Art Gallery problem has been proven to be \(\exists\mathbb{R}\)-complete <a href="#ref-agp">[1]</a> (meaning that any problem expressed over integer or real number values can be reduced to an instance of the Art Gallery problem). In the case of guarding a simple polygon with guards limited to being placed on polygon vertices, the problem of finding the minimum number of guards (or, more precisely, determining whether a polygon can be guarded with at most $k$ guards) is NP-hard @nphard, and even APX-hard @modi2018art (meaning that any NP problem admitting a constant-factor polynomial-time approximation algorithm admits a PTAS that reduces it to this problem). 
+        There exist many variants to this problem, which vary the properties of the polygon to be guarded, where we can place guards, or even whether the guards are allowed to move within the polygon. The general Art Gallery problem has been proven to be \(\exists\mathbb{R}\)-complete <a href="#ref-agp">[1]</a> (meaning that any problem expressed over integer or real number values can be reduced to an instance of the Art Gallery problem). In the case of guarding a simple polygon with guards limited to being placed on polygon vertices, the problem of finding the minimum number of guards (or, more precisely, determining whether a polygon can be guarded with at most $k$ guards) is NP-hard @nphard, and even APX-hard @modi2018art (meaning that any NP problem admitting a constant-factor polynomial-time approximation algorithm admits a PTAS that reduces it to this problem). 
       </p>
 
-      Subir K. Ghosh presented an $O(log n)$-approximation algorithm for vertex-guarding a _simple_ polygon @ghosh, and conjectured that it must be possible to find a polynomial-time _constant_-approximation algorithm. Bhattacharya et al. later proposed a 6-approximation algorithm that turned out to be false, as their algorithm guaranteed the polynomial-time guarding of a simple polygon's boundary (up to an approximation), but not its interior @bhattacharyaApproximabilityGuardingWeak2017.
+      <p>
+        Subir K. Ghosh presented an \(O(\log n)\)-approximation algorithm for vertex-guarding a <i>simple</i> polygon <a href="#ref-ghosh">[4]</a>, and conjectured that it must be possible to find a polynomial-time <i>constant</i>-approximation algorithm. Bhattacharya et al. later proposed a 6-approximation algorithm that turned out to be false, as their algorithm guaranteed the polynomial-time guarding of a simple polygon's boundary (up to an approximation), but not its interior <a href="#ref-bhatt">[5]</a>.
+      </p>
 
-      This project aims to demonstrate the constant-factor polynomial-time approximation algorithm discovered by Ashur et al. for vertex-guarding a _weakly visible polygon_ (noted WV-polygons), building upon Bhattacharya et al.'s previous results and confirming Ghosh's conjecture for this subset of simple polygons @Ashur_Filtser_Katz_2021. This algorithm works by analyzing the geometric properties of a vertex guard of the polygon's _boundary_, then by adding subsequent guards to cover any unguarded regions within the polygon's interior.
+      <p>
+        This project aims to demonstrate the constant-factor polynomial-time approximation algorithm discovered by Ashur et al. for vertex-guarding a <i>weakly visible polygon</i> (noted WV-polygons), building upon Bhattacharya et al.'s previous results and confirming Ghosh's conjecture for this subset of simple polygons @Ashur_Filtser_Katz_2021. This algorithm works by analyzing the geometric properties of a vertex guard of the polygon's _boundary_, then by adding subsequent guards to cover any unguarded regions within the polygon's interior.
+      </p>
 
-      In the following sections, we first discuss how to characterize and detect WV-polygons, then we show how to compute a boundary guard for a WV-polygon, and finally we demonstrate how the algorithm guards the rest of the polygon.
+      <p>
+        In the following sections, we first discuss how to characterize and detect WV-polygons, then we show how to compute a boundary guard for a WV-polygon, and finally we demonstrate how the algorithm guards the rest of the polygon.
+      </p>
 
       <p>
         The concept of <em>guarding</em> a polygon is a highly studied aspect of computational
@@ -1238,42 +1249,35 @@
     <section id="references">
       <h2 class="sec-heading"><span class="sec-num">References</span></h2>
       <ol class="ref-list">
-        <li id="ref-agp">Abrahamsen, M., Adamaszek, A., &amp; Miltzow, T. (2018).
-            <em>The art gallery problem is ∃ℝ-complete.</em>
-            STOC 2018.</li>
-        <li id="ref-nphard">Lee, D. T., &amp; Lin, A. K. (1986).
-            <em>Computational complexity of art gallery problems.</em>
-            IEEE Trans. Inf. Theory, 32(2):276–282.</li>
-        <li id="ref-modi">Modi, A., et al. (2018).
-            <em>APX-hardness of the art gallery problem.</em></li>
-        <li id="ref-ghosh">Ghosh, S. K. (2010).
-            <em>Approximation algorithms for art gallery problems in polygons.</em>
-            Discrete Applied Mathematics, 158(6):718–722.</li>
-        <li id="ref-bhatt">Bhattacharya, B., Ghosh, S. K., &amp; Roy, B. (2017).
-            <em>Approximability of guarding weak visibility polygons.</em>
-            Discrete Applied Mathematics, 228:109–129.</li>
-        <li id="ref-ashur">Ashur, S., Filtser, O., Katz, M. J., &amp; Saban, R. (2022).
-            <em>Terrain-like graphs: PTASs for guarding weakly-visible polygons and terrains.</em>
-            SoCG 2022.</li>
-        <li id="ref-terrainlike">Ashur et al. (2021). Preprint, arXiv:2111.03604.</li>
-        <li id="ref-asano">Asano, T., et al. (2000).
-            <em>Visibility of disjoint polygons.</em>
-            Algorithmica, 27(3–4):329–340.</li>
-        <li id="ref-guibas">Guibas, L., Hershberger, J., Leven, D., Sharir, M., &amp; Tarjan, R. E. (1987).
-            <em>Linear-time algorithms for visibility and shortest path problems inside triangulated simple polygons.</em>
-            Algorithmica, 2(1–4):209–233.</li>
-        <li id="ref-chazelle">Chazelle, B. (1991).
-            <em>Triangulating a simple polygon in linear time.</em>
-            Discrete &amp; Computational Geometry, 6(1):485–524.</li>
-        <li id="ref-ptas">Mustafa, N., &amp; Ray, S. (2010).
-            <em>Improved results on geometric hitting set problems.</em>
-            Discrete &amp; Computational Geometry, 44(4):883–895.</li>
-        <li id="ref-vis1">Joe, B., &amp; Simpson, R. B. (1987).
-            <em>Corrections to Lee's visibility polygon algorithm.</em>
-            BIT, 27(4):458–473.</li>
-        <li id="ref-vis2">Joe, B., &amp; Simpson, R. B. (1985).
-            <em>Visibility of a simple polygon from a point.</em>
-            Research Report CS-85-38, U. Waterloo.</li>
+        <li id="ref-agp_ereal">M. Abrahamsen, A. Adamaszek, and T. Miltzow, <q>The Art Gallery Problem is ∃ℝ-complete,</q> <em>J. ACM</em>, vol. 69, no. 1, Dec. 2021, doi: <a href="https://doi.org/10.1145/3486220">10.1145/3486220</a>.</li>
+        <li id="ref-nphard">D. Lee and A. Lin, “Computational complexity of art gallery problems,” <em>IEEE Transactions on
+Information Theory</em>, vol. 32, no. 2, pp. 276–282, 1986, <a href="https://doi.org/10.1109/TIT.1986.1057165">doi: 10.1109/TIT.1986.1057165</a>.</li>
+        <li id="ref-modi2018art">D. Modi, A. S. Parihar, and A. Sharma, “The Art Gallery Problem: Status and Perspectives,” 2018, Accessed: Nov. 23, 2026. [Online]. Available: <a href="https://aaysharma.github.io/data/AGT.pdf">https://aaysharma.github.io/data/AGT.pdf</a></li>
+        <li id="ref-ghosh">S. K. Ghosh, “Approximation algorithms for art gallery problems in polygons,” <em>Discrete Applied
+Mathematics</em>, vol. 158, no. 6, pp. 718–722, 2010, doi: <a href="https://doi.org/10.1016/j.dam.2009.12.004">https://doi.org/10.1016/j.dam.2009.12.004</a>.</li>
+        <li id="ref-bhattacharyaApproximabilityGuardingWeak2017">P. Bhattacharya, S. K. Ghosh, and B. Roy, “Approximability of Guarding Weak Visibility
+Polygons,” <em>Discrete Applied Mathematics</em>, vol. 228, pp. 109–129, Sep. 2017, doi: <a href="https://doi.org/10.1016/j.dam.2016.12.015">10.1016/
+j.dam.2016.12.015</a>.</li>
+        <li id="ref-Ashur_Filtser_Katz_2021">S. Ashur, O. Filtser, and M. Katz, “A constant-factor approximation algorithm for vertex
+guarding a WV-polygon,” <em>Journal of Computational Geometry</em>, vol. 12, no. 1, pp. 128–144, Dec.
+2021, doi: <a href="https://doi.org/10.20382/jocg.v12i1a6">10.20382/jocg.v12i1a6</a>.</li>
+        <li id="ref-ASANO2000829">T. Asano, S. K. Ghosh, and T. C. Shermer, “Chapter 19 - Visibility in the Plane,” in <em>Handbook of
+Computational Geometry</em>, J.-R. Sack and J. Urrutia, Eds., Amsterdam: North-Holland, 2000, pp.
+829–876. doi: <a href="https://doi.org/https://doi.org/10.1016/B978-044482537-7/50020-6">https://doi.org/10.1016/B978-044482537-7/50020-6</a>.</li>
+        <li id="ref-guibas_linear-time_1987">L. Guibas, J. Hershberger, D. Leven, M. Sharir, and R. E. Tarjan, “Linear-time algorithms for
+visibility and shortest path problems inside triangulated simple polygons,” <em>Algorithmica</em>, vol. 2,
+no. 1, pp. 209–233, Nov. 1987, doi: <a href="https://doi.org/10.1007/BF01840360">10.1007/BF01840360</a>.</li>
+        <li id="ref-chazelle_triangulating_1991">B. Chazelle, “Triangulating a simple polygon in linear time,” <em>Discrete & Computational
+Geometry</em>, vol. 6, no. 3, pp. 485–524, Sep. 1991, <a href="https://doi.org/10.1007/BF02574703">doi: 10.1007/BF02574703</a>.</li>
+        <li id="ref-terrainlike">S. Ashur, O. Filtser, M. J. Katz, and R. Saban, “Terrain-like graphs: PTASs for guarding weakly visible polygons and terrains,” <em>Computational Geometry</em>, vol. 101, p. 101832, 2022, doi: <a href="https://doi.org/https://doi.org/10.1016/j.comgeo.2021.101832">https://doi.org/10.1016/j.comgeo.2021.101832</a>.</em></li>
+        <li id="ref-ptas">N. H. Mustafa and S. Ray, “PTAS for geometric hitting set problems via local search,” in
+<em>Proceedings of the Twenty-Fifth Annual Symposium on Computational Geometry</em>, in SCG '09.
+Aarhus, Denmark: Association for Computing Machinery, 2009, pp. 17–22. doi:
+<a href="https://doi.org/10.1145/1542362.1542367">10.1145/1542362.1542367</a>.</li>
+        <li id="ref-vis_simple">JD. Lee, “Visibility of a simple polygon,” <em>Computer Vision, Graphics, and Image Processing</em>, vol.
+22, no. 2, pp. 207–221, 1983, doi: <a href="https://doi.org/https://doi.org/10.1016/0734-189X(83)90065-8">https://doi.org/10.1016/0734-189X(83)90065-8</a>.</li>
+        <li id="ref-vis_simple_correction">B. Joe and R. B. Simpson, “Corrections to Lee's visibility polygon algorithm,” <em>BIT</em>, vol. 27, no. 4,
+pp. 458–473, Dec. 1987, doi: <a href="https://doi.org/10.1007/BF01937271">10.1007/BF01937271</a>.</li>
       </ol>
     </section>
 
