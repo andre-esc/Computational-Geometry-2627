@@ -93,6 +93,7 @@ export default class PlaygroundDemo extends Demo {
         try {
             const { dominatingSet } = computeBoundaryGuardSet(pts);
             this.renderGuards(pts, dominatingSet.guards, "#4c82f7");
+            console.log("FJLKDSJFKLSDJFL");
             this.emit(
                 `Boundary guard: ${dominatingSet.guards.length} guard${dominatingSet.guards.length !== 1 ? "s" : ""} ` +
                 `(greedy init: ${dominatingSet.initialGreedySize}, ` +
@@ -121,9 +122,9 @@ export default class PlaygroundDemo extends Demo {
 
         try {
             const guards = computeFullGuardSet(pts);
-            this.renderGuards(pts, guards, "#e63946");
+            this.renderGuards(pts, guards.totalGuards, "#e63946");
             this.emit(
-                `Full guard set: ${guards.length} guard${guards.length !== 1 ? "s" : ""} covering the entire interior.`,
+                `Full guard set: ${guards.totalGuards.length} guard${guards.totalGuards.length !== 1 ? "s" : ""} covering the entire interior.`,
                 "ok"
             );
         } catch (e) {

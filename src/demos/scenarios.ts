@@ -35,79 +35,7 @@ export const SCENARIOS: Scenario[] = [
         ],
     },
 
-    // ── 2. Twin Pockets ───────────────────────────────────────────────────────
-    {
-        id: "twin-pockets",
-        name: "Twin pockets",
-        description:
-            "Two rectangular notches cut into the ceiling.  Guards placed at the " +
-            "shoulder corners cannot see the deep interior of each pocket, " +
-            "so hole-guarding must add one guard per pocket.",
-        points: [
-            { x: 90,  y: 450 },   // p0 — base left
-            { x: 830, y: 450 },   // p1 — base right
-            { x: 830, y: 100 },   // top-right outer corner
-            { x: 670, y: 100 },   // right pocket — right shoulder
-            { x: 670, y: 340 },   // right pocket — bottom-right
-            { x: 580, y: 340 },   // right pocket — bottom-left
-            { x: 580, y: 100 },   // right pocket — left shoulder
-            { x: 420, y: 100 },   // left pocket — right shoulder
-            { x: 420, y: 340 },   // left pocket — bottom-right
-            { x: 330, y: 340 },   // left pocket — bottom-left
-            { x: 330, y: 100 },   // left pocket — left shoulder
-            { x: 90,  y: 100 },   // top-left outer corner
-        ],
-    },
-
-    // ── 3. Triple Comb ────────────────────────────────────────────────────────
-    {
-        id: "triple-comb",
-        name: "Triple comb",
-        description:
-            "Three evenly-spaced downward notches.  The narrow corridors force " +
-            "the boundary guard set to grow, and the pockets between teeth " +
-            "are ideal stress-tests for the hole-guarding algorithm.",
-        points: [
-            { x: 90,  y: 450 },   // p0 — base left
-            { x: 830, y: 450 },   // p1 — base right
-            { x: 830, y: 110 },   // top-right
-            { x: 715, y: 110 },   // tooth-3 right shoulder
-            { x: 715, y: 355 },   // tooth-3 bottom-right
-            { x: 645, y: 355 },   // tooth-3 bottom-left
-            { x: 645, y: 110 },   // tooth-3 left shoulder
-            { x: 545, y: 110 },   // tooth-2 right shoulder
-            { x: 545, y: 355 },   // tooth-2 bottom-right
-            { x: 475, y: 355 },   // tooth-2 bottom-left
-            { x: 475, y: 110 },   // tooth-2 left shoulder
-            { x: 375, y: 110 },   // tooth-1 right shoulder
-            { x: 375, y: 355 },   // tooth-1 bottom-right
-            { x: 305, y: 355 },   // tooth-1 bottom-left
-            { x: 305, y: 110 },   // tooth-1 left shoulder
-            { x: 90,  y: 110 },   // top-left
-        ],
-    },
-
-    // ── 4. Deep Offset Pocket ─────────────────────────────────────────────────
-    {
-        id: "deep-pocket",
-        name: "Deep offset pocket",
-        description:
-            "One wide, asymmetric pocket placed off-centre.  The guard on the near " +
-            "shoulder sees most of the pocket but misses the far corner — a minimal " +
-            "case that reliably produces exactly one hole.",
-        points: [
-            { x: 90,  y: 450 },   // p0 — base left
-            { x: 830, y: 450 },   // p1 — base right
-            { x: 830, y: 100 },   // top-right
-            { x: 560, y: 100 },   // pocket right shoulder
-            { x: 560, y: 310 },   // pocket bottom-right
-            { x: 390, y: 310 },   // pocket bottom-left
-            { x: 390, y: 100 },   // pocket left shoulder
-            { x: 90,  y: 100 },   // top-left
-        ],
-    },
-
-    // ── 5. Mountain Range ─────────────────────────────────────────────────────
+    // ── 2. Mountain Range ─────────────────────────────────────────────────────
     {
         id: "mountain-range",
         name: "Mountain range",
@@ -125,30 +53,6 @@ export const SCENARIOS: Scenario[] = [
             { x: 370, y: 130 },   // peak 3
             { x: 255, y: 290 },   // valley 2
             { x: 165, y: 130 },   // peak 2 (left)
-        ],
-    },
-
-    // ── 6. Spiral Staircase ───────────────────────────────────────────────────
-    {
-        id: "staircase",
-        name: "Spiral staircase",
-        description:
-            "An asymmetric staircase that spirals inward.  Its mix of deep and " +
-            "shallow recesses generates a diverse set of constructed edges that " +
-            "cross at multiple heights.",
-        points: [
-            { x: 90,  y: 450 },   // p0 — base left
-            { x: 830, y: 450 },   // p1 — base right
-            { x: 830, y: 110 },   // top-right
-            { x: 650, y: 110 },   // step-3 top
-            { x: 650, y: 240 },   // step-3 riser
-            { x: 500, y: 240 },   // step-2 top
-            { x: 500, y: 350 },   // step-2 riser
-            { x: 310, y: 350 },   // step-1 top
-            { x: 310, y: 200 },   // step-1 riser (goes back up)
-            { x: 180, y: 200 },   // left shelf
-            { x: 180, y: 110 },   // top-left-inner
-            { x: 90,  y: 110 },   // top-left
         ],
     },
 ];
