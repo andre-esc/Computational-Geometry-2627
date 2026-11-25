@@ -1,8 +1,9 @@
 import "./style.css";
 
 import WVDemo from "./demos/WVDemo";
-import VisPolygonDemo from "./demos/VisPolygonDemo";
+import BoundaryGuardingDemo from "./demos/BoundaryGuardingDemo";
 import PlaygroundDemo from "./demos/PlaygroundDemo";
+import HoleGuardingDemo from "./demos/HoleGuardingDemo";
 import { SCENARIOS } from "./demos/scenarios";
 
 // ── Article demos ────────────────────────────────────────────────────────────
@@ -13,7 +14,8 @@ function tryInit<T>(fn: () => T): T | null {
 }
 
 void tryInit(() => new WVDemo("wvDemo", 760, 300));
-void tryInit(() => new VisPolygonDemo("visPolyDemo", 760, 300));
+void tryInit(() => new BoundaryGuardingDemo("boundaryGuardingDemo", 760, 300));
+void tryInit(() => new HoleGuardingDemo("holeGuardDemo", 760, 300));
 const playgroundDemo = tryInit(() => new PlaygroundDemo("playgroundCanvas", 920, 520));
 
 // ── Status bar for playground ─────────────────────────────────────────────────

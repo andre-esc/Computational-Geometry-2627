@@ -10,9 +10,10 @@ export default abstract class Demo {
     protected readonly canvasElement: HTMLCanvasElement;
     protected readonly canvas: Canvas;
 
-    constructor(canvasId: string, width: number, height: number) {
-        const htmlCanvas = document.getElementById(canvasId) as HTMLCanvasElement;
+    protected readonly infoText: HTMLElement | null;
 
+    constructor(canvasId: string, width: number, height: number, infoTextId?: string) {
+        const htmlCanvas = document.getElementById(canvasId) as HTMLCanvasElement;
         if (htmlCanvas === null) throw new Error("Canvas ID doesn't exist");
 
         this.canvasElement = htmlCanvas;
@@ -23,11 +24,27 @@ export default abstract class Demo {
             selection: false,
         });
 
+        if (infoTextId !== undefined) {
+            const htmlInfoText = document.getElementById(infoTextId);
+            if (htmlInfoText === null) throw new Error("Info text ID doesn't exist");
+    
+            this.infoText = htmlInfoText;
+        } else {
+            this.infoText = null;
+        }
+
         this.canvas.on("mouse:dblclick", this.onDoubleClick.bind(this));
-        // this.canvas.on("mouse:down", this.onClick);
     }
 
-    // protected abstract onClick(e: TPointerEventInfo<PointerEvent>): void;
     protected onDoubleClick(_: TPointerEventInfo<PointerEvent>): void {};
-    // protected abstract onRightClick(e: TPointerEventInfo<PointerEvent>): void;
+
+    protected readonly updateInfoText = (text: string) => {
+        if (this.infoText === null) {
+            console.warn("Trying to set info text of demo that doesn't have info text");
+        } else {
+            this.infoText.innerText = text;
+            MathJax.typesetClear([this.infoText]);
+            MathJax.typesetPromise([this.infoText]);
+        }
+    }
 };

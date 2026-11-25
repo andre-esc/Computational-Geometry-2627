@@ -21,9 +21,7 @@ function isAnEar(index: number, pointRef: XY[], availablePoints: number[]) {
     for (let q of availablePoints) {
         if (isInTriangle(pointRef[q], n1, p, n2)) return false;
     }
-
-    console.log(`${getCircular(availablePoints, index - 1)} ${availablePoints[index]} ${getCircular(availablePoints, index + 1)} is an ear`);
-
+    
     return true;
 }
 

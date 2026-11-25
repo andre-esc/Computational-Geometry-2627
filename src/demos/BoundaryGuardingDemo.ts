@@ -18,8 +18,8 @@ export default class BoundaryGuardingDemo extends Demo {
     private guardSet?: DominatingSetResult;
     private currentIteration = 0;
 
-    private readonly startButton = document.getElementById("visPoly_start") as HTMLButtonElement;
-    private readonly nextButton = document.getElementById("visPoly_next") as HTMLButtonElement;
+    private readonly startButton = document.getElementById("boundaryGuarding_start") as HTMLButtonElement;
+    private readonly nextButton = document.getElementById("boundaryGuarding_next") as HTMLButtonElement;
 
     private readonly setVisibleGuards = (guards: Set<number>) => {
         this.visibility.setVisibleGuards(new Set(guards));
@@ -30,11 +30,11 @@ export default class BoundaryGuardingDemo extends Demo {
         const points = this.poly.getPoints();
 
         if (!isPolygonSimple(points)) {
-            alert("Polygon is not simple!");
+            this.updateInfoText("⚠ Polygon is not simple!");
 
             return false;
         } else if (!isWeaklyVisible(points)[0]) {
-            alert("Polygon is not weakly visible!");
+            this.updateInfoText("⚠ Polygon is not weakly visible!");
 
             return false;
         }
@@ -42,8 +42,8 @@ export default class BoundaryGuardingDemo extends Demo {
         return true;
     }
 
-    constructor() {
-        super("visPolyDemo", 800, 300);
+    constructor(canvasId = "boundaryGuardingDemo", width = 760, height = 300, infoTextId = "boundaryGuarding_info") {
+        super(canvasId, width, height, infoTextId);
 
         this.poly = new GPolygon([
             { x: 300, y: 250 },
@@ -99,6 +99,9 @@ export default class BoundaryGuardingDemo extends Demo {
 
             this.nextButton.disabled = false;
             this.startButton.disabled = true;
+            this.updateInfoText(
+                String.raw`Initial boundary guard: \(|G| = ${this.guardSet.iterationGuards[0].length}\) (click next to step forward)`
+            );
             
             this.setVisibleGuards(new Set(this.guardSet.iterationGuards[0]));
             this.currentIteration = 0;
@@ -114,14 +117,18 @@ export default class BoundaryGuardingDemo extends Demo {
 
                 this.nextButton.disabled = true;
                 this.startButton.disabled = false;
+                this.updateInfoText(
+                    String.raw`Final boundary guard: \(|G| = ${this.guardSet.guards.length}\)`
+                );
 
                 this.isDemoActive = false;
                 this.poly.setVerticesMoveable(true);
-
-                console.log(this.guardSet);
-
             } else {
                 this.setVisibleGuards(new Set(this.guardSet.iterationGuards[this.currentIteration]));
+
+                this.updateInfoText(
+                    String.raw`Iteration ${this.currentIteration}: \(|G| = ${this.guardSet.iterationGuards[this.currentIteration].length}\) (click next to step forward)`
+                );
             }
         }
     }

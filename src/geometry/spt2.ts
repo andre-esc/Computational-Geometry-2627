@@ -45,8 +45,6 @@ function findTangentToFunnel(pointRef: XY[], funnel: PointIndex[], apexAt: numbe
     const funnelOrientation = orient(pointRef[funnel[0]], pointRef[funnel[apexAt]], pointRef[funnel[funnel.length - 1]]);
     const searchDirection = Math.sign(funnelOrientation);
 
-    console.log("searchDirection", searchDirection)
-
     const resBeforeApex = binarySearchHelper(0, apexAt, false, mid => {
         const turn = orient(pointRef[target], pointRef[funnel[mid]], pointRef[funnel[mid+1]]);
 
@@ -58,10 +56,7 @@ function findTangentToFunnel(pointRef: XY[], funnel: PointIndex[], apexAt: numbe
 
         return searchDirection * turn > 0;
     })
-
-    console.log(`getting tangent, before: ${resBeforeApex} after: ${resAfterApex}`);
-    // console.log(`getting tangent, before: ${resBeforeApex} after: ${resAfterApex} t1: ${t1} t2: ${t2}`);
-
+    
     if (resBeforeApex === resAfterApex) {  // Only happens if both are -1
         return apexAt;
     } else {

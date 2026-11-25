@@ -7,7 +7,7 @@
   <title>INFO-420: Vertex Guarding a WV-Polygon</title>
 
   <!-- Tailwind CSS (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- <script src="https://cdn.tailwindcss.com"></script> -->
 
   <!-- MathJax -->
   <script>
@@ -28,7 +28,7 @@
     };
   </script>
   <script id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" crossorigin="anonymous" integrity="">
   </script>
 
   <link rel="stylesheet" href="/src/style.css" />
@@ -101,6 +101,20 @@
          ═══════════════════════════════════════════ -->
     <section id="sec-intro">
       <h2 class="sec-heading"><span class="sec-num">1</span> Introduction</h2>
+      
+      <p>
+      The concept of "guarding" a polygon is a highly studied aspect of computational geometry, particularly in association with the Art Gallery problem. To <i>guard</i> a polygon is to place points, called <i>guards</i>, in such a way that every point of the polygon is visible from at least one guard (a point is <i>visible</i> from another point if the line segment connecting them is not obstructed—in the context of polygon guarding, this means that the segment is fully contained within the polygon).
+      </p>
+
+      <p>
+      There exist many variants to this problem, which vary the properties of the polygon to be guarded, where we can place guards, or even whether the guards are allowed to move within the polygon. The general Art Gallery problem has been proven to be \(\exists\mathbb{R}\)-complete <a href="#ref-agp">[1]</a> (meaning that any problem expressed over integer or real number values can be reduced to an instance of the Art Gallery problem). In the case of guarding a simple polygon with guards limited to being placed on polygon vertices, the problem of finding the minimum number of guards (or, more precisely, determining whether a polygon can be guarded with at most $k$ guards) is NP-hard @nphard, and even APX-hard @modi2018art (meaning that any NP problem admitting a constant-factor polynomial-time approximation algorithm admits a PTAS that reduces it to this problem). 
+      </p>
+
+      Subir K. Ghosh presented an $O(log n)$-approximation algorithm for vertex-guarding a _simple_ polygon @ghosh, and conjectured that it must be possible to find a polynomial-time _constant_-approximation algorithm. Bhattacharya et al. later proposed a 6-approximation algorithm that turned out to be false, as their algorithm guaranteed the polynomial-time guarding of a simple polygon's boundary (up to an approximation), but not its interior @bhattacharyaApproximabilityGuardingWeak2017.
+
+      This project aims to demonstrate the constant-factor polynomial-time approximation algorithm discovered by Ashur et al. for vertex-guarding a _weakly visible polygon_ (noted WV-polygons), building upon Bhattacharya et al.'s previous results and confirming Ghosh's conjecture for this subset of simple polygons @Ashur_Filtser_Katz_2021. This algorithm works by analyzing the geometric properties of a vertex guard of the polygon's _boundary_, then by adding subsequent guards to cover any unguarded regions within the polygon's interior.
+
+      In the following sections, we first discuss how to characterize and detect WV-polygons, then we show how to compute a boundary guard for a WV-polygon, and finally we demonstrate how the algorithm guards the rest of the polygon.
 
       <p>
         The concept of <em>guarding</em> a polygon is a highly studied aspect of computational
@@ -267,10 +281,11 @@
             <span class="demo-title">Weak visibility detection</span>
           </div>
           <div class="demo-instructions">
+            <div>This demo demonstrates the weak visibility property. If the polygon is not weakly visible, it displays the base edge's visibility polygon to show which areas are occluded.</div>
             Drag vertices to reshape the polygon.  <kbd>Double-click</kbd> empty canvas to add a vertex.
             <kbd>Right-click</kbd> a vertex to remove it.
-            The polygon turns <span class="legend-wv-ok">dark</span> when weakly visible from the green base edge,
-            and <span class="legend-wv-warn">yellow</span> (with the WV-polygon shown) when it is not.
+            <!-- The polygon turns <span class="legend-wv-ok">dark</span> when weakly visible from the green base edge,
+            and <span class="legend-wv-warn">yellow</span> (with the WV-polygon shown) when it is not. -->
           </div>
           <div class="demo-canvas-wrap">
             <canvas id="wvDemo"></canvas>
@@ -549,19 +564,27 @@
             iterations.
           </p>
 
-          <!-- Demo: Boundary guard / per-vertex visibility -->
+          <!-- Demo: Boundary guard -->
           <div class="demo-wrapper">
             <div class="demo-header">
               <span class="demo-tag">↯ live</span>
-              <span class="demo-title">Per-vertex visibility regions</span>
+              <span class="demo-title">Boundary guarding</span>
             </div>
             <div class="demo-instructions">
+              <div>This demo shows the iterative refinement of a boundary guard, starting with an initial guarding set and performing the local search algorithm to reduce its cardinality as much as possible.</div>
               Drag vertices to reshape.  <kbd>Double-click</kbd> a vertex to toggle its visibility
               region.  <kbd>Double-click</kbd> empty canvas to add a vertex.
               <kbd>Right-click</kbd> a vertex to remove it.
             </div>
             <div class="demo-canvas-wrap">
-              <canvas id="visPolyDemo"></canvas>
+              <canvas id="boundaryGuardingDemo"></canvas>
+            </div>
+            <div class="demo-footer">
+              <div>
+                <button id="boundaryGuarding_start" class="btn btn-demo">Start</button>
+                <button id="boundaryGuarding_next" class="btn btn-demo" disabled>Next</button>
+              </div>
+              <span id="boundaryGuarding_info" class="demo-info">Click to start the boundary guarding.</span>
             </div>
           </div>
         </section>
@@ -649,9 +672,9 @@
               </svg>
             </figure>
             <figcaption class="illus-caption">
-              Constructed edges \\(xy\\) (upper, terracotta) and \\(x'y'\\) (lower, teal) each bound
-              a pocket invisible from their respective guards. \\(\\partial C_{xy}\\) is the arc of
-              \\(\\partial P\\) enclosed in the pocket.
+              Constructed edges \(xy\) (upper, terracotta) and \(x'y'\) (lower, teal) each bound
+              a pocket invisible from their respective guards. \(\partial C_{xy}\) is the arc of
+              \(\partial P\) enclosed in the pocket.
             </figcaption>
           </div>
 
@@ -1111,21 +1134,28 @@
           </div>
 
           <!-- Demo: Full guard (placeholder) -->
-          <div class="demo-wrapper demo-placeholder">
+          <div class="demo-wrapper">
             <div class="demo-header">
-              <span class="demo-tag demo-tag-placeholder">coming soon</span>
-              <span class="demo-title">Interior hole guarding</span>
+              <span class="demo-tag">↯ live</span>
+              <span class="demo-title">Full guarding</span>
             </div>
-            <div class="demo-placeholder-body">
-              <svg class="placeholder-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="8" y="8" width="48" height="48" rx="4" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4"/>
-                <path d="M20 44 L32 20 L44 44 Z" stroke="currentColor" stroke-width="2" fill="none"/>
-                <circle cx="20" cy="44" r="3" fill="currentColor" opacity="0.5"/>
-                <circle cx="44" cy="44" r="3" fill="currentColor" opacity="0.5"/>
-                <circle cx="38" cy="32" r="3" fill="#e63946"/>
-              </svg>
-              <p>A demo showing the full guarding algorithm — boundary guards plus hole-filling guards — will appear here.</p>
-              <p class="placeholder-hint">In the meantime, try the <button class="inline-btn" onclick="document.getElementById('btn-tab-playground').click()">Playground ↗</button> for the full interactive experience.</p>
+            <div class="demo-instructions">
+              <div>This demo shows how <a href="#algo-1">Algorithm 1</a> guards holes in existing boundary guards, highlighting the checked constructed edges as well as the triangles found by the algorithm.</div>
+              Drag vertices to reshape.  <kbd>Double-click</kbd> a vertex to toggle its visibility
+              region.  <kbd>Double-click</kbd> empty canvas to add a vertex.
+              <kbd>Right-click</kbd> a vertex to remove it.
+              <br>
+            </div>
+            <div class="demo-canvas-wrap">
+              <canvas id="holeGuardDemo"></canvas>
+            </div>
+            <div class="demo-footer">
+              <div>
+                <button id="holeGuard_start" class="btn btn-demo">Start</button>
+                <button id="holeGuard_custom" class="btn btn-demo">Start from existing</button>
+                <button id="holeGuard_next" class="btn btn-demo" disabled>Next</button>
+              </div>
+              <span id="holeGuard_info" class="demo-info">Click to start the full guarding from scratch, or guard existing holes.</span>
             </div>
           </div>
         </section>

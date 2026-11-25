@@ -5,7 +5,7 @@ import {
   type DominatingSetResult,
 } from "./dominatingSet";
 import type { XY } from "fabric";
-import { guardHoles } from "./guardHoles";
+import { guardHoles, type HoleGuard } from "./guardHoles";
 import type { ConstructedEdge } from "./misc";
 import trimPolygonForBaseEdgeConvexity from "./baseEdgeConvexity";
 import { getConstructedEdges } from "./visibility";
@@ -37,8 +37,6 @@ export function computeBoundaryGuardSet(polygon: XY[]) {
   // Make base edge convex
   const trimmed = trimPolygonForBaseEdgeConvexity(polygon);
   const guardSet = computeBoundaryGuardSetConvex(trimmed.polygon);
-
-  console.log(trimmed);
 
   // Add guards if base edge was concave
   if (trimmed.trimmedLeft > 0) {
@@ -74,7 +72,7 @@ export function computeBoundaryGuardSet(polygon: XY[]) {
 export interface FullGuardSet {
   guardsBefore: number[];
   totalGuards: number[];
-  extraGuardTriangles: [number, [XY, XY, XY]][];
+  extraGuardTriangles: HoleGuard[];
 };
 
 // Computes the full guard of a WV-polygon, assuming convex base edge vertices
@@ -86,8 +84,8 @@ export function computeFullGuardSetConvex(polygon: XY[]): FullGuardSet {
 
   return {
     guardsBefore: guards,
-    totalGuards: [...new Set([...guards, ...extra.keys()])], 
-    extraGuardTriangles: [...extra.entries()]
+    totalGuards: [...new Set([...guards, ...extra.map(({ guard }) => guard)])], 
+    extraGuardTriangles: extra
   } as FullGuardSet;
 }
 
@@ -114,8 +112,8 @@ export function computeFullGuardSet(polygon: XY[]): FullGuardSet {
     guardSet.totalGuards.forEach((guard, i) => {
       if (guard >= 2) guardSet.totalGuards[i] += trimmed.trimmedRight;
     })
-    guardSet.extraGuardTriangles.forEach(([guard, _], i) => {
-      if (guard >= 2) guardSet.extraGuardTriangles[i][0] += trimmed.trimmedRight;
+    guardSet.extraGuardTriangles.forEach(({ guard }, i) => {
+      if (guard >= 2) guardSet.extraGuardTriangles[i].guard += trimmed.trimmedRight;
     })
   }
 
@@ -127,8 +125,8 @@ export function computeFullGuardSetFromGuards(polygon: XY[], guards: number[]): 
   const extra = guardHoles(polygon, getConstructedEdges(polygon, guards));
 
   return {
-      guardsBefore: guards,
-      totalGuards: [...guards, ...extra.keys()],
-      extraGuardTriangles: [...extra.entries()]
+    guardsBefore: guards,
+    totalGuards: [...new Set([...guards, ...extra.map(({ guard }) => guard)])], 
+    extraGuardTriangles: extra
   } as FullGuardSet;
 }

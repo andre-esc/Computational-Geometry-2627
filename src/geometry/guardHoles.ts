@@ -1,6 +1,12 @@
 import type { XY } from "fabric";
 import { onBase, orient, computeSegmentIntersection, isSegmentInsidePolygon, type ConstructedEdge } from "./misc";
 
+export interface HoleGuard {
+  guard: number;
+  triangle: [XY, XY, XY];
+  constructedEdge: [XY, XY];
+};
+
 /**
  * Implements the algorithm of Ashur et al. to guard holes in a boundary vertex guard
  * 
@@ -9,9 +15,9 @@ import { onBase, orient, computeSegmentIntersection, isSegmentInsidePolygon, typ
  * 
  * @returns A map of added guard indices to the triangles that they guard
  */
-export function guardHoles(polygon: XY[], constructedEdges: ConstructedEdge[]): Map<number, [XY, XY, XY]> {
+export function guardHoles(polygon: XY[], constructedEdges: ConstructedEdge[]): HoleGuard[] {
   const all = constructedEdges.filter(e => onBase(e, polygon));
-  const extra = new Map<number, [XY, XY, XY]>();
+  const extra: HoleGuard[] = [];
 
   for (const e of all.filter(e => isUpper(e))) {
     let best: { p: XY; x2: XY } | null = null;
@@ -35,7 +41,11 @@ export function guardHoles(polygon: XY[], constructedEdges: ConstructedEdge[]): 
       const triangle: [XY, XY, XY] = [lower1, best.p, best.x2];
       const w = findVertexSeeingTriangle(polygon, [lower1, best.p, best.x2]);
 
-      if (w !== -1 && !extra.has(w)) extra.set(w, triangle);
+      if (w !== -1) extra.push({
+        guard: w,
+        triangle,
+        constructedEdge: [lower1, upper1]
+      });
     }
   }
 
