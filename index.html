@@ -79,17 +79,6 @@
           <div class="author-affil">Université libre de Bruxelles</div>
         </div>
       </div>
-      <p class="paper-abstract-label">Abstract</p>
-      <p class="paper-abstract">
-        We present and analyse an interactive implementation of the constant-factor polynomial-time
-        approximation algorithm of Ashur, Filtser, Katz &amp; Saban (2022) for vertex-guarding a
-        <em>weakly visible polygon</em> (WV-polygon).  Starting from Bhattacharya et al.'s boundary
-        guard construction and the terrain-like PTAS of Mustafa &amp; Ray, the algorithm first
-        approximates a minimum boundary guard set for \(\partial P\), then adds a bounded number
-        of additional guards to cover every interior hole, yielding a \((2+\varepsilon)\)-approximation
-        of the global optimum.  All algorithms are implemented in TypeScript with live interactive
-        demonstrations throughout.
-      </p>
     </div>
   </header>
 
@@ -1059,7 +1048,7 @@
             <div class="theorem-proof">
               <em>Proof.</em>
               <p>
-                By Claims 4 and 5, we know that every hole \(H\) has two edges \(h_1 h_2\) and \(h_2 h_3\) touching two upper edges \(x_{d-1} y_{d-1}\) and \(x_d y_d\) with \(x_{d-1}, x_d \in u v\). Let these edges be the crossing point of the slope along \(H\), i.e. \(h_1 h_2\) is the edge of \(H\) with minimum absolute slope, or \((star)\)  \(h_2\) is the downward curving point. Note then that \(h_2\) is the topmost point of \(H\).
+                By Claims 4 and 5, we know that every hole \(H\) has two edges \(h_1 h_2\) and \(h_2 h_3\) touching two upper edges \(x_{d-1} y_{d-1}\) and \(x_d y_d\) with \(x_{d-1}, x_d \in u v\). Let these edges be the crossing point of the slope along \(H\), i.e. \(h_1 h_2\) is the edge of \(H\) with minimum absolute slope, or ★ \(h_2\) is the downward curving point. Note then that \(h_2\) is the topmost point of \(H\).
               </p>
               <p>
                 If the algorithm found an intersection point \(p\) on \(x_{d-1} y_{d-1}\), then either:
@@ -1071,7 +1060,7 @@
                 \(p\) is below (or equal to) \(h_1\), in which case \(x_d y_d\) has the same slope direction as \(x_{d-1} y_{d-1}\) with smaller absolute slope (★ i.e. \(h_2\) is not the downward curving point), a contradiction.
               </p>
               <p>
-                If the algorithm did not find \(p\) on \(x_{d-1} y_{d-1}\), then since \(p\) is the highest intersection point, ★ \(h_2\) once again cannot be the downward curving point, a contradiction.
+                If the algorithm did not find \(p\) on \(x_{d-1} y_{d-1}\), then since \(p\) is the highest intersection point, ★ \(h_2\) once again cannot be the downward curving point, a contradiction. \(\square\)
               </p>
             </div>
           </div>
@@ -1135,12 +1124,7 @@
           <div class="remark-box">
             <div class="remark-label">Remark 1</div>
             <div class="remark-body">
-              Everything above assumes \(u\) and \(v\) are convex vertices.  If \(u\) or \(v\) is
-              concave, replace the concave region with the edge \(uw_1\) (resp. \(vw_2\)) to the
-              first vertex that would render \(u\) (resp. \(v\)) convex, and add \(u\) (resp.
-              \(v\)) to the guard set.  Any region seen from a vertex in the removed concave area
-              can equally be seen from \(u\) or \(v\) — otherwise weak visibility would be
-              violated.
+              Everything so far has assumed that \(u\) and \(v\) are convex. If this is not the case, then we can replace the concave areas with edges \(u w_1\) and \(v w_2\) with \(w_1\) and \(w_2\) the earliest vertices along \(\partial P\) that would render \(u\) and/or \(v\) convex, then place guards at \(u\) and/or \(v\). This works because clearly any point of \(P\) seen by a vertex in the removed concave region can also be seen by their associated base edge vertex (\(u\) or \(v\)), and every point within the region can also be seen by \(u\) or \(v\) (otherwise the weak visibility assumption is violated).
             </div>
           </div>
 
@@ -1175,54 +1159,49 @@
         <section id="sec-approx">
           <h4 class="subsubsec-heading"><span class="sec-num">2.3.4</span> Approximation factor</h4>
 
+          <p>
+            Before discussing the approximation factor, we first prove the following:
+          </p>
+
           <div class="theorem-box theorem-claim">
             <div class="theorem-label">Claim 8</div>
             <div class="theorem-body">
-              Every point \(p \in P\) sees exactly one contiguous sub-segment of \(uv\), and
-              therefore has at most two constructed edges touching \(uv\).
+              Every point \(p \in P\) sees exactly one contiguous sub-segment of \(u v\), and thus admits at most two constructed edges touching \(u v\).
             </div>
             <div class="theorem-proof">
-              <em>Proof.</em> Let \(a\) and \(b\) be the left- and right-most points of \(uv\)
-              seen by \(p\).  Since \(\partial P\) cannot cross \(pa\) or \(pb\), the triangle
-              \(\triangle pab\) contains no boundary point, so \(p\) sees all of \(uv\) between
-              \(a\) and \(b\). \(\square\)
+              <em>Proof.</em> Let \(a\) and \(b\) be the left- and right-most points on \(u v\) seen by \(p\). Since \(\partial P\) cannot cross \(p a\) or \(p b\), \(\triangle p a b\) cannot contain any points of \(\partial P\), and thus \(p\) can see all points of \(u v\) between \(a\) and \(b\).
             </div>
           </div>
+
+          <p>And thus:</p>
 
           <div class="theorem-box theorem-corollary">
             <div class="theorem-label">Corollary 8.1</div>
             <div class="theorem-body">
-              \(p\) has at most one upper edge and one lower edge touching \(uv\).
+              \(p\) admits <i>at most</i> one upper edge and one lower edge touching \(uv\).
             </div>
           </div>
 
           <p>
-            By Claim 8, Algorithm 1 examines at most \(|G|\) constructed edges (one upper edge per
-            guard), and adds at most one vertex to \(G'\) per guard.  Thus
-            \[
-              |G \cup G'| \;\leq\; 2|G|.
-            \]
-            Since \(|G| \leq (1+\varepsilon)\cdot\OPT\), the total approximation factor is
-            \(2 + 2\varepsilon\), or simply \(2 + \varepsilon\) for a given \(\varepsilon > 0\).
+            By Claim 8, <a href="#algo-1">Algorithm 1</a> checks at most \(|G|\) constructed edges, as each vertex of \(G\) has at most one upper edge touching \(u v\). Furthermore, for each check, at most one vertex is added to \(G'\). Thus, \(|G \cup G'| \leq 2|G|\), and since \(|G| \leq (1+\varepsilon) \cdot \textrm{OPT}\) as discussed before <a href="#ref-terrainlike">[10]</a>, the approximation factor of this algorithm is \(2 + 2 \varepsilon\), or simply \(2 + \varepsilon\) for a given \(\varepsilon > 0\).
           </p>
         </section>
 
         <!-- ─── §2.3.5 Runtime ────────────────────────────────────────── -->
         <section id="sec-runtime">
           <h4 class="subsubsec-heading"><span class="sec-num">2.3.5</span> Runtime</h4>
-
+          
+          <p>
+            Since:
+          </p>
           <ul class="paper-list">
-            <li>\(G\) is computed in \(O\!\left(n^{O(\varepsilon^{-2})}\right)\).</li>
-            <li>All constructed edges are computed in \(O(|G|\cdot n) \subseteq O(n^2)\) using
-                Joe &amp; Simpson's algorithm <a href="#ref-vis1">[11]</a><a href="#ref-vis2">[12]</a>.</li>
-            <li>At most \(|G|\) edges are examined, so at most \(|G|^2\) intersection candidates;
-                each triangle guard is found in \(O(n)\) via Claim 6.</li>
+            <li>\(G\) can be calculated in \(O(n^{O(\varepsilon^{-2})})\),</li>
+            <li>All constructed edges can be computed in \(O(|G|n) \sim O(n^2)\) time using Joe and Simpson's algorithm <a href="#ref-vis_simple">[12]</a> <a href="#ref-vis_simple_correction">[13]</a>,</li>
+            <li>As stated previously, the algorithm uses at most \(|G|\) constructed edges, the total number of possible intersection points \(p\) is \(|G|^2\),</li>
+            <li>The vertex guarding \(\triangle x p x'\) can be found in \(O(n)\) (by Claim 6),</li>
           </ul>
           <p>
-            The theoretical total runtime is
-            \[
-              O\!\left(n^{\min\!\left(2,\, O(\varepsilon^{-2})\right)}\right).
-            \]
+            The theoretical total runtime of the algorithm is \(O(n^{\min(2, O(\varepsilon^{-2}))})\) (depending on the choice of \(\varepsilon\)).
           </p>
         </section>
 
@@ -1233,7 +1212,7 @@
     <!-- ═══════════════════════════════════════════
          Footnotes
          ═══════════════════════════════════════════ -->
-    <section id="footnotes" class="footnote-section">
+    <!-- <section id="footnotes" class="footnote-section">
       <hr class="footnote-rule">
       <ol>
         <li id="fn-convex">
@@ -1241,7 +1220,7 @@
           concave case.
         </li>
       </ol>
-    </section>
+    </section> -->
 
     <!-- ═══════════════════════════════════════════
          References
