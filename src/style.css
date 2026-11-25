@@ -451,8 +451,21 @@ body {
   line-height: 1.8;
   color: var(--article-muted);
   font-family: var(--font-serif);
+  counter-reset: item;
+
 }
-.ref-list li { margin-bottom: 0.6em; }
+.ref-list li { 
+  display: list-item;
+  list-style-position: inside;
+  margin-bottom: 0.6em; 
+}
+.ref-list li::before {
+  display: inline-block;
+  content: "[" counter(item) "] ";
+  counter-increment: item;
+  width: 2em;
+  margin-left: -2em;
+}
 .ref-list a { color: var(--accent); }
 
 /* ── Legend helpers ──────────────────────────────────────────────────────── */
