@@ -1,0 +1,77 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Inline illustration styles
+   Split out from index.html so they can be edited independently (e.g. in
+   Illustrator or any CSS editor) without touching the article markup.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Two-panel split figure ──────────────────────────────────────────────── */
+
+/*
+ * Apply to <figure class="illus-figure illus-figure--split"> to override the
+ * default centred-row layout with a vertical column that hosts the grid below.
+ */
+.illus-figure--split {
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: var(--article-bg);
+}
+
+/*
+ * The 1fr/1fr grid that holds the two side-by-side panels.
+ * Sits inside .illus-figure--split, above the caption strip.
+ */
+.illus-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  border-bottom: 1px solid var(--article-rule);
+}
+
+/*
+ * Individual panel inside .illus-split-grid.
+ * Add .illus-panel--left to the left cell to get the dividing border.
+ */
+.illus-panel {
+  padding: 16px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.illus-panel--left {
+  border-right: 1px solid var(--article-rule);
+}
+
+/*
+ * Small all-caps label shown above the SVG inside each panel.
+ * Colour variants:
+ *   default             — neutral dark muted
+ *   .illus-panel-label--wrong   — terracotta (incorrect case)
+ *   .illus-panel-label--correct — teal       (correct case)
+ */
+.illus-panel-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #5a5248;
+  font-family: var(--font-sans);
+}
+.illus-panel-label--wrong   { color: var(--accent); }
+.illus-panel-label--correct { color: var(--teal);   }
+
+/*
+ * Caption strip that runs across the full width at the bottom of a split
+ * figure. Mirrors .illus-caption but belongs to the split layout rather than
+ * the outer wrapper (which already has its own border-top via .illus-caption).
+ */
+.illus-split-caption {
+  padding: 7px 16px 9px;
+  font-size: 12.5px;
+  color: #7a7060;
+  font-family: var(--font-sans);
+  text-align: center;
+  font-style: italic;
+  line-height: 1.5;
+}
