@@ -60,27 +60,6 @@ function * visHelper(pointRef: XY[], spt: PointIndex[], from: 0 | 1) {
 
 
 
-function printLL(ll: LinkedList<BoundaryCoord>) {
-    console.log("Linked list:");
-    // const a = ll;
-
-    ll.prev!.next = null;
-
-    let lll: LinkedList<BoundaryCoord> | null = ll;
-    let i = 0;
-
-    while (lll !== null) {
-        console.log(lll.point);
-        lll = lll.next;
-
-
-        i++;
-        if (i > 20) break;
-    }
-
-    ll.prev!.next = ll;
-}
-
 // Helper function for projecting a sightline onto the polygon
 function projectShadow(
     { uIndex, vIndex, ccwiseVisRegionStart }: ShadowProjection,

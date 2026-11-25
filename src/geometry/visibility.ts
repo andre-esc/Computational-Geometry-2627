@@ -246,7 +246,7 @@ function recordConstructedEdge(
     .find(q => Math.abs(orient(jp, hp, q)) > 1e-9);
   if (!nb) return; // degenerate: both neighbours collinear with the sightline
 
-  const pocketSide = Math.sign(orient(lower.point, upper.point, nb));
+  const pocketSide = -Math.sign(orient(lower.point, upper.point, nb));
   list.push({ guard: guardIndex, lower, upper, pocketSide });
 }
 

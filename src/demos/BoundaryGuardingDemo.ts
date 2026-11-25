@@ -124,7 +124,7 @@ export default class BoundaryGuardingDemo extends Demo {
 
     protected override onDoubleClick(e: TPointerEventInfo<PointerEvent>): void {
         if (!e.target?.get("isPolyControl") && !this.isDemoActive) {
-            this.poly.createNewVertex(e.viewportPoint);
+            this.poly.createNewVertex(e.scenePoint);
         }
     }
 }

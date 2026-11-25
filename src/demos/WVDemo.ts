@@ -7,53 +7,6 @@ import isWeaklyVisible from "../geometry/weakVisibility";
 
 import { Polygon, type TPointerEventInfo } from "fabric";
 
-const demoPoly = [
-    {
-        "x": 100,
-        "y": 260
-    },
-    {
-        "x": 700,
-        "y": 260
-    },
-    {
-        "x": 600,
-        "y": 250
-    },
-    {
-        x: 480,
-        y: 130
-    },
-    {
-        x: 520,
-        y: 100
-    },
-    {
-        x: 470,
-        y: 120
-    },
-    {
-        x: 415,
-        y: 60,
-    },
-    {
-        x: 430,
-        y: 20,
-    },
-    {
-        x: 370,
-        y: 20,
-    },
-    {
-        x: 385,
-        y: 60,
-    },
-    {
-        "x": 200,
-        "y": 250
-    }
-]
-
 export default class WVDemo extends Demo {
     private readonly poly: GPolygon;
     private readonly visPoly: Polygon;
@@ -117,7 +70,7 @@ export default class WVDemo extends Demo {
 
     protected override onDoubleClick(e: TPointerEventInfo<PointerEvent>): void {
         if (!e.target?.get("isPolyControl")) {
-            this.poly.createNewVertex(e.viewportPoint);
+            this.poly.createNewVertex(e.scenePoint);
         }
     }
 }

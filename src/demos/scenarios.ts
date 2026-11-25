@@ -10,13 +10,30 @@ export interface Scenario {
 /**
  * All points are designed for a 920×520 canvas.
  * p0 / p1 are always the base-edge endpoints (at y ≈ 450).
- * Every polygon is weakly visible from that base edge.
+ * The WV test scenarios are weakly visible from that base edge; the explicitly
+ * named bent-corridor example is intentionally not.
  *
  * These shapes are intentionally crafted so that the boundary-guard
  * set leaves uncovered interior pockets, exercising the hole-guarding
  * stage of the algorithm.
  */
 export const SCENARIOS: Scenario[] = [
+    {
+        id: "bent-corridor-not-wv",
+        name: "Bent corridor (not WV)",
+        description:
+            "A narrow L-shaped corridor hides its far end from every point on the base edge. " +
+            "Use Check WV to see why guard computation is unavailable for this polygon.",
+        points: [
+            { x: 230, y: 450 },   // p0 — base left
+            { x: 330, y: 450 },   // p1 — base right
+            { x: 330, y: 250 },
+            { x: 650, y: 250 },
+            { x: 650, y: 150 },
+            { x: 230, y: 150 },
+        ],
+    },
+
     // ── 1. W-shape ────────────────────────────────────────────────────────────
     {
         id: "w-shape",
@@ -32,6 +49,28 @@ export const SCENARIOS: Scenario[] = [
             { x: 460, y: 120 },   // centre peak
             { x: 320, y: 310 },   // left valley
             { x: 180, y: 120 },   // left peak
+        ],
+    },
+
+    {
+        id: "interior-hole-example",
+        name: "Interior guard candidate",
+        description:
+            "A weakly visible polygon whose boundary guards produce a candidate triangle " +
+            "from intersecting constructed edges. The candidate is not necessarily an uncovered hole.",
+        points: [
+            { x: 90,  y: 450 },   // p0 — base left
+            { x: 830, y: 450 },   // p1 — base right
+            { x: 830, y: 130 },
+            { x: 505, y: 130 },
+            { x: 505, y: 180 },
+            { x: 410, y: 180 },
+            { x: 410, y: 315 },
+            { x: 305, y: 315 },
+            { x: 305, y: 280 },
+            { x: 190, y: 280 },
+            { x: 190, y: 130 },
+            { x: 90,  y: 130 },
         ],
     },
 

@@ -9,6 +9,17 @@ import type { Scenario } from "./scenarios";
 
 export type StatusType = "ok" | "warn" | "error" | "info";
 
+const GUARD_COLORS = [
+    "#4c82f7",
+    "#e76f51",
+    "#2a9d8f",
+    "#9b5de5",
+    "#f4a261",
+    "#00a6a6",
+    "#d45087",
+    "#6a994e",
+];
+
 export default class PlaygroundDemo extends Demo {
     private readonly poly: GPolygon;
     private guardCircles: Circle[] = [];
@@ -92,7 +103,7 @@ export default class PlaygroundDemo extends Demo {
 
         try {
             const { dominatingSet } = computeBoundaryGuardSet(pts);
-            this.renderGuards(pts, dominatingSet.guards, "#4c82f7");
+            this.renderGuards(pts, dominatingSet.guards);
             this.emit(
                 `Boundary guard: ${dominatingSet.guards.length} guard${dominatingSet.guards.length !== 1 ? "s" : ""} ` +
                 `(greedy init: ${dominatingSet.initialGreedySize}, ` +
@@ -120,8 +131,8 @@ export default class PlaygroundDemo extends Demo {
         this.clearOverlay(false);
 
         try {
-            const guards = computeFullGuardSet(pts);
-            this.renderGuards(pts, guards, "#e63946");
+            const guards = computeFullGuardSet(pts).totalGuards;
+            this.renderGuards(pts, guards);
             this.emit(
                 `Full guard set: ${guards.length} guard${guards.length !== 1 ? "s" : ""} covering the entire interior.`,
                 "ok"
@@ -137,9 +148,10 @@ export default class PlaygroundDemo extends Demo {
         this.statusCallback?.(msg, type);
     }
 
-    private renderGuards(pts: XY[], guards: number[], color: string) {
-        for (const g of guards) {
+    private renderGuards(pts: XY[], guards: number[]) {
+        for (const [guardIndex, g] of guards.entries()) {
             const pt = pts[g];
+            const color = GUARD_COLORS[guardIndex % GUARD_COLORS.length];
 
             // Visibility polygon for this guard
             try {
@@ -177,12 +189,12 @@ export default class PlaygroundDemo extends Demo {
     public loadScenario(scenario: Scenario) {
         this.clearOverlay(false);
         this.poly.loadPoints(scenario.points);
-        this.emit(`Loaded scenario: ${scenario.name}`, "info");
+        this.emit(`Loaded ${scenario.name}. ${scenario.description}`, "info");
     }
 
     protected override onDoubleClick(e: TPointerEventInfo<PointerEvent>): void {
         if (!e.target?.get("isPolyControl")) {
-            this.poly.createNewVertex(e.viewportPoint);
+            this.poly.createNewVertex(e.scenePoint);
         }
     }
 }

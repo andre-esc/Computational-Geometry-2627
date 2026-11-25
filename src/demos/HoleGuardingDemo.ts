@@ -7,6 +7,7 @@ import { Circle, Point, Polygon, type TPointerEventInfo, type XY } from "fabric"
 import isWeaklyVisible from "../geometry/weakVisibility";
 import { checkBoundaryGuard, computeFullGuardSet, computeFullGuardSetFromGuards, type FullGuardSet } from "../geometry/boundaryGuard";
 import isPolygonSimple from "../geometry/simple";
+import { SCENARIOS } from "./scenarios";
 
 export default class HoleGuardingDemo extends Demo {
     private readonly poly: GPolygon;
@@ -22,6 +23,7 @@ export default class HoleGuardingDemo extends Demo {
     private readonly startButton = document.getElementById("holeGuard_start") as HTMLButtonElement;
     private readonly customButton = document.getElementById("holeGuard_custom") as HTMLButtonElement;
     private readonly nextButton = document.getElementById("holeGuard_next") as HTMLButtonElement;
+    private readonly statusElement = document.getElementById("holeGuard_status");
 
     private readonly setVisibleGuards = (guards: Set<number>) => {
         this.visibility.setVisibleGuards(new Set(guards));
@@ -36,14 +38,14 @@ export default class HoleGuardingDemo extends Demo {
     private readonly setActiveTriangle = (triangle: [XY, XY, XY]) => {
         this.triangle.set({
             points: triangle,
+            visible: true,
             dirty: true,
         });
         this.triangle.setBoundingBox(true);
         this.intersectionPoint.setXY(new Point(triangle[1]));
+        this.intersectionPoint.set("visible", true);
 
         this.canvas.requestRenderAll();
-
-        console.log(triangle);
     }
 
     private readonly setTriangleVisible = (visible: boolean) => {
@@ -56,22 +58,28 @@ export default class HoleGuardingDemo extends Demo {
         this.canvas.requestRenderAll();
     }
 
+    private readonly setStatus = (message: string, type: "info" | "error" | "warn" = "info") => {
+        if (!this.statusElement) return;
+        this.statusElement.textContent = message;
+        this.statusElement.className = `hole-guard-status hole-guard-status--${type}`;
+    }
+
     private readonly verify = (checkGuards: boolean) => {
         const points = this.poly.getPoints();
 
         if (!isPolygonSimple(points)) {
-            alert("Polygon is not simple!");
+            this.setStatus("The polygon is self-intersecting; edit it before running hole guarding.", "error");
 
             return false;
         } else if (!isWeaklyVisible(points)[0]) {
-            alert("Polygon is not weakly visible!");
+            this.setStatus("The polygon must be weakly visible from its base edge.", "warn");
 
             return false;
         } else if (checkGuards) {
             const guards = this.visibility.getVisibleGuards();
 
             if (!checkBoundaryGuard(points, guards)) {
-                alert("Polygon's boundary is not guarded!");
+                this.setStatus("The selected vertices do not guard the whole boundary.", "warn");
 
                 return false;
             }
@@ -81,14 +89,11 @@ export default class HoleGuardingDemo extends Demo {
     }
 
     constructor() {
-        super("holeGuardDemo", 800, 300);
+        super("holeGuardDemo", 920, 520);
 
-        // this.poly = new GPolygon(demoPoly, this.canvas);
-        this.poly = new GPolygon([
-            { x: 300, y: 250 },
-            { x: 500, y: 250 },
-            { x: 400, y: 50 },
-        ], this.canvas);
+        const example = SCENARIOS.find(scenario => scenario.id === "interior-hole-example");
+        if (!example) throw new Error("The interior hole example scenario is missing.");
+        this.poly = new GPolygon(example.points, this.canvas);
 
         this.visibility = new GuardDisplay(this.poly.getPoints(), this.canvas);
 
@@ -146,7 +151,7 @@ export default class HoleGuardingDemo extends Demo {
             this.isDemoActive = true;
             
             this.poly.setVerticesMoveable(false);
-            this.setTriangleVisible(true);
+            this.setTriangleVisible(false);
 
             const guardSet = computeFullGuardSet(points);
             this.guardSet = guardSet;
@@ -155,9 +160,16 @@ export default class HoleGuardingDemo extends Demo {
             this.startButton.disabled = true;
             this.customButton.disabled = true;
             
-            this.poly.setVertexColors(new Set(guardSet.guardsBefore), "rgb(0,255,0)");
-            this.visibility.setVisibleGuards(new Set());
+            this.setVisibleGuards(new Set(guardSet.guardsBefore));
             this.currentTriangle = -1;
+            if (guardSet.extraGuardTriangles.length > 0) {
+                this.setActiveTriangle(guardSet.extraGuardTriangles[0][1]);
+            }
+            this.setStatus(
+                `Boundary stage: ${guardSet.guardsBefore.length} guard(s) cover ∂P; ` +
+                `${guardSet.extraGuardTriangles.length} interior candidate triangle(s) found. ` +
+                `Click Next step to inspect the proposed guards.`,
+            );
         }
 
         this.customButton.onclick = _e => {
@@ -169,7 +181,7 @@ export default class HoleGuardingDemo extends Demo {
             this.isDemoActive = true;
             
             this.poly.setVerticesMoveable(false);
-            this.setTriangleVisible(true);
+            this.setTriangleVisible(false);
 
             this.guardSet = computeFullGuardSetFromGuards(points, guards);
 
@@ -179,6 +191,13 @@ export default class HoleGuardingDemo extends Demo {
             
             this.setVisibleGuards(new Set(this.guardSet.guardsBefore))
             this.currentTriangle = -1;
+            if (this.guardSet.extraGuardTriangles.length > 0) {
+                this.setActiveTriangle(this.guardSet.extraGuardTriangles[0][1]);
+            }
+            this.setStatus(
+                `Selected guards cover ∂P. ${this.guardSet.extraGuardTriangles.length} candidate triangle(s) found; ` +
+                `click Next step to inspect the proposed guards.`,
+            );
         }
 
         this.nextButton.onclick = _e => {
@@ -197,18 +216,25 @@ export default class HoleGuardingDemo extends Demo {
 
                 this.poly.setVerticesMoveable(true);
                 this.setTriangleVisible(false);
+                this.setStatus(
+                    `Complete: the algorithm proposed ${this.guardSet.totalGuards.length} guard(s) in total.`,
+                );
             } else {
                 const [guard, triangle] = this.guardSet.extraGuardTriangles[this.currentTriangle];
 
                 this.setGuardVisible(guard);
                 this.setActiveTriangle(triangle);
+                this.setStatus(
+                    `Candidate ${this.currentTriangle + 1} of ${this.guardSet.extraGuardTriangles.length}: ` +
+                    `the algorithm proposes guard p${guard} for the highlighted triangle.`,
+                );
             }
         }
     }
 
     protected override onDoubleClick(e: TPointerEventInfo<PointerEvent>): void {
         if (!e.target?.get("isPolyControl") && !this.isDemoActive) {
-            this.poly.createNewVertex(e.viewportPoint);
+            this.poly.createNewVertex(e.scenePoint);
         }
     }
 }

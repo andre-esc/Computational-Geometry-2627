@@ -1,7 +1,7 @@
 import "./style.css";
 
-import WVDemo from "./demos/WVDemo";
 import VisPolygonDemo from "./demos/VisPolygonDemo";
+import HoleGuardingDemo from "./demos/HoleGuardingDemo";
 import PlaygroundDemo from "./demos/PlaygroundDemo";
 import { SCENARIOS } from "./demos/scenarios";
 
@@ -12,8 +12,8 @@ function tryInit<T>(fn: () => T): T | null {
     catch (e) { console.warn("Demo init skipped:", e); return null; }
 }
 
-void tryInit(() => new WVDemo("wvDemo", 760, 300));
 void tryInit(() => new VisPolygonDemo("visPolyDemo", 760, 300));
+void tryInit(() => new HoleGuardingDemo());
 const playgroundDemo = tryInit(() => new PlaygroundDemo("playgroundCanvas", 920, 520));
 
 // ── Status bar for playground ─────────────────────────────────────────────────
@@ -78,6 +78,18 @@ document.getElementById("pg-btn-clear")?.addEventListener("click", () => {
     playgroundDemo?.clearOverlay();
 });
 
+document.getElementById("pg-btn-zoom-in")?.addEventListener("click", () => {
+    playgroundDemo?.zoomIn();
+});
+
+document.getElementById("pg-btn-zoom-out")?.addEventListener("click", () => {
+    playgroundDemo?.zoomOut();
+});
+
+document.getElementById("pg-btn-zoom-reset")?.addEventListener("click", () => {
+    playgroundDemo?.resetViewport();
+});
+
 // ── Scenario selector ─────────────────────────────────────────────────────────
 
 const scenarioSelect = document.getElementById("pg-scenario-select") as HTMLSelectElement | null;
@@ -88,6 +100,7 @@ if (scenarioSelect) {
         const opt = document.createElement("option");
         opt.value = s.id;
         opt.textContent = s.name;
+        opt.title = s.description;
         scenarioSelect.appendChild(opt);
     }
 

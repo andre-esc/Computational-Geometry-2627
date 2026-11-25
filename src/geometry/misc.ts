@@ -22,9 +22,31 @@ export function orient(p1: XY, p2: XY, p3: XY) {
 }
 
 export function intersectSegmentSegment(e1: [XY, XY], e2: [XY, XY]) {
+  const [a, b] = e1;
+  const [c, d] = e2;
+  const o1 = orient(a, b, c);
+  const o2 = orient(a, b, d);
+  const o3 = orient(c, d, a);
+  const o4 = orient(c, d, b);
+  const epsilon = 1e-9;
+
+  const onSegment = (p: XY, q: XY, r: XY) =>
+    Math.abs(orient(p, q, r)) <= epsilon &&
+    r.x >= Math.min(p.x, q.x) - epsilon &&
+    r.x <= Math.max(p.x, q.x) + epsilon &&
+    r.y >= Math.min(p.y, q.y) - epsilon &&
+    r.y <= Math.max(p.y, q.y) + epsilon;
+
+  if (((o1 > epsilon && o2 < -epsilon) || (o1 < -epsilon && o2 > epsilon)) &&
+      ((o3 > epsilon && o4 < -epsilon) || (o3 < -epsilon && o4 > epsilon))) {
+    return true;
+  }
+
   return (
-    orient(e1[0], e1[1], e2[0]) * orient(e1[0], e1[1], e2[1]) <= 0 &&
-    orient(e2[0], e2[1], e1[0]) * orient(e2[0], e2[1], e1[1]) <= 0
+    onSegment(a, b, c) ||
+    onSegment(a, b, d) ||
+    onSegment(c, d, a) ||
+    onSegment(c, d, b)
   );
 }
 
@@ -182,26 +204,42 @@ export function isSegmentInsidePolygon(
     return true;
   }
 
-  // 1. Verify no boundary edge is properly crossed
+  const parameters = [0, 1];
+  const len = Math.sqrt(lenSq);
+
+  // Split at every boundary intersection, including touches at polygon vertices.
   for (let i = 0; i < n; i++) {
     const a = polygon[i];
     const b = polygon[(i + 1) % n];
+    const intersection = computeSegmentIntersection([p1, p2], [a, b], eps);
 
-    const inter = computeSegmentIntersection([p1, p2], [a, b], eps);
-    if (!inter) continue;
+    if (intersection) {
+      parameters.push(intersection.t1);
+      continue;
+    }
 
-    // Check if the intersection is strictly in the interior of both segments
-    const isInteriorSegment = inter.t1 > eps && inter.t1 < 1 - eps;
-    const isInteriorEdge = inter.t2 > eps && inter.t2 < 1 - eps;
+    // Parallel edges can still overlap the segment; split at their endpoints.
+    for (const point of [a, b]) {
+      const cross = dx * (point.y - p1.y) - dy * (point.x - p1.x);
+      if (Math.abs(cross) > eps * len) continue;
 
-    if (isInteriorSegment && isInteriorEdge) {
-      return false; // Crosses a boundary edge
+      const t = ((point.x - p1.x) * dx + (point.y - p1.y) * dy) / lenSq;
+      if (t >= -eps && t <= 1 + eps) parameters.push(Math.max(0, Math.min(1, t)));
     }
   }
 
-  // 2. Check that the midpoint is inside or on the boundary of the polygon
-  const mid: XY = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
-  return isPointInPolygon(mid, polygon);
+  parameters.sort((a, b) => a - b);
+  for (let i = 1; i < parameters.length; i++) {
+    const start = parameters[i - 1];
+    const end = parameters[i];
+    if (end - start <= eps) continue;
+
+    const t = (start + end) / 2;
+    const midpoint: XY = { x: p1.x + t * dx, y: p1.y + t * dy };
+    if (!isPointInPolygon(midpoint, polygon, eps)) return false;
+  }
+
+  return true;
 }
 
 /**
