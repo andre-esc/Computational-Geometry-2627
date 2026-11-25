@@ -201,7 +201,7 @@ body {
   color: var(--article-text);
   margin-bottom: 1.15em;
 }
-.paper-body ol, .paper-body ul { margin-bottom: 1em; }
+.paper-body ol, .paper-body ul { margin-bottom: 1em; list-style: auto; }
 
 /* ── Section headings ────────────────────────────────────────────────────── */
 .sec-heading {
@@ -285,6 +285,7 @@ body {
 .theorem-body ol {
   padding-left: 1.6em;
   margin: 0.4em 0;
+  list-style-type: disc;
 }
 .theorem-body li { margin-bottom: 0.3em; }
 
@@ -295,6 +296,18 @@ body {
   color: var(--article-muted);
   border-top: 1px solid rgba(0,0,0,0.07);
   font-style: italic;
+}
+.theorem-proof p {
+  margin-bottom: 0;
+  margin-top: 0.5em;
+  font-size: 14.5px;
+  color: var(--article-muted);
+  font-style: italic;
+}
+.theorem-proof .theorem-offset {
+  margin-left: 0.3em;
+  padding-left: 0.7em;
+  border-left: 1px solid rgba(0,0,0,0.07);
 }
 
 /* Proposition — soft blue-tinted */
@@ -338,6 +351,13 @@ body {
   line-height: 1.75;
   border: 1px solid transparent;
 }
+.callout p {
+  font-family: var(--font-serif);
+  font-size: 15.5px;
+  line-height: 1.75;
+  margin-bottom: 0;
+  margin-top: 0.5em;
+}
 .callout-label {
   font-family: var(--font-sans);
   font-size: 12px;
@@ -351,6 +371,10 @@ body {
   color: var(--article-text);
 }
 .callout-obs .callout-label { color: var(--purple); }
+.callout .callout-sub {
+  font-size: 12px;
+  opacity: 0.65;
+}
 
 /* ── Algorithm pseudocode ────────────────────────────────────────────────── */
 .algo-box {
@@ -387,12 +411,13 @@ body {
   border-bottom: 1px dashed var(--article-rule);
   line-height: 1.65;
 }
-.algo-result {
+p.algo-result {
   margin-top: 12px;
+  margin-bottom: 0;
   padding-top: 10px;
   border-top: 1px dashed var(--article-rule);
   font-size: 14px;
-  color: var(--article-muted);
+  color: var(--article-text);
 }
 
 /* ── Remark ──────────────────────────────────────────────────────────────── */
@@ -454,10 +479,9 @@ body {
   counter-reset: item;
 
 }
-.ref-list li { 
-  display: list-item;
-  list-style-position: inside;
+.ref-list li {
   margin-bottom: 0.6em; 
+  list-style: none;
 }
 .ref-list li::before {
   display: inline-block;

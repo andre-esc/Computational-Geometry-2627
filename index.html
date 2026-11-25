@@ -112,61 +112,19 @@
       </p>
 
       <p>
-        There exist many variants to this problem, which vary the properties of the polygon to be guarded, where we can place guards, or even whether the guards are allowed to move within the polygon. The general Art Gallery problem has been proven to be \(\exists\mathbb{R}\)-complete <a href="#ref-agp">[1]</a> (meaning that any problem expressed over integer or real number values can be reduced to an instance of the Art Gallery problem). In the case of guarding a simple polygon with guards limited to being placed on polygon vertices, the problem of finding the minimum number of guards (or, more precisely, determining whether a polygon can be guarded with at most $k$ guards) is NP-hard @nphard, and even APX-hard @modi2018art (meaning that any NP problem admitting a constant-factor polynomial-time approximation algorithm admits a PTAS that reduces it to this problem). 
+        There exist many variants to this problem, which vary the properties of the polygon to be guarded, where we can place guards, or even whether the guards are allowed to move within the polygon. The general Art Gallery problem has been proven to be \(\exists\mathbb{R}\)-complete <a href="#ref-agp_ereal">[1]</a> (meaning that any problem expressed over integer or real number values can be reduced to an instance of the Art Gallery problem). In the case of guarding a simple polygon with guards limited to being placed on polygon vertices, the problem of finding the minimum number of guards (or, more precisely, determining whether a polygon can be guarded with at most \(k\) guards) is NP-hard <a href="#ref-nphard">[2]</a>, and even APX-hard <a href="#ref-modi2018art">[3]</a> (meaning that any NP problem admitting a constant-factor polynomial-time approximation algorithm admits a PTAS that reduces it to this problem). 
       </p>
 
       <p>
-        Subir K. Ghosh presented an \(O(\log n)\)-approximation algorithm for vertex-guarding a <i>simple</i> polygon <a href="#ref-ghosh">[4]</a>, and conjectured that it must be possible to find a polynomial-time <i>constant</i>-approximation algorithm. Bhattacharya et al. later proposed a 6-approximation algorithm that turned out to be false, as their algorithm guaranteed the polynomial-time guarding of a simple polygon's boundary (up to an approximation), but not its interior <a href="#ref-bhatt">[5]</a>.
+        Subir K. Ghosh presented an \(O(\log n)\)-approximation algorithm for vertex-guarding a <i>simple</i> polygon <a href="#ref-ghosh">[4]</a>, and conjectured that it must be possible to find a polynomial-time <i>constant</i>-approximation algorithm. Bhattacharya et al. later proposed a 6-approximation algorithm that turned out to be false, as their algorithm guaranteed the polynomial-time guarding of a simple polygon's boundary (up to an approximation), but not its interior <a href="#ref-bhattacharyaApproximabilityGuardingWeak2017">[5]</a>.
       </p>
 
       <p>
-        This project aims to demonstrate the constant-factor polynomial-time approximation algorithm discovered by Ashur et al. for vertex-guarding a <i>weakly visible polygon</i> (noted WV-polygons), building upon Bhattacharya et al.'s previous results and confirming Ghosh's conjecture for this subset of simple polygons @Ashur_Filtser_Katz_2021. This algorithm works by analyzing the geometric properties of a vertex guard of the polygon's _boundary_, then by adding subsequent guards to cover any unguarded regions within the polygon's interior.
+        This project aims to demonstrate the constant-factor polynomial-time approximation algorithm discovered by Ashur et al. for vertex-guarding a <i>weakly visible polygon</i> (noted WV-polygons), building upon Bhattacharya et al.'s previous results and confirming Ghosh's conjecture for this subset of simple polygons <a href="#ref-Ashur_Filtser_Katz_2021">[6]</a>. This algorithm works by analyzing the geometric properties of a vertex guard of the polygon's <i>boundary</i>, then by adding subsequent guards to cover any unguarded regions within the polygon's interior.
       </p>
 
       <p>
         In the following sections, we first discuss how to characterize and detect WV-polygons, then we show how to compute a boundary guard for a WV-polygon, and finally we demonstrate how the algorithm guards the rest of the polygon.
-      </p>
-
-      <p>
-        The concept of <em>guarding</em> a polygon is a highly studied aspect of computational
-        geometry, particularly in association with the Art Gallery problem.  To <em>guard</em> a
-        polygon is to place points, called <em>guards</em>, such that every point of the polygon is
-        visible from at least one guard.  A point is <em>visible</em> from another if the line
-        segment connecting them lies fully within the polygon.
-      </p>
-
-      <p>
-        There exist many variants of this problem.  The general Art Gallery problem has been proven
-        to be \(\exists\mathbb{R}\)-complete <a href="#ref-agp">[1]</a>, meaning any problem over
-        real-number values can be reduced to it.  Guarding a simple polygon with guards restricted
-        to polygon vertices is NP-hard <a href="#ref-nphard">[2]</a> and even APX-hard
-        <a href="#ref-modi">[3]</a>: any NP problem admitting a constant-factor PTAS reduces to this
-        problem.
-      </p>
-
-      <p>
-        Ghosh presented an \(O(\log n)\)-approximation for vertex-guarding a simple polygon
-        <a href="#ref-ghosh">[4]</a>, and conjectured the existence of a polynomial-time
-        <em>constant</em>-factor approximation.  Bhattacharya et al. later proposed a 6-approximation
-        that turned out to be incomplete: their algorithm guaranteed (up to approximation) the guarding
-        of the polygon's <em>boundary</em>, but not its interior
-        <a href="#ref-bhatt">[5]</a>.
-      </p>
-
-      <p>
-        This project demonstrates the constant-factor polynomial-time approximation algorithm
-        discovered by Ashur, Filtser, Katz &amp; Saban for vertex-guarding a
-        <em>weakly visible polygon</em> (WV-polygon), confirming Ghosh's conjecture for this class
-        <a href="#ref-ashur">[6]</a>.  The algorithm works in two stages:
-      </p>
-      <ol class="paper-list">
-        <li>Compute a \((1+\varepsilon)\)-approximate vertex guard of the boundary \(\partial P\).</li>
-        <li>Add at most \(|G|\) additional guards to cover every interior hole.</li>
-      </ol>
-      <p>
-        The result is a \((2+2\varepsilon)\)-approximation of the optimal guard set.  In the
-        following sections we characterise WV-polygons, show how to guard \(\partial P\), and then
-        guard the polygon's interior.
       </p>
     </section>
 
@@ -180,53 +138,44 @@
       <section id="sec-wv">
         <h3 class="subsec-heading"><span class="sec-num">2.1</span> Weakly visible polygons</h3>
 
-        <p>
+        <!-- <p>
           A polygon \(P\) is said to be <strong>weakly visible</strong> from an edge \(uv\) if for
           every point \(p \in P\), there exists a point \(g \in uv\) that sees \(p\).  To detect
           this property we use:
+        </p> -->
+        <p>
+          A polygon is said to be <i>weakly visible</i> from an edge \(u v\) if for all points \(p \in P\), there exists a point \(g \in u v\) that guards (sees) \(p\).
+        </p>
+
+        <p>
+          In order to detect whether a given polygon is weakly visible from an edge, we make use of a simple property held by all WV-polygons:
         </p>
 
         <div class="theorem-box theorem-prop">
           <div class="theorem-label">Proposition <span class="theorem-num">1</span>
             <span class="theorem-cite">
-              [<a href="#ref-asano">7</a>, <a href="#ref-guibas">8</a>]
+              [<a href="#ref-ASANO2000829">7</a>], [<a href="#ref-guibas_linear-time_1987">8</a>]
             </span>
           </div>
           <div class="theorem-body">
-            Let \(uv\) be an edge of polygon \(P\), with \(u\) to the right of \(v\).
-            Then \(P\) is weakly visible from \(uv\) if and only if
+            Let \(u v\) be an edge in a polygon \(P\). Assume w.l.o.g. that \(u\) is to the right of \(v\). Then, \(P\) is weakly visible from \(u v\) iff.
             <ul>
-              <li>the shortest path from \(u\) to any vertex \(w \in P\) only ever takes <em>left</em> turns, and</li>
-              <li>the shortest path from \(v\) to any vertex \(w \in P\) only ever takes <em>right</em> turns.</li>
+              <li>The shortest path from \(u\) to any vertex \(w \in P\) only ever takes <em>left</em> turns, and</li>
+              <li>The shortest path from \(v\) to any vertex \(w \in P\) only ever takes <em>right</em> turns.</li>
             </ul>
           </div>
         </div>
 
         <p>
-          To test this, we compute the <strong>Shortest Path Tree (SPT)</strong> of the polygon.
-          Writing \(\pi(u, x)\) for the shortest Euclidean path from \(u\) to \(x\) within \(P\),
-          the SPT from vertex \(u\) is
-          \[
-            \SPT_P(u) \;=\; \bigcup_{v \in V(P)} \pi(u, v),
-          \]
-          a tree whose vertices are those of \(P\) and whose edges form the shortest paths from
-          \(u\) to all other vertices.
+          To test this property, we calculate what is called the <i>Shortest Path Tree (SPT)</i> of the polygon. Denote \(\pi(u, x)\) the shortest Euclidean path from \(u\) to \(x\) within \(P\). The SPT from vertex \(u\) is then defined as \[\textrm{SPT}_P(u)=\bigcup_{v \in V} \pi(u, v)\]and consists of a tree whose vertices are vertices of \(P\) and whose edges form the shortest paths from \(s\) to all other vertices of \(P\).
         </p>
 
         <p>
-          To compute \(\SPT_P(s)\) from a vertex \(s\), we first triangulate \(P\) and form the dual
-          graph \(D\).  Iterating over \(D\) from the triangle containing \(s\), each step crosses a
-          diagonal \(uv\) and admits an unprocessed vertex \(w\).  Let \(a\) be the farthest common
-          ancestor of \(u\) and \(v\) in \(\SPT_P(s)\).  Then \(\pi(a,u)\) and \(\pi(a,v)\) form a
-          <em>funnel</em> \(F(uav)\) — the two paths diverge from \(a\)
-          <a href="#ref-guibas">[8]</a>.
+          To compute \(\textrm{SPT}_P (s)\) from a vertex \(s\) of \(P\), we first triangulate \(P\) and derive the dual graph \(D\) of the triangulation. Then, we iterate through the vertices of \(D\), starting from the triangle containing our root vertex \(s\). As we iterate, we progressively enter and process triangles of the triangulation—each iteration admits a diagonal \(u v\) of the triangulation that we cross (equivalent to the edge of \(D\) that we traverse) and an unprocessed vertex \(w\) of the triangle we just entered.
         </p>
 
         <p>
-          For each diagonal \(uv\) with unprocessed vertex \(w\), we find the tangent \(x\) to the
-          funnel \(F(uav)\).  Assuming \(x \in \pi(a,u)\), we split \(F(uav)\) into
-          \(F(uxw)\) and \(F(wau)\), adding edge \(xw\) to \(\pi(s,x)\) and gradually building
-          \\(\\SPT_P(s)\\).
+          Let \(a\) be the farthest common ancestor of \(u\) and \(v\) in \(\textrm{SPT}_P (s)\). Then, \(\pi(a, u)\) and \(\pi(a, v)\) form a <i>funnel</i> \(F(u a v)\), i.e. the two paths turn away from each other, and join at \(a\) <a href="#ref-guibas_linear-time_1987">[8]</a>.
         </p>
 
         <!-- Illustration: Funnel F(u,a,v) -->
@@ -271,19 +220,16 @@
         </div>
 
         <p>
-          To test weak visibility of \\(P\\) from \\(uv\\) we:
+          We can then compute \(\textrm{SPT}_P (s)\) by constructing funnels as we iterate over \(D\). For each diagonal \(u v\) and corresponding unprocessed vertex \(w\), we get its tangent \(x\) to the funnel \(F(u a v)\). Assume w.l.o.g. that \(x\) lies on \(\pi(a, u)\). Then, we split the funnel into two funnels \(F(u x w)\) and \(F(w a v)\), forming the funnels for adjacent diagonals \(u w\) and \(w v\). We can then add \(x w\) to \(\pi(s, x)\), slowly building \(\textrm{SPT}_P (s)\) as we go along.
         </p>
-        <ol class="paper-list">
-          <li>Compute \(\SPT_P(u)\) and \(\SPT_P(v)\).</li>
-          <li>Verify that all paths in \(\SPT_P(u)\) turn left, and all paths in \(\SPT_P(v)\) turn right.</li>
-        </ol>
 
         <p>
-          Theoretically this takes \(O(n)\) using Chazelle's triangulation
-          <a href="#ref-chazelle">[9]</a> and finger trees <a href="#ref-guibas">[8]</a>.  Our
-          implementation uses ear-clipping triangulation and plain JS arrays, running in
-          \(O(n^3)\).
+          Given this algorithm, to test whether a simple polygon \(P\) is weakly visible from edge \(u v\), we
         </p>
+        <ul class="paper-list">
+          <li>Calculate \(\textrm{SPT}_P (u)\) and \(\textrm{SPT}_P (v)\)</li>
+          <li>Verify turn direction in both</li>
+        </ul>
 
         <!-- Demo: Weak Visibility -->
         <div class="demo-wrapper">
@@ -302,6 +248,10 @@
             <canvas id="wvDemo"></canvas>
           </div>
         </div>
+
+        <p>
+          This can theoretically be done in \(O(n)\) time by using Chazelle's algorithm for triangulation <a href="#ref-chazelle_triangulating_1991">[9]</a> and by employing the use of <i>finger trees</i> to store funnels <a href="#ref-guibas_linear-time_1987">[8]</a>. Our implementation is simpler, opting instead to triangulate via ear clipping and store funnels in a regular Javascript array, resulting in an \(O(n^3)\) time.
+        </p>
       </section>
 
       <!-- ─── §2.2 Guarding polygon boundaries ────────────────────────── -->
@@ -309,9 +259,11 @@
         <h3 class="subsec-heading"><span class="sec-num">2.2</span> Guarding polygon boundaries</h3>
 
         <p>
-          With a way to detect WV-polygons in hand, the next step is to approximate a minimum vertex
-          guard for the boundary \(\partial P\) of a WV-polygon \(P\).  We adapt the work of
-          Ashur et al. <a href="#ref-terrainlike">[6]</a>.
+          Now that we can feasibly detect weakly visible polygons, the next step is to discuss how we can approximate a minimum vertex guard for the boundary of a polygon \(P\).
+        </p>
+
+        <p>
+          To do this, we adapt the work of Ashur et al. <a href="#ref-terrainlike">[10]</a>, specifically their statements pertaining to WV-polygons.
         </p>
 
         <!-- ─── §2.2.1 Witness set ───────────────────────────────────── -->
@@ -319,24 +271,21 @@
           <h4 class="subsubsec-heading"><span class="sec-num">2.2.1</span> Constructing a witness set</h4>
 
           <p>
-            Denote \(\partial P\) the boundary of polygon \(P\).  We define a
-            <strong>witness set</strong> \(W\) of points along \(\partial P\) such that if a vertex
-            set \(G\) guards \(W\), it also guards all of \(\partial P\).
+            Denote \(\partial P\) as the boundary of polygon \(P\). In order to guard \(\partial P\), we define a <i>witness set</i> \(W\) of points along \(\partial P\) such that, if a set of vertices \(G\) guards \(W\), then \(G\) also guards \(\partial P\).
           </p>
 
           <p>
-            For each vertex \(v\) of \(P\), compute the visible sections of \(\partial P\) from
-            \(v\).  The endpoints of all these sections split \(\partial P\) into \(O(n^2)\) pieces.
-            Taking one point from every piece gives \(W\):
+            To do this, we first compute all the visible sections of \(\partial P\) that are visible from each vertex \(v\) of \(P\). The endpoints of all these visible sections split \(\partial P\) into \(O(n^2)\) pieces. If we take an arbitrary point from every piece \(P_i\), we obtain our witness set: if \(G\) guards these points, then \(G\) guards \(\partial P\).
           </p>
 
           <div class="theorem-box theorem-proof">
             <div class="theorem-label">Proof</div>
             <div class="theorem-body">
-              Assume \(G\) guards \(W\).  Let \(p_i \in W\) with \(p_i \in P_i\), and let
-              \(g \in G\) see \(p_i\).  Then \(p_i\) lies in a visible section from \(g\); since
-              \(p_i \in P_i\), \(g\) sees all of \(P_i\).  As every \(p_i\) is guarded, every
-              piece \(P_i\) is guarded, hence \(\partial P\) is guarded. \(\square\)
+              <p>Assume that \(G\) guards \(W\).</p>
+  
+              <p>Let \(p_i \in W\) such that \(p_i \in P_i\) and \(g \in G\) such that \(g\) sees \(p_i\). Then, \(p_i\) must be part of a visible section from \(g\), and since \(p_i\) is within \(P_i\), \(g\) must also guard \(P_i\).</p>
+
+              <p>Since all \(p_i\) are guarded by a vertex \(g \in G\), the entire boundary \(\partial P\) is guarded. \(\square\)</p>
             </div>
           </div>
         </section>
@@ -345,14 +294,22 @@
         <section id="sec-ptas">
           <h4 class="subsubsec-heading"><span class="sec-num">2.2.2</span> A PTAS for guarding the witness set</h4>
 
-          <p>Before describing the algorithm, two observations are needed:</p>
+          <p>
+            To obtain a PTAS for guarding this witness set, Ashur et al. use the result of Mustafa and Ray <a href="#ref-ptas">[11]</a>, which gives an \(O(1+\varepsilon)\)-approximation PTAS for any minimum hitting problem provided that a specific condition is satisfied.
+          </p>
+
+          <p>
+            Before proceeding, we must first note two things:
+          </p>
 
           <div class="callout callout-obs">
             <div class="callout-label">Observation 1</div>
-            Finding a minimum vertex guard \(G \subset V\) for \(W\) is equivalent to finding
-            the minimum dominating set of the visibility graph of \(G \cup W\).  Indeed, every
-            \(w \in W\) must be adjacent to some vertex in \(G\) in the visibility graph — this is
-            exactly the guard condition.
+            <p>
+              Finding a minimum vertex guard \(G \subset V\) to guard the set of points \(W\) is equivalent to finding the minimum dominating set of the visibility graph of \(G \cup W\).
+            </p>
+            <p>
+              Indeed, if we find a set of points \(G\) in \(V\) that dominates \(W\) (i.e. every point \(w \in W\) is adjacent to a point in the dominating set \(G\)), this directly implies that all points in \(W\) are visible from at least one point in \(G\), and thus \(W\) is guarded.
+            </p>
           </div>
 
           <!-- Illustration: vis-graph ↔ dominating set parallel -->
@@ -459,11 +416,10 @@
 
           <div class="callout callout-obs">
             <div class="callout-label">Observation 2</div>
-            The visibility graph of boundary points of a WV-polygon is <strong>terrain-like</strong>:
-            if vertices \(a, b, c, d \in V\) appear in counter-clockwise order, and \(a\) sees \(c\)
-            and \(b\) sees \(d\), then \(a\) must see \(d\).  Failing this would create a boundary
-            crossing that contradicts weak visibility.
-            <sup><a href="#fn-convex" class="fn-link">1</a></sup>
+            <p>The visibility graph of points along the boundary of a WV-polygon are "terrain-like" (as the authors put it), i.e. if, for vertices \(a, b, c, d \in V\) in (counter-)clockwise order, \(a\) sees \(c\) and \(b\) sees \(d\), then \(a\) must see \(d\).</p>
+            <p>Indeed, if this is not the case, then that means that \(\partial P\) intersects \(a d\) without intersecting \(a c\) or \(b d\). It is easy to see that this would either mean \(a\) is not visible from the base edge \(u v\) (if the intersection happens between \(a\) and \(u\)) or \(d\) is not visible from \(u v\) (if the intersection happens between \(v\) and \(d\)), which is a contradiction of the weak visibility property.</p>
+            <p class="callout-sub"><i>Note:</i> This only holds if \(u\) and \(v\) are <i>convex.</i> See <a href="#fn-convex">Remark 1</a> for details.</p>
+            <!-- <sup><a href="#fn-convex" class="fn-link">1</a></sup> -->
           </div>
 
           <!-- Illustration: terrain-like property (a sees c, b sees d ⟹ a sees d) -->
@@ -507,26 +463,24 @@
           </div>
 
           <p>
-            The terrain-like property lets us apply the PTAS of Mustafa &amp; Ray
-            <a href="#ref-ptas">[10]</a>, which yields a \((1+\varepsilon)\)-approximation for any
-            minimum hitting set satisfying a <em>locality condition</em>.  Applied here, the algorithm
-            is:
+            Therefore, if we find a PTAS for finding the minimum dominating set of a terrain-like graph, we find a PTAS for guarding \(W\) and thus \(\partial P\).
+          </p>
+
+          <p>
+            Mustafa and Ray provide a proof scheme for general hitting set problems such as this <a href="#ref-ptas">[11]</a>, which, applied to the minimum dominating set problem, admits the following local search algorithm:
           </p>
 
           <div class="algo-box">
             <div class="algo-header">Local-search boundary guard</div>
             <div class="algo-body">
-              Given \(\varepsilon > 0\), set \(k = c^2\varepsilon^{-2}\) for a suitable constant
-              \(c\).
+              Given a certain precision \(\varepsilon > 0\), set \(k = c^2\varepsilon^{-2}\) with \(c\) a certain constant. Perform the following \(k\)-level local search:
               <ol>
-                <li>Start with an arbitrary dominating set \(G \subseteq V\) for \(W\).</li>
-                <li>If any \(k\) guards of \(G\) can be replaced by \(k-1\) guards from
-                    \(V \setminus G\) while still dominating \(W\), perform the swap and repeat.</li>
+                <li>Start with an arbitrary hitting set (in this case, a dominating set \(G \subset V\) of \(W\)).</li>
+                <li>If any \(k\) points of \(S\) can be replaced with \(k-1\) points of \(V \setminus S\) while still being a hitting set (dominating set of \(W\)), replace and repeat.</li>
                 <li>Stop when no improving swap exists.</li>
               </ol>
               <p class="algo-result">
-                This returns a dominating set of size at most
-                \((1+\varepsilon)\cdot\OPT\).
+                This algorithm returns a dominating set of size <i>at most</i> \(\varepsilon \cdot \textrm{OPT}\), where \(\textrm{OPT}\) is the size of the optimal set.
               </p>
             </div>
           </div>
@@ -537,18 +491,10 @@
           <h4 class="subsubsec-heading"><span class="sec-num">2.2.3</span> Proving the PTAS</h4>
 
           <p>
-            The <em>locality condition</em> of Mustafa &amp; Ray <a href="#ref-ptas">[10]</a>
-            requires that for any disjoint \(R, B \subseteq \mathcal{P}\) in range space
-            \((\mathcal{P}, \mathcal{D})\), we can build a planar bipartite graph \(H\) between
-            \(R\) and \(B\) such that for every range \(D \in \mathcal{D}\) with
-            \(R \cap D \neq \emptyset\) and \(B \cap D \neq \emptyset\), there exist
-            \(r \in R \cap D\), \(b \in B \cap D\) with \((r,b) \in H\).
+            The condition for this to be a valid PTAS, as stated by Mustafa and Ray, is the <i>locality condition</i>, which states that for any disjoint subsets \(R, B \subseteq \mathcal{P}\) in range space \(R = (\mathcal{P}, \mathcal{D})\) (where \(\mathcal{D}\) contains all subsets of \(\mathcal{P}\)), we can construct a planar bipartite graph \(H\) between \(R\) and \(B\) such that for any range \(D \in \mathcal{D}\), if \(R\) and \(B\) participate in the range (\(R, B \cap \mathcal{D} \neq \emptyset\)) then there exist \(r \in R \cap D\) and \(b \in B \cap D\) such that \((a, b)\) is an edge in \(H\) <a href="#ref-ptas">[11]</a>.
           </p>
           <p>
-            For our setting this translates to: for every vertex \(v\), there exist \(r \in R\) and
-            \(b \in B\) both dominating \(v\) with \((r,b)\) an edge of \(H\).  The planarity of
-            \(H\) is established using the terrain-like property; the full proof is given in
-            <a href="#ref-terrainlike">[6]</a>.
+            For our case, this translates to the following condition: we can construct a planar bipartite graph \(H = (R, B, F)\) between \(R\) and \(B\) such that for every vertex \(v\), there exist \(r in R\) and \(b in B\) such that \(r, b\) dominate \(v\) and \((r,b) \in F\). This is proven by the authors using the terrain-like property of the graph <a href="#ref-terrainlike">[10]</a>, but this is out of scope for the project.
           </p>
         </section>
 
@@ -556,23 +502,18 @@
         <section id="sec-boundary-summary">
           <h4 class="subsubsec-heading"><span class="sec-num">2.2.4</span> Summary</h4>
 
-          <p>In summary:</p>
+          <p>In short, we can</p>
           <ol class="paper-list">
-            <li>Compute the witness set \(W\) of \(P\).</li>
-            <li>Apply the local-search algorithm above to obtain a \((1+\varepsilon)\)-approximate guard set for \(\partial P\).</li>
+            <li>Compute the witness set of \(P\), then</li>
+            <li>Apply the approximation algorithm above to find a \((1+\varepsilon)\)-approximation guarding set of \(\partial P\).</li>
           </ol>
 
           <p>
-            Our implementation uses \(k = 2\): we prune individually redundant guards
-            (\(k=1\) swaps) and perform 2-for-1 guard swaps (\(k=2\) swaps).  Assuming
-            \(\OPT > c^2 = 8\), this gives \(\varepsilon = 2\), so at most a 3-approximate
-            boundary guard.
+            Our implementation sets \(k=2\). Assuming that \(\textrm{OPT}\) is greater than \(c^2=8\), we obtain \(\varepsilon=2\), and thus a 3-approximation of the minimum vertex guard (i.e. the obtained result is at most 3 times larger than the minimum).
           </p>
 
           <p>
-            The naive implementation runs in \(O(n^{2k+1}) = O(n^5)\) in the worst case.  In
-            practice, greedy initialisation makes the local search converge in very few
-            iterations.
+            Additionally, we use a naive implementation, which by Mustafa and Ray, has a running time of \(O(n^{2k+1}) \sim O(n^{O(\varepsilon^{-2})})\) since \(k \sim \varepsilon^{-2}\) up to a constant <a href="#ref-terrainlike">[10]</a>, <a href="#ref-ptas">[11]</a>.
           </p>
 
           <!-- Demo: Boundary guard -->
@@ -606,15 +547,19 @@
         <h3 class="subsec-heading"><span class="sec-num">2.3</span> Guarding holes</h3>
 
         <p>
-          A guard set for \(\partial P\) does not automatically guard the interior of \(P\).  Interior
-          <em>holes</em> — maximal convex connected subregions not seen by any guard — can still
-          exist.  We need to identify and cover them.
+          The above algorithm guarantees the guarding of the boundary \(\partial P\), but does not guarantee the guarding of the entire interior of \(P\). Indeed, guard sets that guard \(\partial P\) but not \(P\) do exist:
         </p>
 
         <p>
-          The following sections are inspired by and closely paraphrase Ashur et al.
-          <a href="#ref-ashur">[6]</a>.  Any interpretation not in the original is marked with
-          \((\star)\).
+          In order to ensure that we guard the entirety of \(P\), we must add additional guards \(G'\) that cover any potential "holes" left behind by a boundary guard \(G\). We must analyze the structural properties of said holes, and place additional guards in such a way that we are guaranteed to guard every hole.
+        </p>
+
+        <p>
+          First, we will analyze the properties of "constructed edges", then of the holes themselves.
+        </p>
+
+        <p>
+          <strong>Note:</strong> the following sections are inspired by and paraphrased from Ashur et al.'s paper <a href="#ref-Ashur_Filtser_Katz_2021">[6]</a>. Any additional comments and interpretations not in the original text, such as the names of the following claims, are marked with a ★.
         </p>
 
         <!-- ─── §2.3.1 Constructed edges ─────────────────────────────── -->
@@ -622,20 +567,16 @@
           <h4 class="subsubsec-heading"><span class="sec-num">2.3.1</span> Properties of constructed edges</h4>
 
           <p>
-            A <strong>constructed edge</strong> formed by guard \(v\) is an interior chord of \(P\)
-            on the boundary of \(\Vis(v)\).  Every constructed edge \(xy\) is adjacent to a
-            <em>pocket</em> \(C_{xy} \subset P\) invisible from \(v\).
+            A <strong>constructed edge</strong> formed by a vertex \(v\) is defined as an edge interior to \(P\) formed by the visibility polygon \(\textrm{Vis}(p)\) of \(p\). All constructed edges \(x y\) are adjacent to a corresponding <strong>pocket</strong> \(C_{x y}\) not part of \(\textrm{Vis}(p)\).
           </p>
 
           <ul class="paper-list">
-            <li>\(xy\) is an <strong>upper edge</strong> if the pocket \(C_{xy}\) is <em>below</em>
-                the line \(\ell_{xy}\) through \(x\) and \(y\).</li>
-            <li>\(xy\) is a <strong>lower edge</strong> if \(C_{xy}\) is <em>above</em>
-                \(\ell_{xy}\).</li>
+            <li>\(x y\) is an <strong>upper edge</strong> if \(C_{x y}\) is <i>below</i> \(x y\), i.e. there exists a point \(p \in x y\) such that all visible points of \(C_{x y}\) from \(p\) are <i>below</i> \(\ell_{x y}\) (where \(\ell_{x y}\) is the line along \(x y\)). </li>
+            <li>\(x y\) is an <strong>lower edge</strong> if \(C_{x y}\) is <i>above</i> \(x y\), i.e. there exists a point \(p \in x y\) such that all visible points of \(C_{x y}\) from \(p\) are <i>above</i> \(\ell_{x y}\). </li>
           </ul>
 
           <p>
-            We write \(\partial C_{xy}\) for the section of \(\partial P\) covered by the pocket.
+            Additionally, we denote \(\partial C_{x y}\) the section of \(\partial P\) covered by the pocket \(C_{x y}\).
           </p>
 
           <!-- Illustration: upper/lower edge + pocket C_xy -->
@@ -689,16 +630,17 @@
             </figcaption>
           </div>
 
+          <p>
+            The following are a few observations for WV-polygons (with \(u\) and \(v\) convex) that will be useful later (assume w.l.o.g. that any constructed edge \(x y\) has \(x\) lower than \(y\)):
+          </p>
+
           <div class="theorem-box theorem-claim">
-            <div class="theorem-label">Claim 1 <span class="star-marker">\((\star)\)</span> — Boundary leaning</div>
+            <div class="theorem-label">Claim 1 — ★ Boundary leaning</div>
             <div class="theorem-body">
-              Let \(xy\) and \(x'y'\) be two constructed edges such that \(C_{xy}\) and \(y'\) lie
-              on the same side of \(xy\).  Then \(y' \in \partial C_{xy}\).
+              Let \(x y\) and \(x'y'\) be two constructed edges such that \(C_{x y}\) and \(y'\) are on the same side of \(x y\). Then, \(y' \in \partial C_{x y}\).
             </div>
             <div class="theorem-proof">
-              <em>Proof.</em> Let \(w = xy \cap x'y'\).  Since \(y'\) and \(C_{xy}\) are on the
-              same side and \(w \in xy\) sees \(y'\), we have \(y' \in C_{xy}\).  As
-              \(y' \in \partial P\) it follows that \(y' \in \partial C_{xy}\). \(\square\)
+              <em>Proof.</em> Let \(w\) be \(x y \cap x'y'\). Since \(y'\) and \(C_{x y}\) are on the same side and \(w \in x y\) sees \(y'\), \(y' \in C_{x y}\). And since \(y' \in \partial P\), that means \(y' \in \partial C_{x y}\). \(\square\)
             </div>
           </div>
 
@@ -757,20 +699,15 @@
           </div>
 
           <div class="theorem-box theorem-claim">
-            <div class="theorem-label">Claim 2 <span class="star-marker">\((\star)\)</span> — Lifted pockets</div>
+            <div class="theorem-label">Claim 2</span> — ★ Lifted pockets</div>
             <div class="theorem-body">
-              If \(x \in uv\), then \(C_{xy}\) is weakly above \(x\).
-              If \(x \notin uv\), then \(C_{xy}\) is <em>strictly</em> above \(x\).
+              If \(x \in u v\), \(C_{x y}\) is weakly above \(x\). If not, then \(C_{x y}\) is <i>strictly</i> above \(x\).
             </div>
             <div class="theorem-proof">
               <em>Proof.</em>
-              If \(x \in uv\): \(C_{xy} \subseteq P\) and \(P\) is weakly above \(uv \ni x\), so
-              \(C_{xy}\) is weakly above \(x\).
-              If \(x \notin uv\): \(C_{xy} \cap uv = \emptyset\) (otherwise \(uv \subset C_{xy}\)
-              contradicting weak visibility).  Every \(z \in C_{xy}\) has a sightline to some
-              \(z' \in uv\), and since \(z' \notin C_{xy}\) the chord \(zz'\) must cross \(xy\),
-              forcing \(z\) strictly above \(xy\) and hence above its lower endpoint \(x\).
-              \(\square\)
+              <p>If \(x \in u v\), then \(C_{x y}\) has to be (weakly) above \(x\) since \(P\) is weakly above \(u v \ni x\) and \(C_{x y} \subset P\).</p>
+              <p>If not, then \(C_{x y} \cap u v = \emptyset\) since otherwise \(u v \subset C_{x y}\) and \(p\) is not visible from \(u v\).</p>
+              <p class="theorem-offset">All points \(z \in C_{x y}\) have a point \(z' \in u v\) that sees \(z\). Since \(z \in C_{x y}\) and \(z \notin C_{x y}\), \(x y\) and \(z z'\) cross. And since \(z'\) is below \(x y\), \(z\) <strong>must</strong> be above \(x y\), and therefore also above its lower endpoint \(x\). \(\square\)</p>
             </div>
           </div>
 
@@ -829,11 +766,24 @@
           <h4 class="subsubsec-heading"><span class="sec-num">2.3.2</span> Properties of holes</h4>
 
           <p>
-            A <strong>hole</strong> \\(H\\) in \\(P\\) with respect to guard set \\(G\\) is a maximal
-            convex connected subregion not visible from any guard.  Holes are convex because they
-            are intersections of half-planes (the non-visible side of each constructed edge).
-            Every hole touches at least one upper edge and one lower edge.
+           Now, we analyze the properties of holes. A <strong>hole</strong> \(H\) in \(P\) with regards to guard \(G\) is a maximal convex connected subregion of \(P\) such that no point in \(H\) is visible from \(G\).
           </p>
+
+          <p>We can make the following evident observations:</p>
+
+          <div class="callout callout-obs">
+            <div class="callout-label">Observation 3</div>
+            <p>
+              All holes are <i>convex</i>, since they are formed by the intersection of halfplanes defined by constructed edges (one side is visible, the other is not; holes are the intersections of non-visible regions).
+            </p>
+          </div>
+
+          <div class="callout callout-obs">
+            <div class="callout-label">Observation 4</div>
+            <p>
+              Every hole touches at least one upper edge and one lower edge.
+            </p>
+          </div>
 
           <!-- Illustration: a hole H with one upper and one lower constructed edge -->
           <div class="illus-wrapper" role="img" aria-label="Diagram: a hole H bounded by one upper and one lower constructed edge">
@@ -883,51 +833,77 @@
             </figcaption>
           </div>
 
+          <p>
+            We will now show that every hole \(H\) is attached to two intersecting constructed edges \(x y\) and \(x'y'\) with endpoints \(x, x' \in u v\), then use this fact to find guards for all \(H\) in polynomial time.
+          </p>
+
           <div class="theorem-box theorem-claim">
-            <div class="theorem-label">Claim 3 <span class="star-marker">\((\star)\)</span> — Downward hole boundary curving</div>
+            <div class="theorem-label">Claim 3</span> — ★ Downward hole boundary curving</div>
             <div class="theorem-body">
-              Let \(H = (h_1, \ldots, h_k)\).  If edge \(h_1 h_2\) lies along an upper edge \(xy\)
-              with \(x\) below \(y\) and \(x \notin uv\), then \(h_2 h_3\) lies along another
-              upper edge \(x'y'\) with \(h_2\) lower than \(h_3\).
+              Let \(H=(h_1,\dots,h_k)\). If \(h_1 h_2\) is along an upper edge \(x y\) such that \(x\) is below \(y\) and \(x \notin u v\), then \(h_2 h_3\) is along another upper edge \(x'y'\) with \(h_2\) lower than \(h_3\).
             </div>
             <div class="theorem-proof">
-              <em>Proof.</em> Since \(x \notin uv\), Claim 2 gives \(H \subset C_{xy}\) strictly
-              above \(x\).  By Claim 1, \(y' \in \partial C_{xy}\), so \(y'\) is strictly above
-              \(x\).  Similarly \(x \in \partial C_{x'y'}\), and by Claim 2 \(x\) is weakly above
-              \(x'\).  If \(y'\) were below \(x'\), then \(x\) would be above \(y'\) — but \(x\)
-              is strictly below \(y' \in C_{xy}\), a contradiction.  Hence \(y'\) is above \(x'\)
-              and \(h_2\) is lower than \(h_3\). \(\square\)
+              <em>Proof.</em> 
+              <p>
+                Since \(x \notin u v\), \(H \subset C_{x y}\) is strictly above \(x\) (by Claim 2).
+              </p>
+              <p>
+                Assume that \(y'\) is on the same side of \(x y\) as \(h_3\), and therefore \(C_{x y}\). Then by Claim 1,  \(y' \in \partial C_{x y}\), and by Claim 2, \(y' \in C_{x y}\) is strictly above \(x\) (since \(x \notin u v\)).
+              </p>
+              <p>
+                Additionally, \(x \in \partial C_{x'y'}\) by the same reasoning.
+              </p>
+              <p>
+                Now, if \(x'\) is above \(y'\) (and thus \(h_2\) is above \(h_3\)), \(y'\) is the lower endpoint and thus \(x \in C_{x'y'}\) is (strictly or weakly) above \(y'\). However, we know that \(x\) is <strong>strictly below</strong> \(y' \in C_{x y}\), which is a contradiction.
+              </p>
+              <p>
+                Therefore, \(y'\) is above \(x'\), and \(h_2\) is lower than \(h_3\). \(\square\)
+              </p>
             </div>
           </div>
 
+          <p>
+            Informally, this means that as long as the upper edge associated with a hole edge doesn't touch \(u v\), the boundary of the hole cannot start curving downwards.
+          </p>
+
+          <p>
+            This is formalized in the following claim:
+          </p>
+
           <div class="theorem-box theorem-claim">
-            <div class="theorem-label">Claim 4 <span class="star-marker">\((\star)\)</span> — \(uv\)-touching</div>
+            <div class="theorem-label">Claim 4 — ★ \(uv\)-touching</div>
             <div class="theorem-body">
-              Every hole \(H = (h_1,\ldots,h_k)\) has an edge along an upper edge whose lower
-              endpoint lies in \(uv\).
+              Any hole \(H = (h_1,\dots,h_k)\) touches an upper edge with an endpoint in \(u v\).
             </div>
             <div class="theorem-proof">
-              <em>Proof.</em> \(H\) touches at least one upper edge.  If none of these has a lower
-              endpoint on \(uv\), Claim 3 forces the boundary of \(H\) to curve upward
-              indefinitely — but \(H\) is convex and finite, so eventually there must be a
-              downward-curving edge.  Downward curvature is only possible when the lower endpoint
-              reaches \(uv\) (otherwise Claim 3 forbids it).  Contradiction. \(\square\)
+              <em>Proof.</em>
+              <p>
+                We know that \(H\) touches at least one upper edge. Assume w.l.o.g. that \(h_1 h_2\) is along upper edge \(x_1 y_1\). If \(x_1 y_1\) does not touch \(u v\), then by Claim 3, \(h_2 h_3\) is also along an upper edge \(x_2 y_2\) with \(h_2\) below \(h_3\), and so on.
+              </p> 
+              <p>
+                Since \(H\) is convex, we know that at some point, \(H\) has an edge \(h_i h_{i+1}\) along an upper edge such that \(h_i\) is <strong>above</strong> \(h_{i+1}\), and therefore at some point, \(H\) has an edge along an upper edge \(x_j y_j\) that touches \(u v\) (to allow downward curving, by Claim 3). \(\square\)
+              </p>
             </div>
           </div>
 
+          Additionally, it is easy to prove then that subsequent upper edges also touch \(u v\):
+
           <div class="theorem-box theorem-claim">
-            <div class="theorem-label">Claim 5 <span class="star-marker">\((\star)\)</span> — Subsequent \(uv\)-touching</div>
+            <div class="theorem-label">Claim 5 — ★ Subsequent \(uv\)-touching</div>
             <div class="theorem-body">
-              If \(h_1 h_2\) lies along an upper edge \(xy\) with \(x \in uv\) below \(y\), then
-              the adjacent edge \(h_2 h_3\) lies along an upper edge \(x'y'\) also with
-              \(x' \in uv\).
+              If \(h_1 h_2\) is along an upper edge \(x y\) such that \(x\) is below \(y\) and \(x \in u v\), then \(h_2 h_3\) is along an upper edge \(x'y'\) also such that \(x'\) is below \(y'\) and \(x' in u v\).
             </div>
             <div class="theorem-proof">
-              <em>Proof.</em> Since \(xy\) and \(x'y'\) intersect at \(h_2\), and \(h_1 \in C_{x'y'}\)
-              is on the same side as \(x\), Claim 1 gives \(x \in \partial C_{x'y'}\), so \(x\) is
-              weakly above \(x'\) by Claim 2.  Since \(x \in uv\), this forces \(x' \in uv\). \(\square\)
+              <em>Proof.</em> Since \(x y\) and \(x'y'\) intersect at \(h_2\), and \(h_1 \in C_{x'y'}\) is on the same side of \(x' y'\) as \(x\), \(x \in \partial C_{x'y'}\) (by Claim 1) and thus \(x\) is (strictly or weakly) above \(x'\) (by Claim 2). However, \(x \in u v\), so the only way for \(x\) to be strictly or weakly above \(x'\) is for \(x' \in u v\) to also be true. \(\square\)
             </div>
           </div>
+
+          <p>
+            ★ For illustrative purposes (unnecessary for logical proof but helpful to visualize for later), let us define a "downward curving" point as follows: \(h_2\) is a <strong>downward curving point</strong> if \(h_1 h_2\) and \(h_2 h_3\) are along upper edges, and the slope of \(h_1 h_2\) and the slope of \(h_2 h_3\) differ in sign.
+          </p>
+          <p>
+            Now, note that even in the case of downward curving, the "downward" constructed edge \(x_d y_d\) must still touch \(u v\) since otherwise, by similar reasoning to Claim 2, \(u v \subset C_{x_d y_d}\) and \(p\) is not visible from \(u v\).
+          </p>
 
           <!-- Illustration: two panels — wrong case (x_d y_d not touching uv) and correct case (both touch) -->
           <div class="illus-wrapper" role="img" aria-label="Two intersecting upper edges: wrong case vs correct case touching uv">
@@ -1010,24 +986,47 @@
           <h4 class="subsubsec-heading"><span class="sec-num">2.3.3</span> The algorithm</h4>
 
           <p>
-            Before stating the algorithm we need one more structural result:
+            Now that we have proven that every hole \(H\) touches at least two upper edges \(x y\) and \(x'y'\) with \(x, x' \in u v\), we can now tackle the main algorithm proposed by the paper <a href="#ref-Ashur_Filtser_Katz_2021">[6]</a>.
+          </p>
+
+          <p>
+            First, we show the following:
           </p>
 
           <div class="theorem-box theorem-claim">
-            <div class="theorem-label">Claim 6 <span class="star-marker">\((\star)\)</span> — Convex subregion guarding</div>
+            <div class="theorem-label">Claim 6 — ★ Convex subregion guarding</div>
             <div class="theorem-body">
-              Let \(S \subset P\) be a convex polygon subregion.  Then some vertex \(w \in V(P)\)
-              guards \(S\).
+              Let \(S\) be a simple convex polygon subregion of \(P\) (\(S \subset P\)). Then, there exists a vertex \(v\) of \(P\) that guards \(S\).
             </div>
             <div class="theorem-proof">
-              <em>Proof.</em> If \(S\) and \(P\) share a vertex we are done.  Otherwise, let \(y\)
-              be the closest point of \(\partial P\) to \(S\).  If \(y\) does not see all of \(S\),
-              there is a point \(y' \in \partial P\) between \(y\) and an un-seen point, and \(y'\)
-              is strictly closer to \(S\) than \(y\) — contradicting minimality.  Hence \(y\) sees
-              \(S\).  Sliding \(y\) along \(\partial P\) until the convex hull of \(S \cup \{y\}\)
-              hits a vertex \(w\) of \(P\) gives a vertex that also sees \(S\). \(\square\)
+              <em>Proof.</em> 
+              <p>
+                If \(S\) and \(P\) share a vertex, then that vertex guards \(S\). If not, we have the following reasoning.
+              </p>
+              <p>
+                First, we prove that there is a point \(y \in \partial P\) that guards \(S\):
+              </p>
+              <p class="theorem-offset">
+                Let \(y\) be the point on \(\partial P\) closest to \(S\). If \(y\) does not guard \(S\), then \(y \notin \partial S\) and there exists a point \(t \in S\) that is not visible from \(y\), i.e. there exists a point \(y' \in \partial P\) between \(y\) and \(t\).
+              </p>
+              <p class="theorem-offset">
+                However, it is easy to see that \(y'\) would be closer to \(S\) than \(y\): assume w.l.o.g. that the edge of \(S\) closest to \(y'\) is horizontal and that \(y'\) is above \(S\). Then, since \(t \in S\) and \(y'\) is above \(S\), \(y\) is above \(y'\). This means that \(y'\) must be closer to \(S\) than \(y\), a contradiction.
+              </p>
+              <p>
+                Then, we find a vertex guarding \(S\):
+              </p>
+              <p class="theorem-offset">
+                We can slide \(y\) along \(\partial P\) in any direction until the convex hull of \(S \cup y\) hits a vertex \(w\) of \(P\).
+              </p>
+              <p class="theorem-offset">
+                \(w\) is then either an endpoint reached by \(y\), or another vertex of \(P\) along the tangent of \(S\) to \(y\). Either way, it is easy to see that \(w\) guards \(S\). \(\square\)
+              </p>
             </div>
           </div>
+
+          <p>
+            Proving this gives us the ability to formulate the following algorithm:
+          </p>
 
           <!-- Algorithm pseudocode -->
           <div class="algo-box" id="algo-1">
@@ -1035,17 +1034,16 @@
             <div class="algo-body">
               <div class="algo-io">
                 <strong>Input:</strong> Polygon \(P\), vertex guard \(G\) guarding \(\partial P\).<br>
-                <strong>Output:</strong> \(G' \subseteq V\) such that \(G' \cup G\) guards \(P\).
+                <strong>Output:</strong> \(G' \subset V\) such that \(G' \cup G\) guards \(P\).
               </div>
               <ol>
                 <li>Compute all constructed edges \(E\) of \(G\).</li>
                 <li>For each upper edge \(xy \in E\) with \(x \in uv\):
                   <ol type="a">
                     <li>Find the <em>highest</em> intersection point \(p\) of \(xy\) with another
-                        constructed edge \(x'y' \in E\), \(x' \in uv\), where \(x'\) is on the
-                        same side of \(xy\) as \(C_{xy}\).</li>
+                        constructed edge \(x'y' \in E\), \(x' \in uv\) such that \(x'\) is on the same side of \(x y\) as \(C_{x y}\).</li>
                     <li>If \(p\) exists, find the vertex \(w\) of \(P\) that guards the triangle
-                        \(\triangle x p x' \subset P\) (via Claim 6) and add \(w\) to \(G'\).</li>
+                        \(\triangle x p x' \subset P\) (possible via Claim 6) and add it to \(G'\).</li>
                   </ol>
                 </li>
                 <li>Return \(G'\).</li>
@@ -1054,25 +1052,27 @@
           </div>
 
           <div class="theorem-box theorem-claim">
-            <div class="theorem-label">Claim 7 — Correctness of Algorithm <a href="#algo-1">1</a></div>
+            <div class="theorem-label">Claim 7</div>
             <div class="theorem-body">
-              Every hole \(H\) in \(P\) is contained in one of the triangles \(\triangle xpx'\)
-              identified by Algorithm 1.
+              The above algorithm is correct, i.e. any hole \(H\) in \(P\) is contained in one of the triangles covered by the algorithm.
             </div>
             <div class="theorem-proof">
-              <em>Proof.</em> By Claims 4 and 5, every hole \(H\) has two successive edges
-              \(h_1 h_2\) and \(h_2 h_3\) on upper edges \(x_{d-1}y_{d-1}\) and \(x_d y_d\) with
-              \(x_{d-1}, x_d \in uv\).  Let \(h_2\) be the topmost point of \(H\).  If the
-              algorithm finds intersection point \(p\) on \(x_{d-1}y_{d-1}\):
-              <ul>
-                <li>If \(p\) is above or equal to \(h_2\), then \(\triangle x_{d-1}p\,x_d\)
-                    contains \(H\). ✓</li>
-                <li>If \(p\) is below \(h_1\), then \(x_d y_d\) slopes in the same direction as
-                    \(x_{d-1}y_{d-1}\) with smaller absolute slope, contradicting \(h_2\) being
-                    the topmost point.</li>
-              </ul>
-              If no \(p\) is found on \(x_{d-1}y_{d-1}\), the same contradiction arises.
-              \(\square\)
+              <em>Proof.</em>
+              <p>
+                By Claims 4 and 5, we know that every hole \(H\) has two edges \(h_1 h_2\) and \(h_2 h_3\) touching two upper edges \(x_{d-1} y_{d-1}\) and \(x_d y_d\) with \(x_{d-1}, x_d \in u v\). Let these edges be the crossing point of the slope along \(H\), i.e. \(h_1 h_2\) is the edge of \(H\) with minimum absolute slope, or \((star)\)  \(h_2\) is the downward curving point. Note then that \(h_2\) is the topmost point of \(H\).
+              </p>
+              <p>
+                If the algorithm found an intersection point \(p\) on \(x_{d-1} y_{d-1}\), then either:
+              </p>
+              <p class="theorem-offset">
+                \(p\) is above (or equal to) \(h_2\), in which case \(triangle x_{d-1} p x_d\) definitely contains \(H\), or
+              </p>
+              <p class="theorem-offset">
+                \(p\) is below (or equal to) \(h_1\), in which case \(x_d y_d\) has the same slope direction as \(x_{d-1} y_{d-1}\) with smaller absolute slope (★ i.e. \(h_2\) is not the downward curving point), a contradiction.
+              </p>
+              <p>
+                If the algorithm did not find \(p\) on \(x_{d-1} y_{d-1}\), then since \(p\) is the highest intersection point, ★ \(h_2\) once again cannot be the downward curving point, a contradiction.
+              </p>
             </div>
           </div>
 
