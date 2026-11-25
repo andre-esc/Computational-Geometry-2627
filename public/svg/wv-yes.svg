@@ -1,0 +1,12 @@
+<svg viewBox="0 0 360 205" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .wv-polygon-shape { fill: #e8e4dc; stroke: #514d46; stroke-width: 3; stroke-linejoin: round; }
+    .wv-base-edge     { stroke: #27a65a; stroke-width: 6; stroke-linecap: round; fill: none; }
+    .wv-base-label    { fill: #26734d; font: 12px sans-serif; }
+  </style>
+  <title>Weakly visible W-shaped polygon</title>
+  <desc>A W-shaped polygon above a green base edge — every point sees the base edge.</desc>
+  <polygon points="24,174 336,174 298,35 235,115 180,35 121,115 63,35" class="wv-polygon-shape"/>
+  <line x1="24" y1="174" x2="336" y2="174" class="wv-base-edge"/>
+  <text x="24" y="195" class="wv-base-label">base edge uv</text>
+</svg>

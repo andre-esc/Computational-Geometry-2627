@@ -1,0 +1,16 @@
+<svg viewBox="0 0 360 205" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .wv-polygon-shape    { fill: #e8e4dc; stroke: #514d46; stroke-width: 3; stroke-linejoin: round; }
+    .wv-base-edge        { stroke: #27a65a; stroke-width: 6; stroke-linecap: round; fill: none; }
+    .wv-base-label       { fill: #26734d; font: 12px sans-serif; }
+    .wv-hidden-sightline { fill: none; stroke: #c94b46; stroke-width: 2; stroke-dasharray: 5 4; }
+    .wv-hidden-label     { fill: #a53d38; font: 11px sans-serif; }
+  </style>
+  <title>Bent corridor that is not weakly visible</title>
+  <desc>An L-shaped corridor with a short green base edge at its lower left; the far arm is hidden from the base.</desc>
+  <polygon points="24,174 92,174 92,112 324,112 324,50 24,50" class="wv-polygon-shape"/>
+  <line x1="24" y1="174" x2="92" y2="174" class="wv-base-edge"/>
+  <text x="24" y="195" class="wv-base-label">base edge uv</text>
+  <path d="M92 162 L178 112" class="wv-hidden-sightline"/>
+  <text x="178" y="100" class="wv-hidden-label">hidden region</text>
+</svg>

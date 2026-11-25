@@ -1,0 +1,22 @@
+<svg viewBox="0 0 500 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <line x1="40" y1="210" x2="460" y2="210" stroke="#8c7f70" stroke-width="2"/>
+  <text x="30"  y="226" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">u</text>
+  <text x="456" y="226" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">v</text>
+  <polyline points="40,210 110,120 200,55 310,80 390,130 460,210" stroke="#c8bfb0" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+  <polygon points="200,55 310,80 290,120 215,105" fill="rgba(192,101,42,0.14)"/>
+  <line x1="200" y1="55" x2="310" y2="80" stroke="#c0652a" stroke-width="2.2"/>
+  <circle cx="200" cy="55"  r="4.5" fill="#c0652a"/>
+  <circle cx="310" cy="80"  r="4.5" fill="#c0652a"/>
+  <text x="186" y="52"  text-anchor="end"   font-size="13" font-family="Georgia,serif" font-style="italic" fill="#c0652a">x</text>
+  <text x="326" y="77"  text-anchor="start" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#c0652a">y</text>
+  <circle cx="258" cy="82"  r="4.5" fill="#6b7ec0"/>
+  <text x="244" y="78"  text-anchor="end"   font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">z</text>
+  <circle cx="300" cy="210" r="4" fill="#8c7f70"/>
+  <text x="310" y="208" text-anchor="start" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#6b6050">z'</text>
+  <line x1="258" y1="82" x2="300" y2="210" stroke="#6b7ec0" stroke-width="1.6" stroke-dasharray="5 3"/>
+  <text x="258" y="96" text-anchor="middle" font-size="11.5" font-family="Georgia,serif" font-style="italic" fill="#c0652a">C&#x2093;&#x1D67;</text>
+  <line x1="22" y1="22" x2="50" y2="22" stroke="#c0652a" stroke-width="2.2"/>
+  <text x="57" y="26" font-size="11" font-family="sans-serif" fill="#5a5248">constructed edge xy (x ∉ uv)</text>
+  <line x1="22" y1="40" x2="50" y2="40" stroke="#6b7ec0" stroke-width="1.6" stroke-dasharray="5 3"/>
+  <text x="57" y="44" font-size="11" font-family="sans-serif" fill="#5a5248">sightline z → z' (crosses xy ⟹ z strictly above x)</text>
+</svg>

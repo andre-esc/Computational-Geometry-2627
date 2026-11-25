@@ -1,0 +1,27 @@
+<svg viewBox="0 0 500 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <line x1="30" y1="210" x2="470" y2="210" stroke="#8c7f70" stroke-width="2"/>
+  <text x="20"  y="226" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">u</text>
+  <text x="466" y="226" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b6050">v</text>
+  <polyline points="30,210 90,120 170,50 290,65 390,120 470,210" stroke="#c8bfb0" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+  <line x1="100" y1="210" x2="290" y2="65" stroke="#c0652a" stroke-width="2.2"/>
+  <line x1="250" y1="210" x2="120" y2="90" stroke="#2d8f7a" stroke-width="2.2"/>
+  <circle cx="182" cy="147" r="5" fill="#6b7ec0"/>
+  <text x="168" y="143" text-anchor="end" font-size="13" font-family="Georgia,serif" font-style="italic" fill="#6b7ec0">p</text>
+  <polygon points="100,210 182,147 250,210" fill="rgba(107,126,192,0.18)" stroke="#6b7ec0" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <ellipse cx="176" cy="183" rx="22" ry="12" fill="rgba(107,126,192,0.35)" stroke="#6b7ec0" stroke-width="1.2"/>
+  <text x="176" y="187" text-anchor="middle" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#5060a0">H</text>
+  <circle cx="100" cy="210" r="4.5" fill="#c0652a"/>
+  <circle cx="250" cy="210" r="4.5" fill="#2d8f7a"/>
+  <circle cx="290" cy="65"  r="4"   fill="#c0652a"/>
+  <circle cx="120" cy="90"  r="4"   fill="#2d8f7a"/>
+  <text x="86"  y="208" text-anchor="end"   font-size="12" font-family="Georgia,serif" font-style="italic" fill="#c0652a">x<tspan dy="2" font-size="9">d-1</tspan></text>
+  <text x="264" y="208" text-anchor="start" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">x<tspan dy="2" font-size="9">d</tspan></text>
+  <text x="296" y="62"  text-anchor="start" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#c0652a">y<tspan dy="2" font-size="9">d-1</tspan></text>
+  <text x="106" y="88"  text-anchor="start" font-size="12" font-family="Georgia,serif" font-style="italic" fill="#2d8f7a">y<tspan dy="2" font-size="9">d</tspan></text>
+  <line x1="310" y1="180" x2="338" y2="180" stroke="#c0652a" stroke-width="2.2"/>
+  <text x="345" y="184" font-size="10.5" font-family="sans-serif" fill="#5a5248">x<tspan dy="1" font-size="8">d-1</tspan>y<tspan dy="1" font-size="8">d-1</tspan></text>
+  <line x1="310" y1="196" x2="338" y2="196" stroke="#2d8f7a" stroke-width="2.2"/>
+  <text x="345" y="200" font-size="10.5" font-family="sans-serif" fill="#5a5248">x<tspan dy="1" font-size="8">d</tspan>y<tspan dy="1" font-size="8">d</tspan></text>
+  <rect x="310" y="208" width="28" height="12" rx="2" fill="rgba(107,126,192,0.18)" stroke="#6b7ec0" stroke-width="1" stroke-dasharray="3 2"/>
+  <text x="345" y="218" font-size="10.5" font-family="sans-serif" fill="#5a5248">△x<tspan dy="1" font-size="8">d-1</tspan>px<tspan dy="1" font-size="8">d</tspan> ⊇ H</text>
+</svg>
